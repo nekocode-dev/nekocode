@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Service | FlipFocus by NekoCode</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=DotGothic16&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-pink: #ff71ce;
+            --neon-blue: #01cdfe;
+            --neon-purple: #b967ff;
+            --neon-yellow: #fff700;
+            --bg-dark: #05040a;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            font-family: 'DotGothic16', sans-serif;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 0;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #05040a; }
+        ::-webkit-scrollbar-thumb { background: #333; border: 1px solid #555; }
+
+        .scanlines {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15),
+                rgba(0, 0, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        .glass-panel {
+            background: rgba(12, 12, 16, 0.95);
+            backdrop-filter: blur(4px);
+            border: 1px solid #333;
+        }
+
+        .neon-text { text-shadow: 2px 2px 0px var(--neon-purple); }
+
+        .section-title {
+            font-family: 'Press Start 2P', cursive;
+            color: var(--neon-blue);
+            font-size: 12px;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #333;
+        }
+
+        .content-text {
+            font-size: 14px;
+            line-height: 1.8;
+            color: #b0b0b0;
+        }
+
+        .content-text strong {
+            color: var(--neon-pink);
+        }
+
+        .content-text ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .content-text li {
+            padding: 6px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .content-text li::before {
+            content: '>';
+            position: absolute;
+            left: 0;
+            color: var(--neon-blue);
+            font-family: 'Press Start 2P', cursive;
+            font-size: 8px;
+        }
+
+        .back-btn {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            color: var(--neon-blue);
+            text-decoration: none;
+            border: 1px solid var(--neon-blue);
+            padding: 10px 20px;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: var(--neon-blue);
+            color: #000;
+        }
+
+        .hanko {
+            border: 2px solid #ff3333;
+            color: #ff3333;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'DotGothic16', sans-serif;
+            font-size: 10px;
+            transform: rotate(-15deg);
+            opacity: 0.8;
+        }
+
+        .highlight-box {
+            background: rgba(255, 113, 206, 0.1);
+            border-left: 3px solid var(--neon-pink);
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .warning-box {
+            background: rgba(255, 247, 0, 0.1);
+            border-left: 3px solid var(--neon-yellow);
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .may-list li::before {
+            content: '✓';
+            color: #50fa7b;
+        }
+
+        .may-not-list li::before {
+            content: '✗';
+            color: #ff5555;
+        }
+    </style>
+</head>
+<body>
+    <div class="scanlines"></div>
+
+    <div class="container mx-auto px-4 py-10 max-w-4xl relative z-10">
+        
+        <!-- Header -->
+        <header class="mb-10">
+            <a href="../index.html" class="back-btn inline-block mb-8">← BACK TO PORTFOLIO</a>
+            <div class="glass-panel p-6">
+                <div class="flex items-center gap-4 mb-4">
+                    <span class="text-3xl">📜</span>
+                    <div>
+                        <h1 class="text-2xl font-bold text-white neon-text" style="font-family: 'Press Start 2P', cursive;">TERMS OF SERVICE</h1>
+                        <p class="text-xs text-gray-500 mt-2">FlipFocus by NekoCode</p>
+                    </div>
+                </div>
+                <p class="text-xs text-blue-400 font-mono">> LAST_UPDATED: JANUARY 2025</p>
+            </div>
+        </header>
+
+        <!-- Content -->
+        <main class="glass-panel p-8">
+            
+            <!-- Agreement -->
+            <section class="mb-10">
+                <h2 class="section-title">// AGREEMENT TO TERMS</h2>
+                <div class="content-text">
+                    <p>By downloading, installing, or using FlipFocus ("the App"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, please do not use the App.</p>
+                </div>
+            </section>
+
+            <!-- Description -->
+            <section class="mb-10">
+                <h2 class="section-title">// DESCRIPTION OF SERVICE</h2>
+                <div class="content-text">
+                    <p class="mb-4">FlipFocus is an offline-first flashcard application designed to help users study and learn through spaced repetition algorithms. The App includes features such as:</p>
+                    <ul>
+                        <li>Creating and managing flashcard decks (stored locally)</li>
+                        <li>Spaced repetition learning system (processed on-device)</li>
+                        <li>Progress tracking and analytics (stored locally)</li>
+                        <li>Game modes for interactive learning</li>
+                        <li>Media support (images, audio, text-to-speech)</li>
+                        <li>Local backup and restore functionality</li>
+                        <li>Optional Google account integration for backup ownership</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- User Accounts -->
+            <section class="mb-10">
+                <h2 class="section-title">// USER ACCOUNTS AND DATA</h2>
+                <div class="content-text">
+                    <p class="mb-4"><strong>No Account Required:</strong></p>
+                    <ul>
+                        <li>FlipFocus works completely offline without any account</li>
+                        <li>All features are available without registration</li>
+                        <li>Optional Google account connection only for backup ownership identification</li>
+                    </ul>
+                    
+                    <p class="mb-4 mt-6"><strong>User Content Ownership:</strong></p>
+                    <ul>
+                        <li>You retain complete ownership of all content you create (flashcards, media, etc.)</li>
+                        <li>Your content stays on your device - we never access or store it on our servers</li>
+                        <li>You are responsible for ensuring your content doesn't violate any laws or rights</li>
+                        <li>You can export your data anytime using the backup feature</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Acceptable Use -->
+            <section class="mb-10">
+                <h2 class="section-title">// ACCEPTABLE USE</h2>
+                <div class="content-text">
+                    <div class="highlight-box">
+                        <p class="mb-4"><strong>You MAY:</strong></p>
+                        <ul class="may-list">
+                            <li>Use the App for personal or educational purposes</li>
+                            <li>Create and share flashcard decks (following content guidelines)</li>
+                            <li>Export your data at any time</li>
+                            <li>Provide feedback and suggestions</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="warning-box">
+                        <p class="mb-4"><strong>You MAY NOT:</strong></p>
+                        <ul class="may-not-list">
+                            <li>Use the App for illegal or harmful activities</li>
+                            <li>Upload copyrighted content without permission</li>
+                            <li>Attempt to hack, disrupt, or damage the App</li>
+                            <li>Create content that is offensive, harmful, or violates others' rights</li>
+                            <li>Use the App to spam or harass others</li>
+                            <li>Reverse engineer or attempt to extract source code</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Intellectual Property -->
+            <section class="mb-10">
+                <h2 class="section-title">// INTELLECTUAL PROPERTY</h2>
+                <div class="content-text">
+                    <p class="mb-4"><strong>Your Rights:</strong></p>
+                    <ul>
+                        <li>You own all flashcard content you create</li>
+                        <li>You can export and use your data outside the App</li>
+                        <li>You retain rights to any media you upload</li>
+                    </ul>
+                    
+                    <p class="mb-4 mt-6"><strong>Our Rights:</strong></p>
+                    <ul>
+                        <li>FlipFocus name, logo, and App design are our property</li>
+                        <li>We own the software, algorithms, and App functionality</li>
+                        <li>Pre-installed content and templates are our property</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Premium Features -->
+            <section class="mb-10">
+                <h2 class="section-title">// PREMIUM FEATURES AND SUBSCRIPTIONS</h2>
+                <div class="content-text">
+                    <p class="mb-4"><strong>Premium Services:</strong></p>
+                    <ul>
+                        <li>Advanced game modes and study features</li>
+                        <li>Enhanced TTS (Text-to-Speech) functionality</li>
+                        <li>Advanced analytics and insights (processed locally)</li>
+                        <li>Priority support</li>
+                        <li>Additional customization options</li>
+                    </ul>
+                    
+                    <p class="mb-4 mt-6"><strong>Billing and Cancellation:</strong></p>
+                    <ul>
+                        <li>Subscriptions are billed through your app store account</li>
+                        <li>You can cancel anytime through your app store settings</li>
+                        <li>Refunds are handled according to app store policies</li>
+                        <li>Premium features remain active until subscription expires</li>
+                        <li>All premium features work offline - no ongoing data connection required</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Privacy -->
+            <section class="mb-10">
+                <h2 class="section-title">// PRIVACY AND DATA PROTECTION</h2>
+                <div class="content-text">
+                    <ul>
+                        <li>Your privacy is governed by our <a href="privacy.html" class="text-pink-400 hover:text-pink-300">Privacy Policy</a></li>
+                        <li>All data stays on your device - we implement local security measures</li>
+                        <li>You control all your data - no external sharing or storage</li>
+                        <li>No data deletion requests needed - simply uninstall the app or reset in settings</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Disclaimers -->
+            <section class="mb-10">
+                <h2 class="section-title">// DISCLAIMERS AND LIMITATIONS</h2>
+                <div class="content-text">
+                    <p class="mb-4"><strong>Educational Use:</strong></p>
+                    <ul>
+                        <li>FlipFocus is a study tool, not a guarantee of learning outcomes</li>
+                        <li>We are not responsible for academic or professional results</li>
+                        <li>Users should verify information accuracy in their flashcards</li>
+                    </ul>
+                    
+                    <p class="mb-4 mt-6"><strong>Service Availability:</strong></p>
+                    <ul>
+                        <li>We strive for 99.9% uptime but cannot guarantee uninterrupted service</li>
+                        <li>We may perform maintenance that temporarily affects availability</li>
+                        <li>We are not liable for data loss due to technical issues</li>
+                    </ul>
+                    
+                    <p class="mb-4 mt-6"><strong>Limitation of Liability:</strong></p>
+                    <ul>
+                        <li>Our liability is limited to the amount you paid for the service</li>
+                        <li>We are not responsible for indirect or consequential damages</li>
+                        <li>Some jurisdictions may not allow these limitations</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Termination -->
+            <section class="mb-10">
+                <h2 class="section-title">// TERMINATION</h2>
+                <div class="content-text">
+                    <p class="mb-4"><strong>By You:</strong></p>
+                    <ul>
+                        <li>You may stop using the App at any time</li>
+                        <li>You can request account deletion through the App settings</li>
+                        <li>Your data will be deleted according to our Privacy Policy</li>
+                    </ul>
+                    
+                    <p class="mb-4 mt-6"><strong>By Us:</strong></p>
+                    <ul>
+                        <li>We may terminate accounts for violations of these Terms</li>
+                        <li>We will provide reasonable notice when possible</li>
+                        <li>You will receive instructions for data export when feasible</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Changes -->
+            <section class="mb-10">
+                <h2 class="section-title">// CHANGES TO TERMS</h2>
+                <div class="content-text">
+                    <p class="mb-4">We may update these Terms periodically. We will:</p>
+                    <ul>
+                        <li>Notify users of significant changes through the App</li>
+                        <li>Post updated Terms with a new "Last Updated" date</li>
+                        <li>Continue previous Terms for existing users for 30 days</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Third-Party -->
+            <section class="mb-10">
+                <h2 class="section-title">// THIRD-PARTY SERVICES</h2>
+                <div class="content-text">
+                    <p class="mb-4">The App may integrate with:</p>
+                    <ul>
+                        <li>Cloud storage providers</li>
+                        <li>Payment processors</li>
+                        <li>Text-to-speech engines</li>
+                    </ul>
+                    <p class="mt-4 text-gray-500">These services have their own terms and privacy policies.</p>
+                </div>
+            </section>
+
+            <!-- Contact -->
+            <section class="mb-10">
+                <h2 class="section-title">// CONTACT INFORMATION</h2>
+                <div class="content-text">
+                    <p class="mb-4">For questions about these Terms:</p>
+                    <ul>
+                        <li><strong>Email:</strong> nekocode.dev@gmail.com</li>
+                        <li><strong>In-App:</strong> Use the feedback feature for quick responses</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Footer Note -->
+            <div class="border-t border-gray-800 pt-6 mt-10">
+                <p class="content-text text-center text-sm text-gray-500">
+                    Thank you for using FlipFocus! These Terms are designed to protect both you and us while ensuring a great learning experience.
+                </p>
+            </div>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="text-center py-10 text-[10px] text-gray-600 flex flex-col items-center gap-3">
+            <div class="hanko">猫</div>
+            <p>MADE WITH <span class="text-pink-600">♥</span> BY NEKOCODE</p>
+            <p class="font-mono text-[8px] opacity-50">© 2024 NEKOCODE // TERMS_ACCEPTED</p>
+            <div class="flex gap-4 mt-4">
+                <a href="index.html" class="text-gray-500 hover:text-blue-400 transition-colors">FlipFocus</a>
+                <span class="text-gray-700">|</span>
+                <a href="privacy.html" class="text-gray-500 hover:text-blue-400 transition-colors">Privacy Policy</a>
+                <span class="text-gray-700">|</span>
+                <a href="../index.html" class="text-gray-500 hover:text-blue-400 transition-colors">Portfolio</a>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

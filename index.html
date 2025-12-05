@@ -1,0 +1,1801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NekoCode | Flutter Developer & App Creator</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="NekoCode - Flutter developer specializing in mobile apps, flashcard systems, and creative software. Creator of FlipFocus, a smart spaced-repetition learning app.">
+    <meta name="keywords" content="Flutter developer, mobile app developer, FlipFocus, spaced repetition, flashcard app, NekoCode, indie developer">
+    <meta name="author" content="NekoCode">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="NekoCode | Flutter Developer & App Creator">
+    <meta property="og:description" content="Flutter developer specializing in mobile apps and creative software. Creator of FlipFocus.">
+    <meta property="og:url" content="https://nekocode.dev">
+    <meta property="og:site_name" content="NekoCode">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="NekoCode | Flutter Developer">
+    <meta name="twitter:description" content="Flutter developer specializing in mobile apps. Creator of FlipFocus.">
+    
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#05040a">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=DotGothic16&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-pink: #ff71ce;
+            --neon-blue: #01cdfe;
+            --neon-purple: #b967ff;
+            --neon-yellow: #fff700;
+            --bg-dark: #05040a;
+        }
+
+        /* Smooth Scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Reduced Motion Support */
+        @media (prefers-reduced-motion: reduce) {
+            html {
+                scroll-behavior: auto;
+            }
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            .cursor-glow, .cursor-trail {
+                display: none !important;
+            }
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            font-family: 'Press Start 2P', cursive;
+            color: white;
+            overflow-x: hidden;
+            cursor: none; /* Hide default cursor for custom cursor */
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* Custom Cursor */
+        .cursor-glow {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--neon-pink), transparent 70%);
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            mix-blend-mode: screen;
+            transition: width 0.2s, height 0.2s, opacity 0.2s;
+        }
+        
+        .cursor-glow.hover {
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle, var(--neon-blue), transparent 70%);
+        }
+        
+        .cursor-trail {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--neon-purple);
+            pointer-events: none;
+            z-index: 9998;
+            opacity: 0.6;
+            transform: translate(-50%, -50%);
+            transition: opacity 0.3s;
+        }
+        
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-dark);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s, visibility 0.5s;
+        }
+        
+        .loading-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .loading-text {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 14px;
+            color: var(--neon-pink);
+            margin-top: 20px;
+            animation: pulse 1s infinite;
+        }
+        
+        .loading-bar {
+            width: 200px;
+            height: 4px;
+            background: #222;
+            border: 1px solid #444;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+        
+        .loading-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--neon-pink), var(--neon-purple), var(--neon-blue));
+            animation: loading 1.5s ease-in-out forwards;
+        }
+        
+        @keyframes loading {
+            0% { width: 0%; }
+            50% { width: 70%; }
+            100% { width: 100%; }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        /* Scroll-triggered animations */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Text reveal animation */
+        .text-reveal {
+            overflow: hidden;
+        }
+        
+        .text-reveal span {
+            display: inline-block;
+            transform: translateY(100%);
+            animation: textReveal 0.8s ease-out forwards;
+        }
+        
+        @keyframes textReveal {
+            to { transform: translateY(0); }
+        }
+        
+        /* Glitch effect for headings */
+        .glitch-text {
+            position: relative;
+        }
+        
+        .glitch-text::before,
+        .glitch-text::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+        }
+        
+        .glitch-text:hover::before {
+            animation: glitch1 0.3s infinite;
+            color: var(--neon-blue);
+            opacity: 0.8;
+            left: 2px;
+        }
+        
+        .glitch-text:hover::after {
+            animation: glitch2 0.3s infinite;
+            color: var(--neon-pink);
+            opacity: 0.8;
+            left: -2px;
+        }
+        
+        @keyframes glitch1 {
+            0%, 100% { clip-path: inset(0 0 90% 0); }
+            25% { clip-path: inset(20% 0 60% 0); }
+            50% { clip-path: inset(50% 0 30% 0); }
+            75% { clip-path: inset(70% 0 10% 0); }
+        }
+        
+        @keyframes glitch2 {
+            0%, 100% { clip-path: inset(90% 0 0 0); }
+            25% { clip-path: inset(60% 0 20% 0); }
+            50% { clip-path: inset(30% 0 50% 0); }
+            75% { clip-path: inset(10% 0 70% 0); }
+        }
+        
+        /* 3D Tilt effect for cards */
+        .tilt-card {
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease-out;
+        }
+        
+        .tilt-card-inner {
+            transform: translateZ(20px);
+        }
+        
+        /* Performance mode toggle */
+        .perf-toggle {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 100;
+            background: rgba(0,0,0,0.8);
+            border: 1px solid #444;
+            padding: 8px 12px;
+            font-size: 8px;
+            color: #888;
+            cursor: pointer;
+            font-family: 'DotGothic16', sans-serif;
+            transition: all 0.3s;
+        }
+        
+        .perf-toggle:hover {
+            border-color: var(--neon-pink);
+            color: var(--neon-pink);
+        }
+        
+        .perf-toggle.active {
+            border-color: var(--neon-blue);
+            color: var(--neon-blue);
+        }
+        
+        /* Low performance mode */
+        body.low-perf .cursor-glow,
+        body.low-perf .cursor-trail,
+        body.low-perf #bg-canvas,
+        body.low-perf .scanlines {
+            display: none !important;
+        }
+        
+        body.low-perf {
+            cursor: crosshair;
+            background: linear-gradient(180deg, #020105 0%, #251640 100%);
+        }
+        
+        /* Keyboard navigation focus styles */
+        body.keyboard-nav *:focus {
+            outline: 2px solid var(--neon-blue) !important;
+            outline-offset: 3px;
+        }
+        
+        /* Focus visible for accessibility */
+        a:focus-visible, button:focus-visible {
+            outline: 2px solid var(--neon-pink);
+            outline-offset: 2px;
+        }
+        
+        /* Skip to content link for accessibility */
+        .skip-link {
+            position: absolute;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--neon-pink);
+            color: #000;
+            padding: 10px 20px;
+            z-index: 10001;
+            font-size: 12px;
+            transition: top 0.3s;
+        }
+        
+        .skip-link:focus {
+            top: 10px;
+        }
+        
+        /* Mobile cursor fix */
+        @media (hover: none) and (pointer: coarse) {
+            body {
+                cursor: auto !important;
+            }
+            .cursor-glow, .cursor-trail {
+                display: none !important;
+            }
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #05040a; }
+        ::-webkit-scrollbar-thumb { background: #333; border: 1px solid #555; }
+
+        .scanlines {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15),
+                rgba(0, 0, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 50;
+        }
+        
+        .vignette {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, transparent 60%, rgba(0,0,0,0.9) 100%);
+            pointer-events: none;
+            z-index: 49;
+        }
+
+        #bg-canvas, #neko-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+        }
+        #bg-canvas { z-index: -1; }
+        #neko-canvas { z-index: 40; pointer-events: none; }
+
+        /* UI Design - Tech HUD Style */
+        .glass-panel {
+            background: rgba(12, 12, 16, 0.9);
+            backdrop-filter: blur(4px);
+            border: 1px solid #444;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        /* Decorative HUD Corners */
+        .glass-panel::before, .glass-panel::after {
+            content: ''; position: absolute; width: 8px; height: 8px;
+            border: 2px solid transparent; transition: all 0.3s;
+        }
+        .glass-panel::before { top: -1px; left: -1px; border-top-color: #666; border-left-color: #666; }
+        .glass-panel::after { bottom: -1px; right: -1px; border-bottom-color: #666; border-right-color: #666; }
+        
+        .glass-panel:hover::before { border-top-color: var(--neon-pink); border-left-color: var(--neon-pink); width: 100%; height: 100%; }
+        .glass-panel:hover::after { border-bottom-color: var(--neon-blue); border-right-color: var(--neon-blue); width: 100%; height: 100%; }
+
+        .neon-text { text-shadow: 2px 2px 0px var(--neon-purple); }
+        
+        .btn-retro {
+            position: relative;
+            border: none;
+            outline: none;
+            cursor: none;
+            transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            top: 0;
+            text-transform: uppercase;
+            z-index: 20;
+            display: inline-block;
+            text-decoration: none;
+        }
+        .btn-retro:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 5px 20px rgba(255, 113, 206, 0.4);
+        }
+        .btn-retro:active { top: 2px; transform: translateY(0); }
+        .btn-disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(100%); pointer-events: none; }
+        
+        /* Magnetic button effect */
+        .magnetic-btn {
+            transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        /* Japanese Vertical Text Sidebar */
+        .sidebar-text {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            writing-mode: vertical-rl;
+            text-orientation: upright;
+            font-family: 'DotGothic16', sans-serif;
+            letter-spacing: 0.5em;
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 14px;
+            z-index: 45;
+            pointer-events: none;
+            border-right: 1px solid rgba(255,255,255,0.1);
+            padding-right: 10px;
+        }
+        
+        /* Hanko Stamp */
+        .hanko {
+            border: 2px solid #ff3333;
+            color: #ff3333;
+            border-radius: 50%; /* Circle stamp */
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'DotGothic16', sans-serif;
+            font-size: 10px;
+            transform: rotate(-15deg);
+            opacity: 0.8;
+        }
+
+        /* Card Glows */
+        .glow-pink:hover { box-shadow: 0 0 15px rgba(255, 113, 206, 0.3); }
+        .glow-gray:hover { box-shadow: 0 0 15px rgba(100, 100, 100, 0.2); }
+    </style>
+</head>
+<body>
+    <!-- Skip to content link for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loading-screen">
+        <div class="loading-text">INITIALIZING...</div>
+        <div class="loading-bar">
+            <div class="loading-bar-fill"></div>
+        </div>
+    </div>
+
+    <!-- Custom Cursor -->
+    <div class="cursor-glow" id="cursor-glow"></div>
+    <div class="cursor-trail" id="cursor-trail-1"></div>
+    <div class="cursor-trail" id="cursor-trail-2"></div>
+    <div class="cursor-trail" id="cursor-trail-3"></div>
+
+    <div class="scanlines"></div>
+    <div class="vignette"></div>
+    
+    <div class="sidebar-text">
+        システム稼働中
+        ネココード
+        東京・サイバー
+    </div>
+
+    <canvas id="bg-canvas"></canvas>
+    <canvas id="neko-canvas"></canvas>
+
+    <!-- Performance Toggle -->
+    <button class="perf-toggle" id="perf-toggle" title="Toggle performance mode">
+        ⚡ PERF MODE
+    </button>
+
+    <div id="main-content" class="relative z-10 container mx-auto px-4 py-10 max-w-5xl">
+        
+        <header class="text-center mb-32 pt-20 animate-on-scroll">
+            <div class="inline-block p-8 glass-panel tilt-card" id="header-card">
+                <h1 class="text-3xl md:text-5xl font-bold mb-4 text-white neon-text tracking-widest glitch-text" data-text="NEKOCODE">NEKOCODE</h1>
+                <div class="h-1 bg-gradient-to-r from-pink-500 to-purple-500 w-full animate-pulse mb-4"></div>
+                <p class="text-pink-300 text-xs md:text-sm font-mono">> PROJECT_FLIP_FOCUS_INIT</p>
+                <p class="text-gray-500 text-[10px] mt-3 tracking-[0.2em]">FLUTTER DEVELOPER // PIXEL ARTIST</p>
+            </div>
+        </header>
+
+        <section class="mb-32 flex justify-center animate-on-scroll">
+            <div class="glass-panel p-8 max-w-2xl w-full relative overflow-hidden tilt-card">
+                <div class="absolute top-0 right-0 p-2 text-[8px] text-gray-600 font-mono">SYS.ID: 0992</div>
+                
+                <div class="flex items-center gap-4 mb-6 border-b border-gray-800 pb-4">
+                    <div class="flex gap-2">
+                        <div class="w-2 h-2 rounded-full bg-red-500/80"></div>
+                        <div class="w-2 h-2 rounded-full bg-yellow-500/80"></div>
+                        <div class="w-2 h-2 rounded-full bg-green-500/80"></div>
+                    </div>
+                    <span class="text-xs text-gray-500 ml-auto font-mono">dev@nekocode:~/portfolio</span>
+                </div>
+                <p class="leading-8 text-gray-300 text-xs md:text-sm font-mono">
+                    <span class="text-pink-400">const</span> <span class="text-yellow-300">profile</span> = {<br>
+                    &nbsp;&nbsp;alias: <span class="text-green-400">"NekoCode"</span>,<br>
+                    &nbsp;&nbsp;focus: <span class="text-green-400">"Flutter & Flashcards"</span>,<br>
+                    &nbsp;&nbsp;status: <span class="text-green-400">"Building FlipFocus..."</span>,<br>
+                    &nbsp;&nbsp;location: <span class="text-green-400">"Virtual Tokyo"</span><br>
+                    };
+                </p>
+            </div>
+        </section>
+
+        <section id="projects" class="mb-20 animate-on-scroll">
+            <div class="flex items-center mb-10">
+                <div class="h-[1px] bg-gray-800 flex-grow"></div>
+                <div class="mx-6 text-center">
+                    <h2 class="text-xl text-pink-400 text-shadow-sm mb-1">APPS & CONCEPTS</h2>
+                    <p class="text-[8px] text-gray-600 tracking-widest">アプリケーション</p>
+                </div>
+                <div class="h-[1px] bg-gray-800 flex-grow"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                
+                <!-- FlipFocus - LIVE -->
+                <div class="glass-panel p-6 group glow-pink relative flex flex-col tilt-card">
+                    <div class="absolute top-3 right-3 z-10">
+                        <span class="bg-green-900/50 text-green-400 border border-green-700 text-[8px] px-2 py-1">LIVE</span>
+                    </div>
+                    <div class="h-32 bg-gray-900 mb-4 border border-gray-800 flex items-center justify-center overflow-hidden relative group-hover:border-pink-500 transition-colors">
+                        <img src="flipfocus/icon.png" alt="FlipFocus" class="w-20 h-20 rounded-[22%] group-hover:scale-110 transition-transform">
+                    </div>
+                    <h3 class="text-white mb-2 text-sm font-bold">FlipFocus</h3>
+                    <p class="text-[9px] text-gray-500 mb-3 font-mono">FLASHCARD_SYSTEM // FSRS-5</p>
+                    <p class="text-[10px] text-gray-300 mb-auto leading-relaxed">
+                        Smart flashcards with spaced repetition, gamification & OCR scanning.
+                    </p>
+                    <div class="flex justify-center mt-4">
+                        <a href="flipfocus/index.html" class="btn-retro magnetic-btn bg-pink-700 hover:bg-pink-600 text-white text-[10px] py-3 px-8 border border-pink-500 text-center block">VIEW WEBSITE</a>
+                    </div>
+                </div>
+
+                <!-- Project Metro - CONCEPT -->
+                <div class="glass-panel p-6 group glow-gray opacity-80 relative flex flex-col tilt-card">
+                    <div class="absolute top-3 right-3 z-10">
+                        <span class="bg-gray-800 text-gray-400 border border-gray-600 text-[8px] px-2 py-1">CONCEPT</span>
+                    </div>
+                    <div class="h-32 bg-gray-900 mb-4 border border-gray-800 flex items-center justify-center overflow-hidden group-hover:border-gray-600 transition-colors">
+                        <span class="text-4xl grayscale opacity-50">🚇</span>
+                    </div>
+                    <h3 class="text-gray-300 mb-2 text-sm font-bold">Project: Metro</h3>
+                    <p class="text-[9px] text-gray-600 mb-3 font-mono">NAVIGATION_TOOL</p>
+                    <p class="text-[10px] text-gray-500 mb-auto leading-relaxed">
+                        [DATA REDACTED] Japanese transit navigation system logic.
+                    </p>
+                    <div class="flex gap-2 mt-4">
+                        <button class="btn-retro btn-disabled flex-1 bg-transparent text-gray-600 text-[10px] py-3 border border-gray-800 cursor-not-allowed">WAITING...</button>
+                    </div>
+                </div>
+
+                <!-- Project Widget - PLANNING -->
+                <div class="glass-panel p-6 group glow-gray opacity-80 relative flex flex-col tilt-card">
+                    <div class="absolute top-3 right-3 z-10">
+                        <span class="bg-gray-800 text-gray-400 border border-gray-600 text-[8px] px-2 py-1">PLANNING</span>
+                    </div>
+                    <div class="h-32 bg-gray-900 mb-4 border border-gray-800 flex items-center justify-center overflow-hidden group-hover:border-gray-600 transition-colors">
+                        <span class="text-4xl grayscale opacity-50">📟</span>
+                    </div>
+                    <h3 class="text-gray-300 mb-2 text-sm font-bold">Project: Widget</h3>
+                    <p class="text-[9px] text-gray-600 mb-3 font-mono">HOME_SCREEN_PET</p>
+                    <p class="text-[10px] text-gray-500 mb-auto leading-relaxed">
+                        Drafting phase for a Flutter-based interactive home screen companion.
+                    </p>
+                    <div class="flex gap-2 mt-4">
+                        <button class="btn-retro btn-disabled flex-1 bg-transparent text-gray-600 text-[10px] py-3 border border-gray-800 cursor-not-allowed">WAITING...</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="text-center py-10 text-[10px] text-gray-600 flex flex-col items-center gap-3">
+            <div class="hanko">猫</div>
+            <p>MADE WITH <span class="text-pink-600">♥</span> IN TOKYO (VIRTUALLY)</p>
+            <p class="font-mono text-[8px] opacity-50">© 2024 NEKOCODE // SYSTEM_READY</p>
+            <div class="flex gap-4 mt-4">
+                <a href="flipfocus/privacy.html" class="text-gray-500 hover:text-pink-400 transition-colors">Privacy Policy</a>
+                <span class="text-gray-700">|</span>
+                <a href="flipfocus/terms.html" class="text-gray-500 hover:text-pink-400 transition-colors">Terms of Service</a>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        const bgCanvas = document.getElementById('bg-canvas');
+        const bgCtx = bgCanvas.getContext('2d', { alpha: false });
+        const nekoCanvas = document.getElementById('neko-canvas');
+        const nekoCtx = nekoCanvas.getContext('2d');
+
+        let width, height;
+        let frameCount = 0;
+        let mouseX = 0;
+        let mouseY = 0;
+
+        // Weather System
+        let weather = {
+            type: 'SAKURA', 
+            timer: 0,
+            particles: [],
+            lightning: 0, 
+            bolts: [],
+            skyLerp: 0, 
+            targetSkyLerp: 0
+        };
+
+        document.addEventListener('mousemove', e => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        function resize() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            bgCanvas.width = width;
+            bgCanvas.height = height;
+            nekoCanvas.width = width;
+            nekoCanvas.height = height;
+            initScenery();
+        }
+        window.addEventListener('resize', resize);
+
+        /* ------------------------------------------------------------
+           SYSTEM 1: PROCEDURAL TOKYO (Background)
+        ------------------------------------------------------------ */
+        let scenery = {
+            buildings: [], backBuildings: [], utilityPoles: [], 
+            train: { x: -1000, y: 0, active: false, speed: 8, waitTimer: 200 },
+            highwayCars: [], stars: [], yokai: [], stalls: [], clouds: []
+        };
+
+        // CLOUD & LIGHTNING GENERATORS (Kept same as original for optimization)
+        function generatePixelCloudShape() {
+            const shape = [];
+            const w = 15 + Math.floor(Math.random() * 20); 
+            const h = 6 + Math.floor(Math.random() * 8);
+            for(let y=0; y<h; y++) {
+                for(let x=0; x<w; x++) {
+                    let distToCenter = Math.sqrt(Math.pow(x - w/2, 2) + Math.pow(y - h/2, 2));
+                    if(Math.random() < 0.7 - (distToCenter / (w/1.3))) {
+                        let type = 'base';
+                        if (y > h * 0.7) type = 'shadow';
+                        else if (y < h * 0.2 && x > w * 0.2 && x < w * 0.8) type = 'light';
+                        shape.push({x: x*8, y: y*8, type: type});
+                    }
+                }
+            }
+            return shape;
+        }
+
+        function spawnLightning() {
+            let startX = Math.random() * width;
+            let segments = [{x: startX, y: -50}];
+            let currX = startX; let currY = -50;
+            while(currY < height) {
+                currY += 10 + Math.random() * 20; currX += (Math.random() - 0.5) * 50; 
+                segments.push({x: currX, y: currY});
+            }
+            weather.bolts.push({ segments: segments, life: 10 });
+            weather.lightning = 0.6; 
+        }
+
+        function lerp(start, end, t) { return start * (1 - t) + end * t; }
+
+        function changeWeather() {
+            const types = ['SAKURA', 'RAIN', 'STORM', 'CLEAR'];
+            weather.type = types[Math.floor(Math.random() * types.length)];
+            weather.targetSkyLerp = (weather.type === 'STORM') ? 1.0 : 0.0;
+            weather.bolts = [];
+            
+            let targetCloudColor = (weather.type === 'STORM') ? [40, 40, 60] : [240, 240, 255];
+            let desiredCount = (weather.type === 'STORM') ? 20 : 12;
+            
+            while (scenery.clouds.length < desiredCount) {
+                 scenery.clouds.push({
+                    x: -300 - Math.random() * 500, y: Math.random() * (height/2),
+                    speed: (0.2 + Math.random() * 0.3), currentSpeed: (0.2 + Math.random() * 0.3),
+                    layer: Math.floor(Math.random() * 3), pixels: generatePixelCloudShape(),
+                    baseColor: [...targetCloudColor], targetColor: [...targetCloudColor],
+                    isHeavy: weather.type === 'STORM' && Math.random() > 0.5
+                });
+            }
+            scenery.clouds.forEach(c => { c.targetColor = [...targetCloudColor]; c.speed = (0.2 + Math.random() * 0.3) * ((weather.type === 'STORM') ? 2.5 : 1.0); });
+        }
+
+        function initScenery() {
+            scenery.buildings = []; scenery.backBuildings = []; scenery.utilityPoles = [];
+            scenery.stars = []; scenery.highwayCars = []; scenery.yokai = []; scenery.stalls = []; scenery.clouds = [];
+
+            // Init clouds
+            for(let i=0; i<12; i++) {
+                scenery.clouds.push({
+                    x: Math.random() * width, y: Math.random() * (height/2),
+                    speed: 0.2 + Math.random() * 0.3, currentSpeed: 0.2 + Math.random() * 0.3,
+                    layer: Math.floor(Math.random() * 3), pixels: generatePixelCloudShape(),
+                    baseColor: [240, 240, 255], targetColor: [240, 240, 255], isHeavy: false
+                });
+            }
+            changeWeather();
+
+            const signOptions = ["NEKO", "CODE", "FLUTTER", "FOCUS", "FLIP", "居酒屋", "ラーメン", "焼き鳥", "BAR", "TECH", "DATA"];
+            for(let i=0; i<50; i++) scenery.stars.push({x: Math.random()*width, y: Math.random()*(height/2), s: Math.random()*2});
+            for(let i=0; i<15; i++) scenery.highwayCars.push({ x: Math.random() * width, speed: 4 + Math.random() * 3, type: Math.random() > 0.5 ? 'head' : 'tail' });
+
+            // Background Buildings
+            let cx = 0;
+            while(cx < width) {
+                let w = 50 + Math.random() * 60; let h = 200 + Math.random() * 250;
+                scenery.backBuildings.push({x: cx, w: w, h: h}); cx += w - 1;
+            }
+
+            // Foreground Buildings & Stalls
+            cx = -50; 
+            while(cx < width + 50) {
+                let w = 100 + Math.random() * 120;
+                let h = 150 + Math.random() * 200;
+                let type = Math.floor(Math.random() * 3);
+                let neon = Math.random() > 0.5 ? '#ff71ce' : '#01cdfe';
+                if(Math.random() > 0.8) neon = '#b967ff';
+
+                // ROOFTOP GENERATION LOGIC
+                let roofProps = { type: 'none', variant: 0 };
+                const rRand = Math.random();
+                if (rRand > 0.85) roofProps.type = 'tank'; // Water tank
+                else if (rRand > 0.7) roofProps.type = 'fence'; // Steel Railing
+                else if (rRand > 0.55) roofProps.type = 'antenna'; // Satellite/Antenna
+                else if (rRand > 0.95) roofProps.type = 'shrine'; // Rare Shrine
+
+                let hasStall = false;
+                if (Math.random() > 0.6 && w > 80) {
+                    hasStall = true;
+                    const stallTypes = [
+                        {type: 'takoyaki', name: 'たこ焼き', color: '#d43f3f'},
+                        {type: 'ramen', name: 'ラーメン', color: '#e67e22'},
+                        {type: 'yakisoba', name: '焼きそば', color: '#d4a574'},
+                        {type: 'okonomiyaki', name: 'お好み焼き', color: '#c0392b'},
+                        {type: 'drinks', name: '飲み物', color: '#3498db'},
+                        {type: 'souvenir', name: 'お土産', color: '#9b59b6'}
+                    ];
+                    const stallType = stallTypes[Math.floor(Math.random() * stallTypes.length)];
+                    
+                    scenery.stalls.push({
+                        x: cx + 10, w: 65, h: 45, 
+                        type: stallType.type, name: stallType.name, color: stallType.color,
+                        frame: 0, steam: [],
+                        hasLanterns: Math.random() > 0.3, // New: Lanterns
+                        hasStools: Math.random() > 0.5,   // New: Stools
+                        noren: { strips: [], sway: 0 }
+                    });
+                    let st = scenery.stalls[scenery.stalls.length - 1];
+                    let stripCount = 3 + Math.floor(Math.random() * 2);
+                    for(let i = 0; i < stripCount; i++) {
+                        st.noren.strips.push({
+                            offsetX: 8 + i * (st.w / (stripCount + 1)),
+                            phase: Math.random() * Math.PI * 2, swaySpeed: 0.05 + Math.random() * 0.03
+                        });
+                    }
+                }
+
+                scenery.buildings.push({
+                    x: cx, w: w, h: h, neon: neon, type: type,
+                    hasAC: Math.random() > 0.4, hasSign: Math.random() > 0.2, 
+                    hasVending: !hasStall && Math.random() > 0.7,
+                    signText: signOptions[Math.floor(Math.random() * signOptions.length)],
+                    windows: [],
+                    roof: roofProps
+                });
+                
+                let b = scenery.buildings[scenery.buildings.length-1];
+                let winStart = height - h + 40; 
+                
+                if (type === 2) { 
+                     for(let wy=winStart; wy<height-40; wy+=40) b.windows.push({x: cx + 10, y: wy, w: w-20, h: 25, type: 'balcony', lit: Math.random()>0.5});
+                } else { 
+                    for(let wy=winStart; wy<height-40; wy+=30) {
+                        for(let wx=cx+10; wx<cx+w-10; wx+=25) {
+                            if(Math.random()>0.2) b.windows.push({x: wx, y: wy, w: 12, h: 18, type: 'win', lit: Math.random()>0.6});
+                        }
+                    }
+                }
+                cx += w;
+            }
+            for(let px = 100; px < width; px += 300) scenery.utilityPoles.push({x: px});
+        }
+
+        // --- YOKAI SYSTEM ---
+        function spawnYokai() {
+            const hasMainYokai = scenery.yokai.some(y => y.type !== 'hitodama');
+            let type = 'hitodama';
+            const roll = Math.random();
+
+            if (!hasMainYokai) {
+                if (roll > 0.82) type = 'momen'; 
+                else if (roll > 0.72) type = 'chochin'; 
+                else if (roll > 0.58) type = 'umbrella'; 
+            }
+
+            let layer = 'front';
+            if (type === 'hitodama' && Math.random() > 0.5) layer = 'back';
+            if (type === 'momen') layer = 'back';
+
+            const commonProps = {
+                life: 1800 + Math.random() * 600,
+                state: 'ACTIVE',
+                fade: 1.0,
+                scale: 1.0,
+                glitchOffset: 0,
+                frame: 0,
+                layer: layer
+            };
+
+            const spawnSide = Math.random() > 0.5 ? 'left' : 'right';
+            let startX = spawnSide === 'left' ? -150 : width + 150;
+
+            if (type === 'hitodama') {
+                scenery.yokai.push({
+                    ...commonProps, type: 'hitodama',
+                    x: Math.random() * width, 
+                    y: layer === 'back' ? height - 250 - Math.random() * 150 : height - 100 - Math.random() * 200,
+                    centerX: Math.random() * width, 
+                    centerY: layer === 'back' ? height - 300 : height - 150,
+                    angle: Math.random() * Math.PI * 2,
+                    color: Math.random() > 0.5 ? '#01cdfe' : '#50fa7b',
+                    history: [], pulse: 0, trailLength: 8
+                });
+            }
+            else if (type === 'umbrella') {
+                scenery.yokai.push({
+                    ...commonProps, type: 'umbrella',
+                    x: startX, y: height - 40,
+                    dir: spawnSide === 'left' ? 1 : -1,
+                    vx: 0, vy: 0, subState: 'ground',
+                    scaleY: 1,
+                    umbrellaColor: Math.random() > 0.5 ? '#e74c3c' : '#8e44ad',
+                    hopTimer: 0,
+                    layer: 'front' 
+                });
+            }
+            else if (type === 'momen') {
+                scenery.yokai.push({
+                    ...commonProps, type: 'momen',
+                    x: startX, 
+                    y: 50 + Math.random() * 80, 
+                    speed: (spawnSide === 'left' ? 1 : -1) * (1.5 + Math.random()),
+                    segments: [],
+                    segmentCount: 18,
+                    waveFreq: 0.15,
+                    waveAmp: 4,
+                    layer: 'back'
+                });
+                let m = scenery.yokai[scenery.yokai.length-1];
+                for(let i=0; i<m.segmentCount; i++) {
+                    m.segments.push({x: startX, y: m.y});
+                }
+            }
+            else if (type === 'chochin') {
+                scenery.yokai.push({
+                    ...commonProps, type: 'chochin',
+                    x: startX, y: height - 120 - Math.random() * 40,
+                    vx: (spawnSide === 'left' ? 1 : -1) * 0.5, 
+                    swingAngle: 0, floatY: 0, tongueLength: 10, tonguePhase: 0,
+                    glowIntensity: 0.8 + Math.random() * 0.2,
+                    layer: 'front'
+                });
+            }
+        }
+
+        function drawYokai(layer) {
+            const list = scenery.yokai.filter(y => y.layer === layer);
+            
+            list.forEach(y => {
+                bgCtx.save();
+                
+                let renderScale = y.scale;
+                if (y.layer === 'back') {
+                    renderScale = y.scale * 0.6; 
+                    bgCtx.globalAlpha = y.fade * 0.7;
+                } else {
+                    bgCtx.globalAlpha = y.fade;
+                }
+
+                if (y.state === 'ASCENDING') {
+                    bgCtx.translate(y.glitchOffset, 0);
+                    bgCtx.globalCompositeOperation = 'screen';
+                    bgCtx.fillStyle = 'rgba(200, 255, 255, 0.5)';
+                    bgCtx.fillRect(y.x, y.y, 10 * renderScale, -50 * (1-y.fade));
+                }
+
+                if (y.type === 'hitodama') {
+                    y.history.forEach((pos, idx) => {
+                        let alpha = (idx / y.history.length) * 0.6 * (y.layer === 'back' ? 0.7 : 1.0);
+                        let size = (idx / y.history.length) * 5 * renderScale;
+                        bgCtx.fillStyle = y.color.replace(')', `,${alpha})`).replace('rgb', 'rgba');
+                        bgCtx.shadowColor = y.color; bgCtx.shadowBlur = size;
+                        bgCtx.beginPath(); bgCtx.arc(pos.x, pos.y, size, 0, Math.PI*2); bgCtx.fill();
+                    });
+                    bgCtx.fillStyle = y.color.replace(')', `,${0.9 * (y.layer === 'back' ? 0.7 : 1.0)})`).replace('rgb', 'rgba');
+                    bgCtx.shadowColor = y.color; bgCtx.shadowBlur = 20 * y.pulse * renderScale;
+                    bgCtx.beginPath(); bgCtx.arc(y.x, y.y, 6 * renderScale * y.pulse, 0, Math.PI*2); bgCtx.fill();
+                    bgCtx.shadowBlur = 0;
+                    bgCtx.fillStyle = '#fff';
+                    bgCtx.beginPath(); bgCtx.arc(y.x, y.y, 3 * renderScale, 0, Math.PI*2); bgCtx.fill();
+                }
+                else if (y.type === 'umbrella') {
+                    bgCtx.translate(y.x, y.y);
+                    bgCtx.scale(y.dir * renderScale, y.scaleY * renderScale);
+                    bgCtx.fillStyle = y.umbrellaColor || '#e74c3c';
+                    bgCtx.beginPath(); 
+                    bgCtx.moveTo(-18, -20); bgCtx.lineTo(18, -20); bgCtx.lineTo(0, -50); bgCtx.fill();
+                    bgCtx.strokeStyle = '#c0392b'; bgCtx.lineWidth = 2;
+                    for(let i=-1; i<=1; i++) {
+                        bgCtx.beginPath(); bgCtx.moveTo(i*12, -20); bgCtx.lineTo(0, -50); bgCtx.stroke();
+                    }
+                    bgCtx.fillStyle = '#fff';
+                    bgCtx.beginPath(); bgCtx.arc(0, -35, 10, 0, Math.PI*2); bgCtx.fill();
+                    bgCtx.fillStyle = '#000';
+                    bgCtx.beginPath(); bgCtx.arc(0, -35, 4, 0, Math.PI*2); bgCtx.fill();
+                    bgCtx.fillStyle = '#ecf0f1';
+                    bgCtx.fillRect(-2, -20, 4, 20);
+                    bgCtx.fillStyle = '#8b4513';
+                    bgCtx.fillRect(-6, 0, 12, 5);
+                    bgCtx.fillRect(-3, 5, 6, 2);
+                    if (Math.floor(y.frame/6)%3===0) {
+                        bgCtx.fillStyle = '#ff6b6b';
+                        bgCtx.fillRect(3, -20, 8, 12);
+                    }
+                }
+                else if (y.type === 'momen') {
+                    bgCtx.fillStyle = '#f0f0f0';
+                    bgCtx.shadowColor = 'rgba(255, 255, 255, 0.3)';
+                    bgCtx.shadowBlur = 5;
+                    
+                    let headX = y.x;
+                    let headY = y.y;
+                    let bodyWidth = 16 * renderScale;
+
+                    bgCtx.beginPath();
+                    bgCtx.moveTo(headX, headY - bodyWidth/2); 
+                    for (let i = 0; i < y.segments.length; i++) {
+                        let taper = 1 - (i / y.segments.length) * 0.8;
+                        bgCtx.lineTo(y.segments[i].x, y.segments[i].y - (bodyWidth/2 * taper));
+                    }
+                    let tail = y.segments[y.segments.length - 1];
+                    bgCtx.lineTo(tail.x, tail.y); 
+                    for (let i = y.segments.length - 1; i >= 0; i--) {
+                        let taper = 1 - (i / y.segments.length) * 0.8;
+                        bgCtx.lineTo(y.segments[i].x, y.segments[i].y + (bodyWidth/2 * taper));
+                    }
+                    bgCtx.lineTo(headX, headY + bodyWidth/2);
+                    bgCtx.closePath();
+                    bgCtx.fill();
+                    
+                    let dirFactor = y.speed > 0 ? 1 : -1;
+                    let armX = headX - (10 * dirFactor * renderScale);
+                    let armYTop = headY - bodyWidth/2 + 2;
+                    let armYBot = headY + bodyWidth/2 - 2;
+                    
+                    bgCtx.shadowBlur = 0;
+                    bgCtx.fillStyle = '#f0f0f0';
+                    bgCtx.beginPath(); bgCtx.moveTo(armX, armYTop); bgCtx.lineTo(armX - (5 * dirFactor * renderScale), armYTop - 8 * renderScale); bgCtx.lineTo(armX - (10 * dirFactor * renderScale), armYTop); bgCtx.fill();
+                    bgCtx.beginPath(); bgCtx.moveTo(armX, armYBot); bgCtx.lineTo(armX - (5 * dirFactor * renderScale), armYBot + 8 * renderScale); bgCtx.lineTo(armX - (10 * dirFactor * renderScale), armYBot); bgCtx.fill();
+
+                    bgCtx.fillStyle = '#000000';
+                    bgCtx.beginPath(); bgCtx.ellipse(headX + (2 * dirFactor * renderScale), headY - 3 * renderScale, 1.5 * renderScale, 3 * renderScale, 0, 0, Math.PI*2); bgCtx.fill();
+                    bgCtx.beginPath(); bgCtx.ellipse(headX + (5 * dirFactor * renderScale), headY - 3 * renderScale, 1.5 * renderScale, 3 * renderScale, 0, 0, Math.PI*2); bgCtx.fill();
+                }
+                else if (y.type === 'chochin') {
+                    bgCtx.translate(y.x, y.y + y.floatY);
+                    bgCtx.rotate(y.swingAngle);
+                    bgCtx.scale(renderScale, renderScale);
+                    bgCtx.fillStyle = `rgba(192, 57, 43, ${y.glowIntensity})`;
+                    bgCtx.shadowColor = '#f1c40f'; bgCtx.shadowBlur = 15;
+                    bgCtx.beginPath(); bgCtx.ellipse(0, 0, 16, 28, 0, 0, Math.PI*2); bgCtx.fill();
+                    bgCtx.strokeStyle = '#a93226'; bgCtx.lineWidth = 2;
+                    for(let r=-20; r<20; r+=10) {
+                        bgCtx.beginPath(); bgCtx.ellipse(0, r, 13, 3, 0, 0, Math.PI*2); bgCtx.stroke();
+                    }
+                    bgCtx.shadowBlur = 8;
+                    bgCtx.fillStyle = '#f1c40f';
+                    bgCtx.beginPath(); bgCtx.arc(0, -8, 11, 0, Math.PI*2); bgCtx.fill();
+                    bgCtx.fillStyle = '#000';
+                    bgCtx.beginPath(); bgCtx.arc(0, -8, 4, 0, Math.PI*2); bgCtx.fill();
+                    bgCtx.fillStyle = '#000';
+                    bgCtx.beginPath(); bgCtx.arc(0, 12, 9, 0, Math.PI, false); bgCtx.fill();
+                    bgCtx.shadowBlur = 0;
+                    bgCtx.fillStyle = '#e74c3c';
+                    bgCtx.fillRect(-4, 12, 8, y.tongueLength);
+                    bgCtx.fillStyle = `rgba(241, 196, 15, ${y.glowIntensity * 0.3})`;
+                    bgCtx.beginPath(); bgCtx.ellipse(0, 0, 18, 30, 0, 0, Math.PI*2); bgCtx.fill();
+                    bgCtx.shadowBlur = 0;
+                }
+                bgCtx.restore();
+            });
+        }
+
+        function updateYokai() {
+            for (let i = scenery.yokai.length - 1; i >= 0; i--) {
+                let y = scenery.yokai[i];
+                y.life--;
+                if (y.life <= 0 && y.state !== 'ASCENDING') { y.state = 'ASCENDING'; y.life = 60; }
+                if ((y.x > width + 300 || y.x < -300) && y.state !== 'ASCENDING') { scenery.yokai.splice(i, 1); continue; }
+
+                if (y.state === 'ASCENDING') {
+                    y.y -= 2; y.scale *= 0.98; y.fade -= 0.02;
+                    y.glitchOffset = (Math.random() - 0.5) * 10;
+                    if (y.fade <= 0) { scenery.yokai.splice(i, 1); continue; }
+                }
+
+                if (y.state === 'ACTIVE') {
+                    y.frame += 0.1;
+                    if (y.type === 'hitodama') {
+                        y.angle += 0.015 + Math.sin(frameCount * 0.02) * 0.005;
+                        y.x = y.centerX + Math.sin(y.angle) * 100 + Math.cos(y.angle * 2) * 30;
+                        y.y = y.centerY + Math.sin(2 * y.angle) * 50 + Math.cos(frameCount * 0.03) * 20;
+                        y.pulse = Math.sin(frameCount * 0.1) * 0.3 + 0.7;
+                        y.history.push({x: y.x, y: y.y});
+                        if(y.history.length > y.trailLength) y.history.shift();
+                    } 
+                    else if (y.type === 'umbrella') {
+                        y.hopTimer++;
+                        if (y.subState === 'ground') {
+                            y.scaleY = 1 + Math.sin(frameCount * 0.1) * 0.05;
+                            y.vx = 0;
+                            if (y.hopTimer > 60 && Math.random() < 0.04) {
+                                y.subState = 'jump'; y.scaleY = 1.3; y.vy = -10; y.vx = y.dir * 3; y.hopTimer = 0;
+                            }
+                        } else {
+                            y.vy += 0.45; y.y += y.vy; y.x += y.vx; y.scaleY = 0.85;
+                            if (y.y >= height - 40) { y.y = height - 40; y.subState = 'ground'; y.scaleY = 0.65; }
+                        }
+                    }
+                    else if (y.type === 'momen') {
+                        y.x += y.speed;
+                        y.segments.unshift({x: y.x - (y.speed * 5), y: y.y});
+                        if(y.segments.length > y.segmentCount) y.segments.pop();
+                        for(let j=0; j<y.segments.length; j++) {
+                            let mag = (j / y.segmentCount) * y.waveAmp;
+                            y.segments[j].y += Math.sin(frameCount * y.waveFreq + j) * (mag * 0.4); 
+                        }
+                        y.y += Math.sin(frameCount * 0.05) * 0.5; 
+                    }
+                    else if (y.type === 'chochin') {
+                        y.x += y.vx;
+                        y.swingAngle = Math.sin(frameCount * 0.06) * 0.25;
+                        y.floatY = Math.sin(frameCount * 0.04) * 12;
+                        y.tonguePhase += 0.15;
+                        y.tongueLength = 10 + Math.sin(y.tonguePhase) * 6;
+                        y.glowIntensity = 0.7 + Math.sin(frameCount * 0.08) * 0.15;
+                    }
+                }
+            }
+        }
+
+        function drawScenery() {
+            frameCount++;
+            const roadY = height - 30;
+            const riverY = height - 120;
+            const bridgeY = height - 150;
+
+            // Weather Logic
+            weather.timer++;
+            if (weather.timer > 1000) { weather.timer = 0; changeWeather(); }
+            weather.skyLerp += (weather.targetSkyLerp - weather.skyLerp) * 0.01;
+
+            // Particle Updates
+            for(let i = weather.particles.length - 1; i >= 0; i--) {
+                let p = weather.particles[i];
+                p.y += p.speedY; p.x += p.speedX;
+                if (p.y > height) {
+                     if ((weather.type === 'SAKURA' && p.type === 'SAKURA') || ((weather.type === 'RAIN' || weather.type === 'STORM') && p.type === 'RAIN')) {
+                        p.y = -10; p.x = Math.random() * width;
+                    } else weather.particles.splice(i, 1);
+                }
+            }
+            if (weather.type === 'SAKURA' && weather.particles.filter(p=>p.type==='SAKURA').length < 60 && Math.random()<0.1) {
+                weather.particles.push({type: 'SAKURA', x: Math.random()*width, y: -10, size: 2+Math.random()*2, speedY: 1, speedX: Math.random()*2-1, rotation: 0});
+            } else if ((weather.type==='RAIN' || weather.type==='STORM') && weather.particles.filter(p=>p.type==='RAIN').length < 200) {
+                weather.particles.push({type: 'RAIN', x: Math.random()*width, y: -20, length: 20, speedY: 20, speedX: -1});
+                if(weather.type==='STORM' && Math.random()<0.01) spawnLightning();
+            }
+            if(Math.random() < 0.01 && scenery.yokai.length < 6) spawnYokai();
+            updateYokai();
+
+            // BACKGROUND RENDER - Interpolated sky gradient
+            const grad = bgCtx.createLinearGradient(0, 0, 0, height);
+            const c1 = [2, 1, 5]; const t1 = [10, 10, 16];
+            const c2 = [17, 17, 43]; const t2 = [15, 15, 21];
+            const c3 = [37, 22, 64]; const t3 = [21, 21, 32];
+
+            let r1 = lerp(c1[0], t1[0], weather.skyLerp);
+            let g1 = lerp(c1[1], t1[1], weather.skyLerp);
+            let b1 = lerp(c1[2], t1[2], weather.skyLerp);
+            let r2 = lerp(c2[0], t2[0], weather.skyLerp);
+            let g2 = lerp(c2[1], t2[1], weather.skyLerp);
+            let b2 = lerp(c2[2], t2[2], weather.skyLerp);
+            let r3 = lerp(c3[0], t3[0], weather.skyLerp);
+            let g3 = lerp(c3[1], t3[1], weather.skyLerp);
+            let b3 = lerp(c3[2], t3[2], weather.skyLerp);
+
+            grad.addColorStop(0, `rgb(${r1},${g1},${b1})`); 
+            grad.addColorStop(0.5, `rgb(${r2},${g2},${b2})`); 
+            grad.addColorStop(1, `rgb(${r3},${g3},${b3})`);
+            bgCtx.fillStyle = grad; bgCtx.fillRect(0, 0, width, height);
+
+            // Stars & Moon (Only visible when not fully stormy)
+            if (weather.skyLerp < 0.8) {
+                bgCtx.globalAlpha = 1.0 - weather.skyLerp;
+                bgCtx.fillStyle = '#fff';
+                scenery.stars.forEach(s => { if(Math.random()>0.9) bgCtx.fillRect(s.x, s.y, s.s, s.s); });
+                // Moon
+                const mx = width * 0.75, my = 150, mRad = 80;
+                bgCtx.fillStyle = '#ffeebb'; 
+                bgCtx.beginPath(); bgCtx.arc(mx, my, mRad, 0, Math.PI*2); bgCtx.fill();
+                bgCtx.globalAlpha = 1.0;
+            }
+
+            // Clouds
+            scenery.clouds.forEach(c => {
+                c.x += c.currentSpeed; if (c.x > width + 400) c.x = -300;
+                c.pixels.forEach(p => {
+                    let color = `rgba(${c.baseColor.join(',')}, ${p.type==='shadow'?0.5:0.3})`;
+                    bgCtx.fillStyle = color; bgCtx.fillRect(c.x + p.x, c.y + p.y, 8, 8);
+                });
+            });
+
+            // Lightning
+            if (weather.lightning > 0) {
+                bgCtx.fillStyle = `rgba(255,255,255,${weather.lightning*0.3})`; bgCtx.fillRect(0,0,width,height);
+                weather.lightning -= 0.05;
+                bgCtx.strokeStyle = '#fff'; bgCtx.lineWidth = 2; bgCtx.shadowBlur = 10; bgCtx.shadowColor = '#fff';
+                weather.bolts.forEach(b => {
+                    bgCtx.beginPath(); b.segments.forEach((s,i) => i==0?bgCtx.moveTo(s.x,s.y):bgCtx.lineTo(s.x,s.y)); bgCtx.stroke();
+                });
+                bgCtx.shadowBlur = 0;
+            }
+
+            // Back Buildings (Pixel Style Silhouettes with seeded windows)
+            scenery.backBuildings.forEach((b, idx) => {
+                const bY = height - b.h - 100;
+                const px = 4;
+                
+                // Building silhouette
+                bgCtx.fillStyle = '#12121e';
+                bgCtx.fillRect(b.x, bY, b.w, b.h);
+                
+                // Slight edge highlight
+                bgCtx.fillStyle = '#1a1a2a';
+                bgCtx.fillRect(b.x, bY, px, b.h);
+                
+                // Seeded pseudo-random for consistent window pattern
+                // Use building index + position as seed for deterministic randomness
+                const seed = (x, y) => {
+                    const n = Math.sin(x * 12.9898 + y * 78.233 + idx * 43.5453) * 43758.5453;
+                    return n - Math.floor(n);
+                };
+                
+                // Distant windows - deterministic pattern (no flickering)
+                // Some buildings have floor-based lighting, others scattered
+                const isFloorLit = seed(idx, 0) > 0.7; // 30% of buildings have floor lighting
+                const litFloors = isFloorLit ? [
+                    Math.floor(seed(idx, 1) * 5) + 2,
+                    Math.floor(seed(idx, 2) * 5) + 8
+                ] : [];
+                
+                let floorNum = 0;
+                for(let wy = bY + 15; wy < bY + b.h - 15; wy += 12) {
+                    floorNum++;
+                    for(let wx = b.x + 6; wx < b.x + b.w - 6; wx += 10) {
+                        const windowSeed = seed(wx, wy);
+                        
+                        // Determine if window is lit
+                        let isLit = false;
+                        if(isFloorLit) {
+                            // Floor-based: entire floors lit
+                            isLit = litFloors.includes(floorNum % 12);
+                        } else {
+                            // Scattered: ~25% of windows lit (more realistic for night)
+                            isLit = windowSeed > 0.75;
+                        }
+                        
+                        if(isLit) {
+                            // Warm window glow with slight color variation
+                            const warmth = 180 + windowSeed * 40;
+                            bgCtx.fillStyle = `rgba(255,${warmth},${warmth - 60},0.5)`;
+                            bgCtx.fillRect(wx, wy, px - 1, px);
+                        }
+                    }
+                }
+                
+                // Only some buildings have antennas (seeded, not random each frame)
+                if(seed(idx, 99) > 0.8) {
+                    bgCtx.fillStyle = '#0a0a15';
+                    bgCtx.fillRect(b.x + b.w/2, bY - 12, 2, 12);
+                    // Very slow blinking (every 3 seconds) - only a few buildings
+                    if(seed(idx, 100) > 0.6 && frameCount % 180 < 30) {
+                        bgCtx.fillStyle = '#ff3030';
+                        bgCtx.fillRect(b.x + b.w/2 - 1, bY - 14, 3, 3);
+                    }
+                }
+            });
+
+            // Water & Bridge
+            bgCtx.fillStyle = '#151525'; bgCtx.fillRect(0, riverY, width, height-riverY);
+            bgCtx.fillStyle = '#111'; bgCtx.fillRect(0, bridgeY, width, 25);
+            
+            // Train
+            if (scenery.train.active) {
+                scenery.train.x += scenery.train.speed;
+                bgCtx.fillStyle = '#e0e040'; bgCtx.fillRect(scenery.train.x, bridgeY+30, 400, 30);
+                bgCtx.fillStyle = '#ccffcc'; for(let i=10;i<390;i+=50) bgCtx.fillRect(scenery.train.x+i, bridgeY+35, 30, 15);
+                if(scenery.train.x > width + 100) { scenery.train.active = false; scenery.train.waitTimer = 300; }
+            } else { scenery.train.waitTimer--; if(scenery.train.waitTimer<=0){scenery.train.active=true; scenery.train.x=-500;}}
+
+            drawYokai('back');
+
+            // FOREGROUND BUILDINGS
+            const groundY = roadY - 5;
+            bgCtx.fillStyle = '#121215'; bgCtx.fillRect(0, roadY, width, 40);
+
+            scenery.buildings.forEach(b => {
+                const roofY = groundY - b.h;
+                const px = 4; // Pixel size for pixel art effect
+                
+                // Building Body with pixel shading
+                // Main body - darker base
+                bgCtx.fillStyle = '#16161c';
+                bgCtx.fillRect(b.x, roofY, b.w, b.h);
+                
+                // Left edge highlight (moonlight)
+                bgCtx.fillStyle = '#252530';
+                bgCtx.fillRect(b.x, roofY, px*2, b.h);
+                
+                // Right edge shadow
+                bgCtx.fillStyle = '#0c0c10';
+                bgCtx.fillRect(b.x + b.w - px*2, roofY, px*2, b.h);
+                
+                // Roof edge detail
+                bgCtx.fillStyle = '#2a2a35';
+                bgCtx.fillRect(b.x, roofY, b.w, px);
+                
+                // Pixel grid texture on building
+                bgCtx.fillStyle = 'rgba(255,255,255,0.02)';
+                for(let py = roofY; py < groundY; py += px*4) {
+                    for(let pxx = b.x; pxx < b.x + b.w; pxx += px*4) {
+                        if((py + pxx) % (px*8) === 0) bgCtx.fillRect(pxx, py, px, px);
+                    }
+                }
+                
+                // AC Units (pixel style)
+                if (b.hasAC) {
+                    const acCount = Math.floor(b.w / 50);
+                    for(let i = 0; i < acCount; i++) {
+                        const acX = b.x + 15 + i * 50;
+                        const acY = roofY + 60 + (i % 3) * 80;
+                        if(acY < groundY - 30) {
+                            // AC box
+                            bgCtx.fillStyle = '#3a3a45';
+                            bgCtx.fillRect(acX, acY, px*5, px*3);
+                            bgCtx.fillStyle = '#2a2a35';
+                            bgCtx.fillRect(acX, acY + px*3, px*5, px);
+                            // Vent lines
+                            bgCtx.fillStyle = '#1a1a20';
+                            bgCtx.fillRect(acX + px, acY + px, px*3, px/2);
+                            bgCtx.fillRect(acX + px, acY + px*2, px*3, px/2);
+                        }
+                    }
+                }
+                
+                // Rooftop Objects (Pixel Style)
+                if (b.roof.type === 'tank') {
+                    // Pixel Water Tank
+                    bgCtx.fillStyle = '#8b7355';
+                    bgCtx.fillRect(b.x + 10, roofY - px*6, px*5, px*6);
+                    bgCtx.fillStyle = '#6b5344';
+                    bgCtx.fillRect(b.x + 10, roofY - px*2, px*5, px); // Band
+                    bgCtx.fillStyle = '#5a4535';
+                    bgCtx.fillRect(b.x + 10 + px*5, roofY - px*3, px, px*4); // Pipe
+                    // Highlight
+                    bgCtx.fillStyle = '#9b8365';
+                    bgCtx.fillRect(b.x + 10, roofY - px*6, px, px*4);
+                } else if (b.roof.type === 'fence') {
+                    // Pixel Steel Railing
+                    bgCtx.fillStyle = '#4a4a55';
+                    for(let r = 0; r < b.w; r += px*3) {
+                        bgCtx.fillRect(b.x + r, roofY - px*4, px, px*4);
+                    }
+                    bgCtx.fillRect(b.x, roofY - px*4, b.w, px);
+                } else if (b.roof.type === 'antenna') {
+                    // Pixel Satellite Dish
+                    bgCtx.fillStyle = '#5a5a65';
+                    bgCtx.fillRect(b.x + 8, roofY - px*4, px*6, px*3);
+                    bgCtx.fillStyle = '#4a4a55';
+                    bgCtx.fillRect(b.x + 10, roofY - px*2, px*2, px*2);
+                    // Antenna pole with slow blinking light (every 2 seconds)
+                    bgCtx.fillStyle = '#3a3a45';
+                    bgCtx.fillRect(b.x + b.w - 12, roofY - px*10, px, px*10);
+                    bgCtx.fillStyle = frameCount % 120 < 20 ? '#ff3333' : '#440000';
+                    bgCtx.fillRect(b.x + b.w - 12, roofY - px*11, px, px);
+                } else if (b.roof.type === 'shrine') {
+                    // Pixel Torii Gate
+                    bgCtx.fillStyle = '#8b2020';
+                    bgCtx.fillRect(b.x + b.w/2 - 12, roofY - px*6, px, px*6);
+                    bgCtx.fillRect(b.x + b.w/2 + 8, roofY - px*6, px, px*6);
+                    bgCtx.fillStyle = '#a52828';
+                    bgCtx.fillRect(b.x + b.w/2 - 16, roofY - px*7, px*10, px);
+                    bgCtx.fillRect(b.x + b.w/2 - 14, roofY - px*5, px*8, px);
+                }
+
+                // Windows (Pixel Style with glow) - very slow state changes
+                b.windows.forEach((w, wIdx) => {
+                    // Very rare light toggle (roughly once per minute per window)
+                    if (frameCount % 3600 === (wIdx * 17) % 3600) {
+                        w.lit = !w.lit;
+                    }
+                    
+                    // Seeded variation for curtain style (deterministic)
+                    const wSeed = Math.sin(w.x * 12.9898 + w.y * 78.233) * 43758.5453;
+                    const hasCurtain = (wSeed - Math.floor(wSeed)) > 0.5;
+                    
+                    if(w.lit) {
+                        // Window glow
+                        bgCtx.fillStyle = 'rgba(255,240,200,0.08)';
+                        bgCtx.fillRect(w.x - px, w.y - px, w.w + px*2, w.h + px*2);
+                        // Window light with warm variation
+                        const warmth = 200 + ((wSeed * 1000) % 55);
+                        bgCtx.fillStyle = `rgb(255,${warmth},${warmth - 80})`;
+                        bgCtx.fillRect(w.x, w.y, w.w, w.h);
+                        // Curtain/blinds effect (deterministic)
+                        bgCtx.fillStyle = 'rgba(180,160,120,0.4)';
+                        bgCtx.fillRect(w.x, w.y, w.w, px);
+                        if(hasCurtain) {
+                            bgCtx.fillStyle = 'rgba(0,0,0,0.25)';
+                            bgCtx.fillRect(w.x, w.y + w.h/2, w.w, w.h/2);
+                        }
+                    } else {
+                        // Dark window with reflection
+                        bgCtx.fillStyle = '#0a0a12';
+                        bgCtx.fillRect(w.x, w.y, w.w, w.h);
+                        // Glass reflection (deterministic position)
+                        bgCtx.fillStyle = 'rgba(80,100,130,0.12)';
+                        bgCtx.fillRect(w.x, w.y, px*2, w.h);
+                    }
+                    // Window frame
+                    bgCtx.fillStyle = '#1a1a22';
+                    bgCtx.fillRect(w.x + w.w/2 - px/2, w.y, px, w.h);
+                    bgCtx.fillRect(w.x, w.y + w.h/2 - px/2, w.w, px);
+                });
+
+                // Neon Signs (Pixel Style with glow)
+                if (b.hasSign) {
+                    const signX = b.x + b.w + px;
+                    const signY = roofY + 30;
+                    const signW = px * 6;
+                    const signH = Math.min(120, b.h - 60);
+                    
+                    // Sign backing
+                    bgCtx.fillStyle = '#0a0a0f';
+                    bgCtx.fillRect(signX, signY, signW, signH);
+                    
+                    // Neon glow
+                    bgCtx.shadowColor = b.neon;
+                    bgCtx.shadowBlur = 8;
+                    bgCtx.fillStyle = b.neon;
+                    
+                    // Vertical text
+                    bgCtx.font = `${px*3}px "DotGothic16", monospace`;
+                    bgCtx.textAlign = "center";
+                    for (let i = 0; i < Math.min(b.signText.length, 6); i++) {
+                        bgCtx.fillText(b.signText[i], signX + signW/2, signY + 15 + (i * px*4));
+                    }
+                    bgCtx.shadowBlur = 0;
+                    bgCtx.textAlign = "start";
+                }
+                
+                // Vending Machine (Pixel Style)
+                if (b.hasVending) {
+                    const vmX = b.x + b.w - 25;
+                    const vmY = groundY - px*12;
+                    // Machine body
+                    bgCtx.fillStyle = '#2040a0';
+                    bgCtx.fillRect(vmX, vmY, px*5, px*12);
+                    // Display
+                    bgCtx.fillStyle = '#60a0ff';
+                    bgCtx.fillRect(vmX + px, vmY + px, px*3, px*4);
+                    // Product rows
+                    bgCtx.fillStyle = '#ff6060';
+                    bgCtx.fillRect(vmX + px, vmY + px*6, px, px*2);
+                    bgCtx.fillStyle = '#60ff60';
+                    bgCtx.fillRect(vmX + px*2, vmY + px*6, px, px*2);
+                    bgCtx.fillStyle = '#ffff60';
+                    bgCtx.fillRect(vmX + px*3, vmY + px*6, px, px*2);
+                    // Glow
+                    bgCtx.fillStyle = 'rgba(100,160,255,0.2)';
+                    bgCtx.fillRect(vmX - px, vmY, px*7, px*13);
+                }
+            });
+
+            // STALLS (Updated)
+            scenery.stalls.forEach(s => {
+                s.frame += 0.1; s.noren.sway += 0.06;
+                // Stall Body
+                bgCtx.fillStyle = s.color;
+                bgCtx.beginPath();
+                bgCtx.moveTo(s.x - 5, groundY - s.h); 
+                bgCtx.lineTo(s.x + s.w + 5, groundY - s.h); 
+                bgCtx.lineTo(s.x + s.w, groundY - s.h + 12); 
+                bgCtx.lineTo(s.x, groundY - s.h + 12); 
+                bgCtx.fill();
+                
+                // Posts
+                bgCtx.fillStyle = '#5d4037';
+                bgCtx.fillRect(s.x, groundY - s.h + 12, 5, s.h - 12);
+                bgCtx.fillRect(s.x + s.w - 5, groundY - s.h + 12, 5, s.h - 12);
+                
+                // Counter
+                bgCtx.fillStyle = '#34495e'; bgCtx.fillRect(s.x, groundY - 20, s.w, 15);
+                
+                // STOOLS (New)
+                if (s.hasStools) {
+                    bgCtx.fillStyle = '#8e44ad'; // Cushion
+                    bgCtx.fillRect(s.x + 10, groundY - 5, 10, 3);
+                    bgCtx.fillRect(s.x + 30, groundY - 5, 10, 3);
+                    bgCtx.fillStyle = '#555'; // Leg
+                    bgCtx.fillRect(s.x + 13, groundY - 2, 4, 5);
+                    bgCtx.fillRect(s.x + 33, groundY - 2, 4, 5);
+                }
+
+                // STEAM (New for food stalls)
+                if ((s.type === 'ramen' || s.type === 'takoyaki' || s.type === 'yakisoba') && Math.random() > 0.8) {
+                    s.steam.push({x: s.x + s.w/2 + (Math.random()-0.5)*10, y: groundY - 25, life: 40});
+                }
+                bgCtx.fillStyle = 'rgba(255,255,255,0.4)';
+                for(let i = s.steam.length-1; i>=0; i--) {
+                    let st = s.steam[i]; st.y -= 0.5; st.life--; st.x += Math.sin(frameCount*0.1 + st.y)*0.2;
+                    if(st.life<=0) s.steam.splice(i,1);
+                    else bgCtx.fillRect(st.x, st.y, 2, 2);
+                }
+
+                // LANTERNS (New)
+                if (s.hasLanterns) {
+                    let glow = Math.sin(frameCount * 0.1) * 5;
+                    bgCtx.fillStyle = '#e74c3c'; // Red lantern
+                    bgCtx.shadowColor = '#c0392b'; bgCtx.shadowBlur = 10;
+                    // Left Lantern
+                    bgCtx.beginPath(); bgCtx.ellipse(s.x - 2, groundY - s.h + 20, 6, 8, 0, 0, Math.PI*2); bgCtx.fill();
+                    // Right Lantern
+                    bgCtx.beginPath(); bgCtx.ellipse(s.x + s.w + 2, groundY - s.h + 20, 6, 8, 0, 0, Math.PI*2); bgCtx.fill();
+                    bgCtx.shadowBlur = 0;
+                }
+
+                // Signboard
+                bgCtx.fillStyle = '#8b4513'; bgCtx.fillRect(s.x + s.w/2 - 22, groundY - s.h - 18, 45, 18);
+                bgCtx.fillStyle = '#fff'; bgCtx.font = '8px "DotGothic16", monospace';
+                bgCtx.textAlign = 'center'; bgCtx.fillText(s.name, s.x + s.w/2, groundY - s.h - 5); bgCtx.textAlign = 'start';
+
+                // Noren (Curtains)
+                s.noren.strips.forEach(strip => {
+                    let totalSway = Math.sin(s.noren.sway * strip.swaySpeed + strip.phase) * 4;
+                    bgCtx.fillStyle = '#f5f5dc';
+                    bgCtx.beginPath();
+                    bgCtx.moveTo(s.x + strip.offsetX, groundY - s.h + 12); 
+                    bgCtx.lineTo(s.x + strip.offsetX + 14, groundY - s.h + 12); 
+                    bgCtx.lineTo(s.x + strip.offsetX + 14 + totalSway, groundY - s.h + 30); 
+                    bgCtx.lineTo(s.x + strip.offsetX + totalSway, groundY - s.h + 30); 
+                    bgCtx.fill();
+                });
+            });
+            
+            drawYokai('front');
+
+            // Foreground Particles (Sakura/Rain)
+            if(weather.type === 'SAKURA') {
+                bgCtx.fillStyle = '#ffb7c5';
+                weather.particles.filter(p=>p.type==='SAKURA').forEach(s => {
+                     bgCtx.save(); bgCtx.translate(s.x, s.y); bgCtx.rotate(s.rotation);
+                     bgCtx.beginPath(); bgCtx.ellipse(0, 0, s.size, s.size * 0.6, 0, 0, Math.PI * 2); bgCtx.fill(); bgCtx.restore();
+                });
+            } else {
+                bgCtx.strokeStyle = 'rgba(170, 190, 255, 0.5)'; bgCtx.lineWidth = 1;
+                weather.particles.filter(p=>p.type==='RAIN').forEach(p => {
+                    bgCtx.beginPath(); bgCtx.moveTo(p.x, p.y); bgCtx.lineTo(p.x + p.speedX, p.y + p.length); bgCtx.stroke();
+                });
+            }
+
+            // Utility Poles (Foreground)
+            bgCtx.strokeStyle = '#1a1a1a'; bgCtx.lineWidth = 3; bgCtx.beginPath();
+            for(let i=0; i<scenery.utilityPoles.length - 1; i++) {
+                let p1 = scenery.utilityPoles[i]; let p2 = scenery.utilityPoles[i+1];
+                bgCtx.moveTo(p1.x, height - 150); bgCtx.bezierCurveTo(p1.x + 100, height - 120, p2.x - 100, height - 120, p2.x, height - 150);
+            }
+            bgCtx.stroke();
+            scenery.utilityPoles.forEach(p => {
+                bgCtx.fillStyle = '#2a2a2e'; bgCtx.fillRect(p.x - 4, height - 250, 8, 250);
+                bgCtx.fillStyle = '#333'; bgCtx.fillRect(p.x - 20, height - 150, 40, 4); 
+            });
+        }
+
+        /* ------------------------------------------------------------
+           SYSTEM 2: NEKO AI (Unchanged)
+        ------------------------------------------------------------ */
+        let neko = { x: 100, y: 0, state: 'SIT', timer: 100, frame: 0, dir: 1, targetX: 0, zzzParticles: [], emojis: [], energy: 100, lastState: 'IDLE', chaseMode: false, chaseTarget: null, sitTimer: 0 };
+        
+        document.addEventListener('click', (e) => {
+            if (neko.state === 'SLEEP' || neko.state === 'SIT') { neko.state = 'WALK'; neko.targetX = e.clientX; neko.timer = 100; neko.energy = 80; }
+            else {
+                const icons = ['🍣', '🧶', '🐟', '⚡', '👾', '💖', '🍙', '🌸', '🎮', '🌟'];
+                neko.emojis.push({ icon: icons[Math.floor(Math.random() * icons.length)], x: 20, y: -20, vx: (Math.random() - 0.5) * 3, vy: -4 - Math.random() * 2, life: 60, alpha: 1.0 });
+                if (Math.random() > 0.6) { neko.chaseMode = true; neko.chaseTarget = {x: e.clientX, y: e.clientY}; neko.timer = 100; }
+            }
+        });
+
+        function updateNeko() {
+            const floorY = height - 40; const pSize = 3; 
+            neko.frame += 0.15; neko.timer--; neko.sitTimer++;
+            
+            if (neko.state === 'WALK' || neko.state === 'CHASE') neko.energy -= 0.1; else if (neko.state === 'SLEEP' || neko.state === 'SIT') neko.energy = Math.min(100, neko.energy + 0.15);
+            
+            if (neko.chaseMode && neko.chaseTarget) {
+                neko.state = 'CHASE';
+                let dx = neko.chaseTarget.x - neko.x;
+                let dist = Math.sqrt(dx*dx);
+                if (dist < 10 || neko.energy < 20) { neko.chaseMode = false; neko.state = 'IDLE'; neko.timer = 60; } else { neko.dir = dx > 0 ? 1 : -1; neko.x += (dx / dist) * 2.5; }
+            }
+            
+            if (neko.timer < 0 && !neko.chaseMode) {
+                const r = Math.random();
+                if (neko.energy < 30 && r < 0.7) { if (neko.sitTimer > 400 && Math.random() > 0.5) { neko.state = 'SIT'; neko.timer = 180; neko.sitTimer = 0; } else { neko.state = 'SLEEP'; neko.timer = 300; } }
+                else if (r < 0.45) { neko.state = 'GROOM'; neko.timer = 90; } else if (r < 0.65) { neko.state = 'WALK'; neko.targetX = Math.random() * width; neko.timer = 200; } else { neko.state = 'IDLE'; neko.timer = 60; }
+            }
+            if (neko.state === 'WALK' && !neko.chaseMode) {
+                let dx = neko.targetX - neko.x;
+                if (Math.abs(dx) < 5) { neko.state = 'IDLE'; neko.timer = 40; } else { neko.dir = dx > 0 ? 1 : -1; neko.x += neko.dir * 2; }
+            }
+
+            nekoCtx.clearRect(0, 0, width, height);
+            nekoCtx.save(); nekoCtx.translate(neko.x, floorY);
+            nekoCtx.font = "20px Arial"; nekoCtx.textAlign = "center";
+            for (let i = neko.emojis.length - 1; i >= 0; i--) {
+                let em = neko.emojis[i]; em.x += em.vx; em.y += em.vy; em.vy += 0.2; em.life--; em.alpha = em.life / 60;
+                nekoCtx.fillStyle = `rgba(255, 255, 255, ${em.alpha})`; nekoCtx.fillText(em.icon, em.x, em.y);
+                if (em.life <= 0) neko.emojis.splice(i, 1);
+            }
+
+            if (neko.dir === 1) { nekoCtx.scale(-1, 1); nekoCtx.translate(-36, 0); }
+            const f = Math.floor(neko.frame);
+            nekoCtx.fillStyle = 'rgba(0,0,0,0.4)'; nekoCtx.fillRect(5, 28, 25, 4);
+            nekoCtx.fillStyle = '#1a1a1a'; 
+
+            if (neko.state === 'IDLE') {
+                let blink = (f % 80 < 3);
+                drawRects(nekoCtx, pSize, [[4,5,6,7], [3,2,8,5], [3,0,2,2], [8,0,2,2], [10,9,2,3], [11+Math.sin(frameCount*0.1), 8, 2, 3]]);
+                if (!blink) { nekoCtx.fillStyle = '#fff'; drawRects(nekoCtx, pSize, [[4,4,1,1], [8,4,1,1]]); }
+            } 
+            else if (neko.state === 'WALK' || neko.state === 'CHASE') {
+                let bob = (f % 4) < 2 ? 0 : 1;
+                nekoCtx.fillStyle = '#1a1a1a';
+                drawRects(nekoCtx, pSize, [[2, 5+bob, 10, 5], [12, 4+bob, 2, 3], [0, 2+bob, 7, 5], [1, 0+bob, 2, 2], [5, 0+bob, 2, 2]]);
+                nekoCtx.fillStyle = '#fff'; drawRects(nekoCtx, pSize, [[1, 4+bob, 1, 1], [5, 4+bob, 1, 1]]);
+                nekoCtx.fillStyle = '#1a1a1a';
+                if (f % 4 === 0) drawRects(nekoCtx, pSize, [[2, 10+bob, 2, 2], [9, 10+bob, 2, 2]]);
+                else if (f % 4 === 1) drawRects(nekoCtx, pSize, [[2, 10+bob, 2, 2], [8, 9+bob, 2, 2]]);
+                else if (f % 4 === 2) drawRects(nekoCtx, pSize, [[3, 9+bob, 2, 2], [8, 10+bob, 2, 2]]);
+                else drawRects(nekoCtx, pSize, [[4, 10+bob, 2, 2], [10, 9+bob, 2, 2]]);
+                drawRects(nekoCtx, pSize, [[14, f%8<4?3+bob:4+bob, 2, 2]]);
+            }
+            else if (neko.state === 'GROOM') {
+                let lick = (f % 8 < 4) ? 1 : 0;
+                drawRects(nekoCtx, pSize, [[4, 6, 7, 6], [4, 2 + lick, 6, 5], [4, 0, 2, 2], [9, 0, 2, 2]]);
+                drawRects(nekoCtx, pSize, f%12<6 ? [[6, 5, 2, 2], [0, 4, 1, 1]] : [[6, 5, 2, 2], [1, 3, 1, 1]]);
+            }
+            else if (neko.state === 'SIT') {
+                drawRects(nekoCtx, pSize, [[4, 7, 7, 5], [3, 5, 8, 4], [3, 3, 2, 2], [8, 3, 2, 2], [5, 4, 1, 1], [8, 4, 1, 1], [4, 12, 6, 2], [11, 8, 2, 2], [12, 6, 2, 2], [11, 4, 2, 2]]);
+                if (f % 60 < 3) { nekoCtx.fillStyle = '#1a1a1a'; drawRects(nekoCtx, pSize, [[5, 4, 1, 1], [8, 4, 1, 1]]); }
+            }
+            else if (neko.state === 'SLEEP') {
+                drawRects(nekoCtx, pSize, [[3, 8, 10, 5], [2, 7, 4, 4], [2, 8, 2, 1], [5, 8, 2, 1]]); 
+                if (Math.floor(neko.frame) % 20 === 0) neko.zzzParticles.push({x: 15, y: 5, life: 40});
+                nekoCtx.fillStyle = '#fff'; nekoCtx.font = '10px monospace';
+                nekoCtx.save(); if (neko.dir === 1) { nekoCtx.scale(-1, 1); nekoCtx.translate(-36, 0); }
+                for (let i = neko.zzzParticles.length - 1; i >= 0; i--) {
+                    let p = neko.zzzParticles[i];
+                    nekoCtx.fillText('z', (neko.dir === 1) ? -(p.x * pSize) + 36 : p.x * pSize, p.y * pSize);
+                    p.y -= 0.2; p.x += Math.sin(p.life/5) * 0.1; p.life--;
+                    if (p.life <= 0) neko.zzzParticles.splice(i, 1);
+                }
+                nekoCtx.restore();
+            }
+            nekoCtx.restore();
+        }
+        function drawRects(ctx, size, coords) { coords.forEach(c => ctx.fillRect(c[0]*size, c[1]*size, c[2]*size, c[3]*size)); }
+        function loop() { drawScenery(); updateNeko(); requestAnimationFrame(loop); }
+        resize(); initScenery(); loop();
+
+        /* ============================================================
+           2025 PORTFOLIO ENHANCEMENTS
+        ============================================================ */
+
+        // --- LOADING SCREEN ---
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loading-screen').classList.add('hidden');
+            }, 1800);
+        });
+
+        // --- CUSTOM CURSOR ---
+        const cursorGlow = document.getElementById('cursor-glow');
+        const cursorTrails = [
+            document.getElementById('cursor-trail-1'),
+            document.getElementById('cursor-trail-2'),
+            document.getElementById('cursor-trail-3')
+        ];
+        
+        let cursorX = 0, cursorY = 0;
+        let trailPositions = [{x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}];
+        
+        document.addEventListener('mousemove', (e) => {
+            cursorX = e.clientX;
+            cursorY = e.clientY;
+            
+            if (cursorGlow) {
+                cursorGlow.style.left = cursorX + 'px';
+                cursorGlow.style.top = cursorY + 'px';
+            }
+        });
+        
+        // Smooth trail animation
+        function animateCursorTrail() {
+            trailPositions.forEach((pos, i) => {
+                const delay = (i + 1) * 0.15;
+                pos.x += (cursorX - pos.x) * (0.3 - delay * 0.05);
+                pos.y += (cursorY - pos.y) * (0.3 - delay * 0.05);
+                
+                if (cursorTrails[i]) {
+                    cursorTrails[i].style.left = pos.x + 'px';
+                    cursorTrails[i].style.top = pos.y + 'px';
+                    cursorTrails[i].style.opacity = 0.6 - (i * 0.15);
+                    cursorTrails[i].style.width = (8 - i * 2) + 'px';
+                    cursorTrails[i].style.height = (8 - i * 2) + 'px';
+                }
+            });
+            requestAnimationFrame(animateCursorTrail);
+        }
+        animateCursorTrail();
+        
+        // Cursor hover effect on interactive elements
+        const interactiveElements = document.querySelectorAll('a, button, .glass-panel, .btn-retro');
+        interactiveElements.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                if (cursorGlow) cursorGlow.classList.add('hover');
+            });
+            el.addEventListener('mouseleave', () => {
+                if (cursorGlow) cursorGlow.classList.remove('hover');
+            });
+        });
+
+        // --- SCROLL-TRIGGERED ANIMATIONS ---
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+        
+        const scrollObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+        
+        document.querySelectorAll('.animate-on-scroll').forEach(el => {
+            scrollObserver.observe(el);
+        });
+
+        // --- 3D TILT EFFECT ON CARDS ---
+        const tiltCards = document.querySelectorAll('.tilt-card');
+        
+        tiltCards.forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                if (document.body.classList.contains('low-perf')) return;
+                
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                const rotateX = (y - centerY) / centerY * -8;
+                const rotateY = (x - centerX) / centerX * 8;
+                
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
+            });
+        });
+
+        // --- MAGNETIC BUTTONS ---
+        const magneticBtns = document.querySelectorAll('.magnetic-btn');
+        
+        magneticBtns.forEach(btn => {
+            btn.addEventListener('mousemove', (e) => {
+                if (document.body.classList.contains('low-perf')) return;
+                
+                const rect = btn.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                
+                btn.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+            });
+            
+            btn.addEventListener('mouseleave', () => {
+                btn.style.transform = 'translate(0, 0)';
+            });
+        });
+
+        // --- PERFORMANCE MODE TOGGLE ---
+        const perfToggle = document.getElementById('perf-toggle');
+        let lowPerfMode = localStorage.getItem('lowPerfMode') === 'true';
+        
+        function applyPerfMode() {
+            if (lowPerfMode) {
+                document.body.classList.add('low-perf');
+                perfToggle.classList.add('active');
+                perfToggle.textContent = '⚡ PERF: ON';
+            } else {
+                document.body.classList.remove('low-perf');
+                perfToggle.classList.remove('active');
+                perfToggle.textContent = '⚡ PERF MODE';
+            }
+        }
+        
+        applyPerfMode();
+        
+        perfToggle.addEventListener('click', () => {
+            lowPerfMode = !lowPerfMode;
+            localStorage.setItem('lowPerfMode', lowPerfMode);
+            applyPerfMode();
+        });
+
+        // --- DETECT REDUCED MOTION PREFERENCE ---
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+        if (prefersReducedMotion.matches) {
+            document.body.classList.add('low-perf');
+        }
+        
+        prefersReducedMotion.addEventListener('change', (e) => {
+            if (e.matches) {
+                document.body.classList.add('low-perf');
+            }
+        });
+
+        // --- KEYBOARD NAVIGATION SUPPORT ---
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Tab') {
+                document.body.classList.add('keyboard-nav');
+            }
+        });
+        
+        document.addEventListener('mousedown', () => {
+            document.body.classList.remove('keyboard-nav');
+        });
+
+        // --- SMOOTH SCROLL FOR ANCHOR LINKS ---
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // --- PARALLAX EFFECT ON SCROLL ---
+        let lastScrollY = 0;
+        window.addEventListener('scroll', () => {
+            if (document.body.classList.contains('low-perf')) return;
+            
+            const scrollY = window.scrollY;
+            const delta = scrollY - lastScrollY;
+            lastScrollY = scrollY;
+            
+            // Subtle parallax on sidebar text
+            const sidebar = document.querySelector('.sidebar-text');
+            if (sidebar) {
+                sidebar.style.transform = `translateY(calc(-50% + ${scrollY * 0.1}px))`;
+            }
+        }, { passive: true });
+
+        console.log('%c🐱 NekoCode Portfolio v2025', 'color: #ff71ce; font-size: 16px; font-weight: bold;');
+        console.log('%cAll 2025 enhancements loaded!', 'color: #01cdfe;');
+    </script>
+</body>
+</html>

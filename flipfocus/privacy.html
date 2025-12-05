@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy | FlipFocus by NekoCode</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=DotGothic16&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-pink: #ff71ce;
+            --neon-blue: #01cdfe;
+            --neon-purple: #b967ff;
+            --neon-yellow: #fff700;
+            --bg-dark: #05040a;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            font-family: 'DotGothic16', sans-serif;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 0;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #05040a; }
+        ::-webkit-scrollbar-thumb { background: #333; border: 1px solid #555; }
+
+        .scanlines {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15),
+                rgba(0, 0, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        .glass-panel {
+            background: rgba(12, 12, 16, 0.95);
+            backdrop-filter: blur(4px);
+            border: 1px solid #333;
+        }
+
+        .neon-text { text-shadow: 2px 2px 0px var(--neon-purple); }
+
+        .section-title {
+            font-family: 'Press Start 2P', cursive;
+            color: var(--neon-pink);
+            font-size: 12px;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #333;
+        }
+
+        .content-text {
+            font-size: 14px;
+            line-height: 1.8;
+            color: #b0b0b0;
+        }
+
+        .content-text strong {
+            color: var(--neon-blue);
+        }
+
+        .content-text ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .content-text li {
+            padding: 6px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .content-text li::before {
+            content: '>';
+            position: absolute;
+            left: 0;
+            color: var(--neon-pink);
+            font-family: 'Press Start 2P', cursive;
+            font-size: 8px;
+        }
+
+        .back-btn {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            color: var(--neon-pink);
+            text-decoration: none;
+            border: 1px solid var(--neon-pink);
+            padding: 10px 20px;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: var(--neon-pink);
+            color: #000;
+        }
+
+        .hanko {
+            border: 2px solid #ff3333;
+            color: #ff3333;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'DotGothic16', sans-serif;
+            font-size: 10px;
+            transform: rotate(-15deg);
+            opacity: 0.8;
+        }
+
+        .highlight-box {
+            background: rgba(1, 205, 254, 0.1);
+            border-left: 3px solid var(--neon-blue);
+            padding: 15px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="scanlines"></div>
+
+    <div class="container mx-auto px-4 py-10 max-w-4xl relative z-10">
+        
+        <!-- Header -->
+        <header class="mb-10">
+            <a href="../index.html" class="back-btn inline-block mb-8">← BACK TO PORTFOLIO</a>
+            <div class="glass-panel p-6">
+                <div class="flex items-center gap-4 mb-4">
+                    <span class="text-3xl">🔒</span>
+                    <div>
+                        <h1 class="text-2xl font-bold text-white neon-text" style="font-family: 'Press Start 2P', cursive;">PRIVACY POLICY</h1>
+                        <p class="text-xs text-gray-500 mt-2">FlipFocus by NekoCode</p>
+                    </div>
+                </div>
+                <p class="text-xs text-pink-400 font-mono">> LAST_UPDATED: JANUARY 2025</p>
+            </div>
+        </header>
+
+        <!-- Content -->
+        <main class="glass-panel p-8">
+            
+            <!-- Introduction -->
+            <section class="mb-10">
+                <h2 class="section-title">// INTRODUCTION</h2>
+                <div class="content-text">
+                    <p>FlipFocus ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains our privacy practices for our offline-first mobile application.</p>
+                </div>
+            </section>
+
+            <!-- Privacy-First Approach -->
+            <section class="mb-10">
+                <h2 class="section-title">// OUR PRIVACY-FIRST APPROACH</h2>
+                <div class="highlight-box">
+                    <p class="content-text"><strong>FlipFocus is designed to be privacy-first and offline-first.</strong> We believe your learning data should stay with you, on your device.</p>
+                </div>
+            </section>
+
+            <!-- What We Don't Collect -->
+            <section class="mb-10">
+                <h2 class="section-title">// INFORMATION WE DO NOT COLLECT</h2>
+                <div class="content-text">
+                    <p class="mb-4"><strong>No Data Collection:</strong></p>
+                    <ul>
+                        <li><strong>No User Analytics:</strong> We do not track your usage patterns or behavior</li>
+                        <li><strong>No Personal Information:</strong> We do not collect names, emails, or personal identifiers</li>
+                        <li><strong>No Study Data:</strong> Your learning progress stays on your device</li>
+                        <li><strong>No Content Tracking:</strong> We cannot see your flashcards or study materials</li>
+                        <li><strong>No Device Tracking:</strong> We do not collect device identifiers or location data</li>
+                    </ul>
+                    
+                    <p class="mb-4 mt-6"><strong>No Third-Party Tracking:</strong></p>
+                    <ul>
+                        <li><strong>No Analytics Services:</strong> We do not use Google Analytics, Firebase, or similar services</li>
+                        <li><strong>No Ad Networks:</strong> We do not integrate advertising networks that track users</li>
+                        <li><strong>No Social Media Tracking:</strong> We do not use social media SDKs that collect data</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Local Storage -->
+            <section class="mb-10">
+                <h2 class="section-title">// INFORMATION STORED LOCALLY</h2>
+                <div class="content-text">
+                    <p class="mb-4"><strong>On Your Device Only:</strong></p>
+                    <ul>
+                        <li><strong>Flashcard Content:</strong> All your questions, answers, images, and audio stay on your device</li>
+                        <li><strong>Study Progress:</strong> Your learning statistics and review history remain local</li>
+                        <li><strong>App Settings:</strong> Preferences, themes, and customizations stored locally</li>
+                        <li><strong>Media Files:</strong> Any images or audio you add are stored only on your device</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Camera Permission -->
+            <section class="mb-10">
+                <h2 class="section-title">// CAMERA PERMISSION AND USAGE</h2>
+                <div class="content-text">
+                    <ul>
+                        <li><strong>Permission Requested:</strong> android.permission.CAMERA</li>
+                        <li><strong>Purpose:</strong> The camera is used solely for real-time scanning and Optical Character Recognition (OCR) to extract text from physical materials (e.g., books, notes) that you choose to scan.</li>
+                        <li><strong>Processing Location:</strong> Camera frames and extracted text are processed on-device. We do not transmit camera data or OCR results to our servers.</li>
+                        <li><strong>Data Retention:</strong> Live camera frames are not stored. Images are only saved if you explicitly capture and save them.</li>
+                        <li><strong>Background Access:</strong> We do not access the camera in the background; use occurs only while you are actively in a camera/scan screen.</li>
+                        <li><strong>User Controls:</strong> You can deny the camera permission; the app remains usable, but scan/OCR features are disabled.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Google Account -->
+            <section class="mb-10">
+                <h2 class="section-title">// OPTIONAL GOOGLE ACCOUNT INTEGRATION</h2>
+                <div class="content-text">
+                    <p class="mb-4"><strong>When You Choose to Connect Google:</strong></p>
+                    <ul>
+                        <li><strong>Identity Only:</strong> We only use your Google account to identify backup ownership</li>
+                        <li><strong>No Data Sent to Google:</strong> Your study content is not sent to Google's servers</li>
+                        <li><strong>Local Encryption:</strong> Backups are encrypted on your device before any storage</li>
+                        <li><strong>Your Control:</strong> You can disconnect Google account anytime without data loss</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Data Security -->
+            <section class="mb-10">
+                <h2 class="section-title">// DATA STORAGE AND SECURITY</h2>
+                <div class="content-text">
+                    <p class="mb-4"><strong>Local Storage Only:</strong></p>
+                    <ul>
+                        <li>All data is stored locally on your device using secure, encrypted storage</li>
+                        <li>We use industry-standard encryption for local data protection</li>
+                        <li>No data is transmitted to external servers during normal app usage</li>
+                    </ul>
+                    
+                    <p class="mb-4 mt-6"><strong>Backup Security (Optional):</strong></p>
+                    <ul>
+                        <li>When you create backups, they are encrypted on your device first</li>
+                        <li>You control where backups are stored (local files, Google Drive via your account)</li>
+                        <li>Backup files are encrypted and can only be restored by you</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Data Sharing -->
+            <section class="mb-10">
+                <h2 class="section-title">// DATA SHARING AND DISCLOSURE</h2>
+                <div class="highlight-box">
+                    <p class="content-text"><strong>We Do NOT Share Any Data:</strong></p>
+                    <ul class="content-text mt-2">
+                        <li><strong>Zero Data Collection:</strong> Since we don't collect data, we have nothing to share</li>
+                        <li><strong>No Third Parties:</strong> We do not work with data brokers, analytics companies, or advertisers</li>
+                        <li><strong>No Government Requests:</strong> We cannot provide data we don't have</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Your Rights -->
+            <section class="mb-10">
+                <h2 class="section-title">// YOUR RIGHTS AND CHOICES</h2>
+                <div class="content-text">
+                    <p class="mb-4"><strong>Complete Control:</strong></p>
+                    <ul>
+                        <li><strong>Full Ownership:</strong> All your data stays on your device - you own and control it completely</li>
+                        <li><strong>Export Anytime:</strong> Use the backup feature to export all your data</li>
+                        <li><strong>Delete Anytime:</strong> Uninstall the app to remove all data, or use app settings to reset</li>
+                        <li><strong>No Requests Needed:</strong> Since we don't collect data, you don't need to request access or deletion</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Children's Privacy -->
+            <section class="mb-10">
+                <h2 class="section-title">// CHILDREN'S PRIVACY</h2>
+                <div class="content-text">
+                    <p class="mb-4">FlipFocus is safe for users of all ages:</p>
+                    <ul>
+                        <li><strong>No Data Collection:</strong> We don't collect any personal information from anyone, including children</li>
+                        <li><strong>COPPA Compliant:</strong> Since we collect no data, we automatically comply with children's privacy laws</li>
+                        <li><strong>Parental Peace of Mind:</strong> Parents can be confident no data leaves the device</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- International Users -->
+            <section class="mb-10">
+                <h2 class="section-title">// INTERNATIONAL USERS</h2>
+                <div class="content-text">
+                    <p class="mb-4">FlipFocus respects privacy worldwide:</p>
+                    <ul>
+                        <li><strong>No Data Transfers:</strong> Since data stays on your device, there are no international transfers</li>
+                        <li><strong>GDPR Compliant:</strong> We comply by not collecting personal data</li>
+                        <li><strong>Universal Privacy:</strong> Same privacy protection regardless of location</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Contact -->
+            <section class="mb-10">
+                <h2 class="section-title">// CONTACT US</h2>
+                <div class="content-text">
+                    <p class="mb-4">For privacy-related questions:</p>
+                    <ul>
+                        <li><strong>Email:</strong> nekocode.dev@gmail.com</li>
+                        <li><strong>In-App:</strong> Use the feedback feature for questions</li>
+                    </ul>
+                    <p class="mt-4 text-gray-500 text-sm">Since we don't collect data, we have no privacy incidents to report and no data breaches are possible.</p>
+                </div>
+            </section>
+
+            <!-- Footer Note -->
+            <div class="border-t border-gray-800 pt-6 mt-10">
+                <p class="content-text text-center text-sm text-gray-500">
+                    This privacy policy reflects our commitment to keeping your learning data private and secure on your device. Your privacy is not just important to us - it's built into our app's architecture.
+                </p>
+            </div>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="text-center py-10 text-[10px] text-gray-600 flex flex-col items-center gap-3">
+            <div class="hanko">猫</div>
+            <p>MADE WITH <span class="text-pink-600">♥</span> BY NEKOCODE</p>
+            <p class="font-mono text-[8px] opacity-50">© 2024 NEKOCODE // PRIVACY_FIRST</p>
+            <div class="flex gap-4 mt-4">
+                <a href="index.html" class="text-gray-500 hover:text-pink-400 transition-colors">FlipFocus</a>
+                <span class="text-gray-700">|</span>
+                <a href="terms.html" class="text-gray-500 hover:text-pink-400 transition-colors">Terms of Service</a>
+                <span class="text-gray-700">|</span>
+                <a href="../index.html" class="text-gray-500 hover:text-pink-400 transition-colors">Portfolio</a>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>
