@@ -11,7 +11,7 @@ Follow these steps to enable your contact form for free.
 
 ```javascript
 /**
- * BACKEND SCRIPT FOR NEKOCODE CONTACT FORM
+ * BACKEND SCRIPT FOR NEKOCODE CONTACT FORMZ
  */
 
 // CHANGE THIS: Where you want to receive emails
