@@ -123,6 +123,10 @@ const initials = name.split(' ').map(n => n[0]).join('').slice(0, 2);
     object-fit: contain; /* Full character art */
     filter: drop-shadow(0 8px 16px rgba(0,0,0,0.2)); /* Deep shadow for 3D feel */
     transition: filter 0.3s ease;
+    
+    /* Hide the bottom cut with a smooth fade */
+    -webkit-mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
   }
   
   .team-card:hover .avatar img {
