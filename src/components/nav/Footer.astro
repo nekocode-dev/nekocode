@@ -143,6 +143,11 @@ const base = import.meta.env.BASE_URL;
     font-size: var(--text-sm);
   }
   
+  /* Fix: Allow nav children to be grid items */
+  .footer-nav {
+    display: contents;
+  }
+  
   .tagline-kanji {
     font-family: "Hiragino Kaku Gothic Pro", "Yu Gothic", sans-serif;
     font-size: 1.1em;
