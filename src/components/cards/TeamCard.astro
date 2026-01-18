@@ -158,7 +158,9 @@ const isNeko = name.toLowerCase().includes('nekocode');
   
   .info {
     width: 100%;
-    margin-top: var(--space-8); /* Push content down more for big heads */
+    margin-top: 130px; /* Push down to clear the 220px/250px avatar (110px/125px inside card) */
+    position: relative;
+    z-index: 20; /* Ensure text sits ON TOP of the avatar, not behind */
   }
   
   /* Responsive */
