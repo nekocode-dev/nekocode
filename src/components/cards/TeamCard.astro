@@ -24,10 +24,10 @@ const {
   class: className = ''
 } = Astro.props;
 
-const initials = name.split(' ').map(n => n[0]).join('').slice(0, 2);
+const isNeko = name.toLowerCase().includes('nekocode');
 ---
 
-<div class:list={['team-card', className]}>
+<div class:list={['team-card', className, { 'is-neko': isNeko }]}>
   <div class="avatar">
     {avatar ? (
       <img src={avatar} alt={name} loading="lazy" />
@@ -85,7 +85,7 @@ const initials = name.split(' ').map(n => n[0]).join('').slice(0, 2);
     border: 1px solid var(--color-border);
     transition: all var(--duration-normal) var(--ease-out);
     position: relative;
-    margin-top: var(--space-12); /* Space for the head to pop out */
+    margin-top: var(--space-16); /* Increased space for bigger head */
   }
   
   .team-card:hover {
@@ -96,12 +96,12 @@ const initials = name.split(' ').map(n => n[0]).join('').slice(0, 2);
   
   .avatar {
     flex-shrink: 0;
-    width: 180px; /* Bigger avatar */
-    height: 180px;
+    width: 220px; /* Big avatar base */
+    height: 220px;
     
     /* The Pop-Out Magic */
     position: absolute;
-    top: -90px; /* Half height to sit on the edge */
+    top: -110px; /* Half height */
     left: 50%;
     transform: translateX(-50%);
     
@@ -110,6 +110,13 @@ const initials = name.split(' ').map(n => n[0]).join('').slice(0, 2);
     justify-content: center;
     transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); /* Bouncy spring */
     z-index: 10;
+  }
+  
+  /* NekoCode Specific Boost */
+  .is-neko .avatar {
+     width: 250px; /* Even bigger for Neko */
+     height: 250px;
+     top: -125px;
   }
   
   .team-card:hover .avatar {
@@ -151,63 +158,27 @@ const initials = name.split(' ').map(n => n[0]).join('').slice(0, 2);
   
   .info {
     width: 100%;
-    margin-top: var(--space-6); /* Push content down */
+    margin-top: var(--space-8); /* Push content down more for big heads */
   }
   
-  .name {
-    font-family: var(--font-display);
-    font-size: var(--text-xl);
-    font-weight: 700;
-    color: var(--color-text);
-    margin: 0 0 var(--space-2);
-  }
-  
-  .role {
-    font-size: var(--text-xs);
-    font-weight: 600;
-    color: var(--color-accent-contrast);
-    background: var(--color-accent);
-    display: inline-block;
-    padding: 4px 12px;
-    border-radius: var(--radius-full);
-    margin-bottom: var(--space-4);
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-  }
-  
-  .bio {
-    font-size: var(--text-sm);
-    color: var(--color-text-secondary);
-    line-height: 1.6;
-    margin: 0;
-  }
-  
-  .links {
-    display: flex;
-    justify-content: center; /* Center since card is centered */
-    gap: var(--space-3);
-    margin-top: var(--space-4);
-  }
-  
-  .links a {
-    color: var(--color-muted);
-    transition: color var(--duration-fast) var(--ease-out);
-  }
-  
-  .links a:hover {
-    color: var(--color-text);
-  }
-  
+  /* Responsive */
   @media (max-width: 480px) {
-    /* Base styles are already responsive/stacked */
+    /* Stack even more */
     .avatar {
-        width: 120px;
-        height: 120px;
-        top: -60px;
+        width: 160px;
+        height: 160px;
+        top: -80px;
+    }
+    
+    .is-neko .avatar {
+        width: 180px;
+        height: 180px;
+        top: -90px;
     }
     
     .team-card {
-        margin-top: var(--space-8);
+        margin-top: var(--space-12);
+        padding-top: var(--space-8);
     }
   }
 </style>
