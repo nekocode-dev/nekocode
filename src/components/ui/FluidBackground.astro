@@ -340,12 +340,13 @@
       },
 
       evaluateTier() {
-          // Simplified Logic: > 30 = S, < 30 = C
-          if (this.fps < 30 && this.tier === 'S') {
+          // Adjusted Logic: User requested to "push the limit".
+          // Threshold lowered to 20 FPS. 
+          // If it can maintain >20 FPS (Cinematic minimum), we keep the high-quality liquid.
+          // Only truly struggling devices (slide-show level) will downgrade.
+          if (this.fps < 20 && this.tier === 'S') {
               this.setTier('C');
           } 
-          // Optional: Upgrade back if performance stabilizes? 
-          // Usually better to stay downgraded to avoid flip-flopping.
       },
 
       setTier(newTier) {
