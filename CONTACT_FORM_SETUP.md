@@ -18,6 +18,9 @@ Follow these steps to enable your contact form for free.
 // By default, this sends to the Gmail account that owns the script.
 const TO_EMAIL = Session.getActiveUser().getEmail();
 
+/**
+ * Handle POST requests (Contact Form)
+ */
 function doPost(e) {
   try {
     const data = JSON.parse(e.postData.contents);
@@ -32,6 +35,36 @@ function doPost(e) {
     return ContentService.createTextOutput(JSON.stringify({ 
       status: 'success', 
       message: 'Message sent successfully' 
+    })).setMimeType(ContentService.MimeType.JSON);
+
+  } catch (error) {
+    return ContentService.createTextOutput(JSON.stringify({ 
+      status: 'error', 
+      message: error.toString() 
+    })).setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+/**
+ * Handle GET requests (Visitor Counter)
+ */
+function doGet(e) {
+  try {
+    const action = e.parameter.action;
+    const propertyKey = 'VISITOR_COUNT';
+    const scriptProperties = PropertiesService.getScriptProperties();
+    
+    let count = Number(scriptProperties.getProperty(propertyKey)) || 0;
+
+    if (action === 'increment_visitor') {
+      count++;
+      scriptProperties.setProperty(propertyKey, count.toString());
+    }
+
+    // Always return the count (whether we incremented or just requested it)
+    return ContentService.createTextOutput(JSON.stringify({ 
+      status: 'success', 
+      count: count 
     })).setMimeType(ContentService.MimeType.JSON);
 
   } catch (error) {
@@ -84,6 +117,12 @@ function initialSetup() {
   const sheet = doc.getSheetByName('Submissions') || doc.insertSheet('Submissions');
   if (sheet.getLastRow() === 0) {
     sheet.appendRow(['Timestamp', 'Name', 'Email', 'Subject', 'Message']);
+  }
+  
+  // Initialize visitor count if missing
+  const scriptProperties = PropertiesService.getScriptProperties();
+  if (!scriptProperties.getProperty('VISITOR_COUNT')) {
+    scriptProperties.setProperty('VISITOR_COUNT', '0');
   }
 }
 ```

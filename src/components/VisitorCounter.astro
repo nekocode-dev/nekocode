@@ -1,0 +1,98 @@
+---
+const { class: className } = Astro.props;
+
+// We use the same URL as the contact form for simplicity, assuming the user updates the backend script.
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyKecivW_-lSa7L_tSgCmcf8c0upzL3ngjFaKXIdPcZR0AAuKJGLYyGX3yh3tGIjmkK/exec';
+---
+
+<visitor-counter class={className} data-script-url={GOOGLE_SCRIPT_URL}>
+  <div class="counter-container" title="Unique Visitors">
+    <span class="icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+    </span>
+    <span class="count">...</span>
+  </div>
+</visitor-counter>
+
+<style>
+  .counter-container {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--color-muted);
+    background: rgba(255, 255, 255, 0.03);
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+    cursor: default;
+  }
+
+  .counter-container:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: var(--color-text-secondary);
+  }
+
+  .icon {
+    display: flex;
+    opacity: 0.7;
+  }
+
+  .count {
+    font-weight: 500;
+    min-width: 2ch;
+    text-align: center;
+  }
+</style>
+
+<script>
+  class VisitorCounter extends HTMLElement {
+    constructor() {
+      super();
+      this.init();
+    }
+
+    async init() {
+      const scriptUrl = this.dataset.scriptUrl;
+      const countElement = this.querySelector('.count');
+      if (!scriptUrl || !countElement) return;
+
+      // Check if user has visited before (simple localStorage check)
+      const storageKey = 'neko_visitor_recorded';
+      const hasVisited = localStorage.getItem(storageKey);
+      
+      // If visited, just get the count. If not, increment.
+      const action = hasVisited ? 'get_count' : 'increment_visitor';
+
+      try {
+        // We use 'no-cors' for Google Scripts usually, but for GET requests to return data 
+        // we might handle it differently. However, Google Apps Script Web Apps allow CORS if deployed correctly.
+        // We'll try a simple fetch. If CORS fails, we might need a workaround, 
+        // but traditionally `ContentService` text output works with simple GETs.
+        
+        const response = await fetch(`${scriptUrl}?action=${action}`);
+        
+        if (!response.ok) throw new Error('Network response was not ok');
+        
+        const data = await response.json();
+        
+        if (data.count !== undefined) {
+          // Format number (e.g. 1,024)
+          countElement.textContent = new Intl.NumberFormat('en-US').format(data.count);
+          
+          if (action === 'increment_visitor') {
+            localStorage.setItem(storageKey, 'true');
+          }
+        }
+      } catch (err) {
+        console.error('Visitor counter error:', err);
+        countElement.textContent = '---';
+      }
+    }
+  }
+
+  customElements.define('visitor-counter', VisitorCounter);
+</script>
