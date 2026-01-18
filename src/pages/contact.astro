@@ -35,10 +35,10 @@ import Button from '@/components/ui/Button.astro';
           <label for="subject">Subject</label>
           <select id="subject" name="subject" required>
             <option value="">Select a topic</option>
-            <option value="project">Project Inquiry</option>
-            <option value="consulting">Consulting</option>
-            <option value="collaboration">Collaboration</option>
-            <option value="other">Other</option>
+            <option value="Project Inquiry">Project Inquiry</option>
+            <option value="Consulting">Consulting</option>
+            <option value="Collaboration">Collaboration</option>
+            <option value="Other">Other</option>
           </select>
         </div>
         
@@ -70,7 +70,9 @@ import Button from '@/components/ui/Button.astro';
 
   form?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    if (!form || !statusDiv || !submitBtn) return;
+    if (!form || !statusDiv || !submitBtn) {
+        return;
+    }
 
     // UI Loading State
     const originalBtnText = submitBtn.innerText;
@@ -83,7 +85,6 @@ import Button from '@/components/ui/Button.astro';
     const honeypot = document.getElementById('website_url') as HTMLInputElement;
     if (honeypot && honeypot.value) {
       // It's a bot! Fake success, do not send request.
-      console.log('Bot detected. Silently rejecting.');
       // Simulate network delay
       await new Promise(r => setTimeout(r, 1000));
       
@@ -105,7 +106,7 @@ import Button from '@/components/ui/Button.astro';
       const jsonData = Object.fromEntries(formData.entries());
 
       // Use no-cors mode for Google Scripts
-      await fetch(GOOGLE_SCRIPT_URL, {
+      const response = await fetch(GOOGLE_SCRIPT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain' }, // Google requires text/plain to avoid preflight
         body: JSON.stringify(jsonData)

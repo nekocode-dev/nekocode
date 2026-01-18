@@ -17,7 +17,8 @@ const {
   href,
   type = 'button',
   disabled = false,
-  class: className = ''
+  class: className = '',
+  ...rest
 } = Astro.props;
 
 const Element = href ? 'a' : 'button';
@@ -41,6 +42,7 @@ const resolvedHref = href && href.startsWith('/') && !href.startsWith('//')
   disabled={disabled}
   role={href ? 'button' : undefined}
   data-magnetic={variant === 'accent' ? '' : undefined}
+  {...rest}
 >
   <slot />
 </Element>
