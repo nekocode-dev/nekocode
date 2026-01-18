@@ -1058,6 +1058,7 @@ const appStoreUrl = ''; // Empty = coming soon
   .store-button {
     display: inline-flex;
     align-items: center;
+    justify-content: center; /* Center content */
     gap: var(--space-3);
     padding: var(--space-4) var(--space-8);
     background: var(--color-text);
@@ -1068,6 +1069,7 @@ const appStoreUrl = ''; // Empty = coming soon
     transition: all var(--duration-fast) var(--ease-out);
     border: none;
     cursor: pointer;
+    width: 220px; /* Fixed width for perfect matching */
   }
   
   .store-button:hover {
