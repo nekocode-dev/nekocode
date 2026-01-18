@@ -86,6 +86,7 @@ const isNeko = name.toLowerCase().includes('nekocode');
     transition: all var(--duration-normal) var(--ease-out);
     position: relative;
     margin-top: var(--space-16); /* Increased space for bigger head */
+    height: 100%; /* Ensure card takes full height of grid cell */
   }
   
   .team-card:hover {
@@ -161,6 +162,11 @@ const isNeko = name.toLowerCase().includes('nekocode');
     margin-top: var(--space-8); /* Overlap is back! */
     position: relative;
     z-index: 20; /* Name sits on top of the suit */
+    
+    /* Flex magic to push links down */
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
   }
   
   .name {
@@ -185,6 +191,8 @@ const isNeko = name.toLowerCase().includes('nekocode');
     text-transform: uppercase;
     position: relative;
     z-index: 20;
+    /* Prevent role from stretching in flex column */
+    align-self: center;
   }
   
   .bio {
@@ -200,7 +208,8 @@ const isNeko = name.toLowerCase().includes('nekocode');
     display: flex;
     justify-content: center; /* Center since card is centered */
     gap: var(--space-3);
-    margin-top: var(--space-4);
+    margin-top: auto; /* Push to the bottom! */
+    padding-top: var(--space-6); 
     position: relative;
     z-index: 20;
   }
