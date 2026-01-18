@@ -7,7 +7,8 @@ import Section from '@/components/layout/Section.astro';
 import TeamCard from '@/components/cards/TeamCard.astro';
 import { getCollection } from 'astro:content';
 
-const teamMembers = await getCollection('team');
+const allTeamMembers = await getCollection('team');
+const teamMembers = allTeamMembers.sort((a, b) => (a.data.order || 99) - (b.data.order || 99));
 ---
 
 <BaseLayout title="Team" description="Meet the team behind NekoCode">
