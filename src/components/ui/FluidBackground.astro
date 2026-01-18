@@ -211,10 +211,19 @@
   window.addEventListener('mousedown', () => connectionState.isMouseDown = true);
   window.addEventListener('mouseup', () => connectionState.isMouseDown = false);
 
+  // Global animation frame ID to manage cancellation
+  let animationFrameId;
+
   function init() {
+    // 1. Cleanup previous loop to prevent double-speed/memory leaks
+    if (animationFrameId) {
+      cancelAnimationFrame(animationFrameId);
+    }
+    
     const container = document.querySelector('.lava-lamp');
     if (!container) return;
     
+    // Clear any existing blobs (vital for View Transitions navigation)
     container.innerHTML = '';
     particles = [];
 
@@ -228,6 +237,9 @@
       
       particles.push(new Particle(div, x, y));
     }
+    
+    // Reset PerformanceManager for the new page life
+    PerformanceManager.init();
     
     loop();
   }
@@ -311,14 +323,14 @@
   function loop() {
     interact();
     computeCohesion();
-    updateLighting(); // Checker inside handles optimization
+    updateLighting(); 
     
     for (const p of particles) {
       p.update();
     }
     
     // Pass timestamp to loop
-    requestAnimationFrame((timestamp) => {
+    animationFrameId = requestAnimationFrame((timestamp) => {
         PerformanceManager.update(timestamp);
         loop();
     });
@@ -341,14 +353,33 @@
 
       init() {
           this.container = document.querySelector('.lava-lamp');
+          // Reset state for new page
+          this.warmup = true;
+          this.lowFpsStrikes = 0;
+          this.frames = 0;
+          this.lastTime = performance.now();
+          
+          if (this.warmupTimer) clearTimeout(this.warmupTimer);
+          
           // Ignore performance for first 4 seconds (Hydration/Load spike protection)
           this.warmupTimer = setTimeout(() => {
               this.warmup = false;
-              console.log('[Performance] Warmup complete. Monitoring active.');
+              // console.log('[Performance] Warmup complete. Monitoring active.');
           }, 4000);
       },
 
       update(timestamp) {
+          // Sleep/Tab Switch Detection
+          // If >2 seconds passed since last frame, user was likely in another tab.
+          // Don't count this massive gap as "0 FPS". Resume smoothly.
+          if (timestamp - this.lastTime > 2000) {
+              // console.log('[Performance] Waking from sleep. Skipping stats.');
+              this.lastTime = timestamp;
+              this.lastCheck = timestamp;
+              this.frames = 0;
+              return;
+          }
+
           this.frames++;
           if (timestamp - this.lastTime >= 1000) {
               this.fps = this.frames;
@@ -371,7 +402,7 @@
           // 2. Strikes: Must fail 3 times in a row (6 seconds of sustained lag)
           if (this.fps < 24 && this.tier === 'S') {
               this.lowFpsStrikes++;
-              console.warn(`[Performance] Strike ${this.lowFpsStrikes}/3 (FPS: ${this.fps})`);
+              // console.warn(`[Performance] Strike ${this.lowFpsStrikes}/3 (FPS: ${this.fps})`);
               
               if (this.lowFpsStrikes >= 3) {
                   this.setTier('C');
@@ -384,19 +415,17 @@
 
       setTier(newTier) {
           if (this.tier === newTier) return;
-          console.log(`[Performance] Switching Tier: ${this.tier} -> ${newTier}`);
+          if (!this.container) return;
+          
+          // console.log(`[Performance] Switching Tier: ${this.tier} -> ${newTier}`);
           this.tier = newTier;
           
           // Helper to apply changes after fade-out
           const applyChanges = () => {
               if (newTier === 'C') {
                   // Tier C: "Safety Mode"
-                  // User requested: "turn it off".
-                  // We disable the heavy Goo Matrix (Computationally expensive).
-                  // We also reduce opacity to make it less distracting if it was stuttering.
-                  // We keep simple blurred dots (Bokeh) so it's not just empty blackness.
-                  this.container.style.filter = 'blur(12px)'; // Cheap GPU blur
-                  this.container.style.opacity = '0.5'; // Dim significantly
+                  this.container.style.filter = 'blur(12px)'; 
+                  this.container.style.opacity = '0.5'; 
               } else {
                   // Tier S: "Liquid Mode" (Ultra)
                   this.container.style.filter = 'url(#goo)';
@@ -405,29 +434,23 @@
           };
 
           // Smooth Transition: Fade Out -> Swap -> Fade In
-          if (this.container) {
-              // 1. Fade Out
-              this.container.style.transition = 'opacity 1s ease-in-out';
-              this.container.style.opacity = '0';
+          this.container.style.transition = 'opacity 1s ease-in-out';
+          this.container.style.opacity = '0';
+          
+          setTimeout(() => {
+              applyChanges();
               
               setTimeout(() => {
-                  // 2. Apply "Turn Off" changes
-                  applyChanges();
-                  
-                  // 3. Fade Back In
-                  setTimeout(() => {
-                    // Start fade in to the target opacity
-                    this.container.style.opacity = newTier === 'C' ? '0.5' : '1'; 
-                  }, 100); 
-              }, 1000); 
-          }
+                this.container.style.opacity = newTier === 'C' ? '0.5' : '1'; 
+              }, 100); 
+          }, 1000); 
       }
   };
 
-  setTimeout(() => {
-    init();
-    PerformanceManager.init();
-  }, 100);
+  // Re-Initialize on every Astro page navigation (View Transitions)
+  document.addEventListener('astro:page-load', () => {
+      init();
+  });
 
 </script>
 
