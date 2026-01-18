@@ -45,9 +45,6 @@ function initScrollReveal() {
 /**
  * Split Text Animation - Word by word reveal
  */
-/**
- * Split Text Animation - Word by word reveal
- */
 function initSplitText() {
     const elements = document.querySelectorAll('[data-split-text]');
 
@@ -151,13 +148,21 @@ function animateCounter(el) {
 
 /**
  * 3D Card Tilt Effect
+ * Optimized: Caches boundingClientRect on mouseenter
  */
 function initCardTilt() {
     const cards = document.querySelectorAll('[data-tilt]');
 
     cards.forEach((card) => {
-        card.addEventListener('mousemove', (e) => {
-            const rect = card.getBoundingClientRect();
+        let rect;
+        let isActive = false;
+
+        const updateTilt = (e) => {
+            if (!isActive) return;
+
+            // Use cached rect
+            if (!rect) rect = card.getBoundingClientRect();
+
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
 
@@ -170,18 +175,30 @@ function initCardTilt() {
             card.style.setProperty('--tilt-x', `${tiltX}deg`);
             card.style.setProperty('--tilt-y', `${tiltY}deg`);
             card.style.transform = `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) translateZ(10px)`;
-        });
+        };
 
-        card.addEventListener('mouseleave', () => {
+        const onMouseEnter = () => {
+            isActive = true;
+            rect = card.getBoundingClientRect();
+        };
+
+        const onMouseLeave = () => {
+            isActive = false;
             card.style.setProperty('--tilt-x', '0deg');
             card.style.setProperty('--tilt-y', '0deg');
             card.style.transform = '';
-        });
+            rect = null; // Clear cache
+        };
+
+        card.addEventListener('mouseenter', onMouseEnter);
+        card.addEventListener('mousemove', (e) => requestAnimationFrame(() => updateTilt(e)));
+        card.addEventListener('mouseleave', onMouseLeave);
     });
 }
 
 /**
  * Custom Cursor
+ * Optimized: Uses translate3d for hardware acceleration and avoids layout thrashing
  */
 function initCustomCursor() {
     // Check for reduced motion preference
@@ -194,20 +211,23 @@ function initCustomCursor() {
     cursor.className = 'custom-cursor';
     document.body.appendChild(cursor);
 
-    let mouseX = 0, mouseY = 0;
-    let cursorX = 0, cursorY = 0;
+    // Initial position off-screen
+    let mouseX = -100, mouseY = -100;
+    let cursorX = -100, cursorY = -100;
 
     document.addEventListener('mousemove', (e) => {
         mouseX = e.clientX;
         mouseY = e.clientY;
-        cursor.classList.add('visible');
+        if (!cursor.classList.contains('visible')) {
+            cursor.classList.add('visible');
+        }
     });
 
     document.addEventListener('mouseleave', () => {
         cursor.classList.remove('visible');
     });
 
-    // Smooth cursor follow
+    // Smooth cursor follow loop
     function animate() {
         const dx = mouseX - cursorX;
         const dy = mouseY - cursorY;
@@ -215,8 +235,8 @@ function initCustomCursor() {
         cursorX += dx * 0.15;
         cursorY += dy * 0.15;
 
-        cursor.style.left = `${cursorX}px`;
-        cursor.style.top = `${cursorY}px`;
+        // Use transform instead of top/left to prevent reflows
+        cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) translate(-50%, -50%)`;
 
         requestAnimationFrame(animate);
     }
@@ -236,22 +256,39 @@ function initCustomCursor() {
 
 /**
  * Magnetic Button Effect
+ * Optimized: Caches boundingClientRect on mouseenter
  */
 function initMagneticButtons() {
     const buttons = document.querySelectorAll('[data-magnetic]');
 
     buttons.forEach((btn) => {
-        btn.addEventListener('mousemove', (e) => {
-            const rect = btn.getBoundingClientRect();
+        let rect;
+        let isActive = false;
+
+        const updateMagnet = (e) => {
+            if (!isActive) return;
+            if (!rect) rect = btn.getBoundingClientRect();
+
             const x = e.clientX - rect.left - rect.width / 2;
             const y = e.clientY - rect.top - rect.height / 2;
 
             btn.style.transform = `translate(${x * 0.2}px, ${y * 0.2}px)`;
-        });
+        };
 
-        btn.addEventListener('mouseleave', () => {
+        const onMouseEnter = () => {
+            isActive = true;
+            rect = btn.getBoundingClientRect();
+        };
+
+        const onMouseLeave = () => {
+            isActive = false;
             btn.style.transform = '';
-        });
+            rect = null;
+        };
+
+        btn.addEventListener('mouseenter', onMouseEnter);
+        btn.addEventListener('mousemove', (e) => requestAnimationFrame(() => updateMagnet(e)));
+        btn.addEventListener('mouseleave', onMouseLeave);
     });
 }
 

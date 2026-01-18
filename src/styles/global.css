@@ -6,7 +6,10 @@
 /* ========================================
    Font Imports
    ======================================== */
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Inter:wght@400..600&display=swap');
+/* ========================================
+   Font Imports
+   ======================================== */
+/* Fonts loaded in BaseLayout.astro for performance */
 
 /* ========================================
    Design Tokens

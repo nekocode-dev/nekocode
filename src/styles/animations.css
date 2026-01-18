@@ -271,8 +271,11 @@
     pointer-events: none;
     z-index: 9999;
     mix-blend-mode: difference;
-    transform: translate(-50%, -50%) scale(1);
-    transition: transform 0.15s var(--anim-ease-out);
+    left: 0;
+    top: 0;
+    will-change: transform;
+    /* Removed transform transition here because JS handles the smoothing */
+    transition: opacity 0.15s var(--anim-ease-out), transform 0.15s var(--anim-ease-out);
     opacity: 0;
 }
 

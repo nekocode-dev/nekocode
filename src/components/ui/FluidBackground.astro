@@ -13,14 +13,18 @@
         <feGaussianBlur in="SourceGraphic" stdDeviation="12" result="blur" />
 
         <!-- Threshold to create the gooey shape -->
-        <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9" result="goo" />
+        <!-- Alpha threshold reduced (19 -> 18) to allow slightly more merging -->
+        <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="goo" />
 
         <!-- 3D Lighting Effect -->
         <!-- Use the alpha channel of the goo as a height map -->
         <feGaussianBlur in="goo" stdDeviation="2" result="softGoo"/>
 
-        <feSpecularLighting in="softGoo" surfaceScale="6" specularConstant="1.5" specularExponent="25" result="specular" lighting-color="#ffffff">
-            <fePointLight x="200" y="-100" z="400"/>
+        <!-- Zen Lighting: Warmer, softer, more "premium oil" feel -->
+        <!-- specularConstant reduced (1.0 -> 0.7) for subtler gloss -->
+        <!-- specularExponent increased (35 -> 50) for smaller, sharper highlights -->
+        <feSpecularLighting in="softGoo" surfaceScale="6" specularConstant="0.7" specularExponent="50" result="specular" lighting-color="#fffff0">
+            <fePointLight id="ambient-light" x="200" y="-100" z="500"/>
         </feSpecularLighting>
 
         <!-- Composite the highlight over the goo -->
@@ -44,152 +48,262 @@
 </div>
 
 <script>
-  // Physics Configuration
+  /**
+   * Realistic Liquid Physics Engine
+   * Uses Lennard-Jones Potential for cohesive particle interaction.
+   * Simulates Van der Waals forces: Attraction at range, Repulsion at close quarters.
+   */
+  
   const CONFIG = {
-    blobCount: 12,
-    baseSize: 100,
-    sizeVar: 150,
-    buoyancy: -0.5, 
-    drag: 0.94, // Even thicker
-    repulsionRadius: 400,
-    repulsionForce: 60, // Reduced significantly
-    returnForce: 0.005,
+    blobCount: 15, 
+    baseRadius: 40, // Much smaller base
+    radiusVar: 100, // Massive variance (tiny to huge blobs)
+    
+    // Lennard-Jones Constants
+    epsilon: 0.1, 
+    sigmaScale: 2.2, 
+    
+    // Environment
+    gravity: 0.012, // Slight bump up (was 0.008)
+    friction: 0.96,
+    wallBounce: 0.5,
+    
+    // Zen Mode Interaction
+    // Increased push slightly (0.05 -> 0.2) based on user feedback "too low"
+    mouseRepulsion: 0.2, 
+    mouseRange: 250,
+    
+    // Temperature
+    temperature: 0.015, // Slight bump up
   };
 
-  class BlobEntity {
-    constructor(element) {
-      this.element = element;
-      this.init();
+  class Particle {
+    constructor(element, x, y) {
+      this.el = element;
+      this.pos = { x, y };
+      this.vel = { x: (Math.random() - 0.5) * 0.5, y: (Math.random() - 0.5) * 0.5 };
+      this.acc = { x: 0, y: 0 };
+      this.radius = CONFIG.baseRadius + Math.random() * CONFIG.radiusVar;
+      
+      // Randomize speed: "Goldilocks" Zone
+      // Range: 0.3x (slow) to 0.8x (gentle drift). 
+      this.speedFactor = 0.3 + Math.random() * 0.5; 
+      
+      this.el.style.width = `${this.radius * 2}px`;
+      this.el.style.height = `${this.radius * 2}px`;
+      
+      const duration = 20 + Math.random() * 15;
+      const direction = Math.random() > 0.5 ? 'alternate' : 'alternate-reverse';
+      this.el.style.animation = `morph ${duration}s linear infinite ${direction}`;
+      this.el.style.animationDelay = `-${Math.random() * 20}s`;
     }
 
-    init(startAtBottom = true) {
-      this.size = CONFIG.baseSize + Math.random() * CONFIG.sizeVar;
-      this.element.style.width = `${this.size}px`;
-      this.element.style.height = `${this.size}px`;
-      
-      // Random starting position
-      this.x = Math.random() * window.innerWidth;
-      this.y = startAtBottom 
-        ? window.innerHeight + this.size 
-        : Math.random() * window.innerHeight;
-      
-      // Velocity
-      this.vx = (Math.random() - 0.5) * 1.5; 
-      this.vy = (Math.random() * -1) - 0.5;
-
-      // Animation properties
-      const morphDuration = 15 + Math.random() * 15;
-      const direction = Math.random() > 0.5 ? 'alternate' : 'alternate-reverse';
-      this.element.style.animation = `morph ${morphDuration}s linear infinite ${direction}`;
-      
-      this.updatePosition();
+    applyForce(fx, fy) {
+      this.acc.x += fx;
+      this.acc.y += fy;
     }
 
     update() {
-      // Apply forces
-      this.vy += -0.02; // Constant buoyancy
+      // 1. Environment Forces
+      const buoyancyInfo = (this.radius / CONFIG.baseRadius); 
+      // Apply random speed factor to gravity
+      this.applyForce(0, -CONFIG.gravity * buoyancyInfo * this.speedFactor);
       
-      // Apply drag
-      this.vx *= CONFIG.drag;
-      this.vy *= CONFIG.drag;
+      this.applyForce(
+        (Math.random() - 0.5) * CONFIG.temperature * this.speedFactor, 
+        (Math.random() - 0.5) * CONFIG.temperature * this.speedFactor
+      );
+
+      // 2. Integration
+      this.vel.x += this.acc.x;
+      this.vel.y += this.acc.y;
       
-      // Update position
-      this.x += this.vx;
-      this.y += this.vy;
+      this.vel.x *= CONFIG.friction;
+      this.vel.y *= CONFIG.friction;
+      
+      this.pos.x += this.vel.x;
+      this.pos.y += this.vel.y;
+      
+      this.acc.x = 0;
+      this.acc.y = 0;
 
-      // Screen Wrapping/Reset
-      if (this.y < -this.size * 2) {
-        this.y = window.innerHeight + this.size;
-        this.x = Math.random() * window.innerWidth;
-        this.vy = (Math.random() * -1) - 0.5;
-      }
-
-      if (this.x < -this.size) this.x = window.innerWidth + this.size;
-      if (this.x > window.innerWidth + this.size) this.x = -this.size;
-
-      this.updatePosition();
+      // 3. Constraints
+      this.checkWalls();
+      this.updateDOM();
     }
 
-    repel(targetX, targetY) {
-      const dx = this.x + this.size/2 - targetX;
-      const dy = this.y + this.size/2 - targetY;
-      const distance = Math.sqrt(dx * dx + dy * dy);
+    checkWalls() {
+      if (this.pos.y < -this.radius * 2) {
+        this.pos.y = windowDimensions.height + this.radius;
+        this.vel.y *= 0.2;
+        this.pos.x = Math.random() * windowDimensions.width;
+      } 
+      else if (this.pos.y > windowDimensions.height + this.radius * 2) {
+          this.pos.y = -this.radius;
+      }
 
-      if (distance < CONFIG.repulsionRadius) {
-        // Normalize distance (0 to 1)
-        const t = distance / CONFIG.repulsionRadius;
-        
-        // Quadratic easing (Ease-Out) for gentle push
-        // Force is strong at center but drops off smoothly
-        const forceFactor = Math.pow(1 - t, 2);
-        
-        // Soft cap max force to prevent explosive velocity
-        // REDUCED CAP from 5 to 1.5 for VERY gentle push
-        const force = Math.min(forceFactor * CONFIG.repulsionForce, 1.5);
-        
-        // Apply direction
-        // We use distance + 1 to avoid divide by zero, though unlikely with radius check
-        const dirX = dx / (distance || 1);
-        const dirY = dy / (distance || 1);
-        
-        this.vx += dirX * force;
-        this.vy += dirY * force;
+      if (this.pos.x < 0) {
+        this.pos.x = 0;
+        this.vel.x *= -CONFIG.wallBounce;
+      } else if (this.pos.x > windowDimensions.width) {
+        this.pos.x = windowDimensions.width;
+        this.vel.x *= -CONFIG.wallBounce;
       }
     }
 
-    updatePosition() {
-      // Use efficient transform
-      this.element.style.transform = `translate3d(${this.x}px, ${this.y}px, 0)`;
+    updateDOM() {
+      // Revert: User reported rotation feels unrealistic.
+      // Removed velocity-based squash & stretch (rotation/scale).
+      // Just use simple position translation for proper liquid feel.
+      const transform = `translate3d(${this.pos.x - this.radius}px, ${this.pos.y - this.radius}px, 0)`;
+      this.el.style.transform = transform;
     }
   }
 
-  // Setup
-  const container = document.querySelector('.lava-lamp');
-  const blobs = [];
+  // --- Physics System ---
+  
+  let particles = [];
+  let connectionState = { 
+      mouseX: window.innerWidth/2, 
+      mouseY: window.innerHeight/2, 
+      isMouseDown: false 
+  };
+  
+  // High-Fidelity: Lighting Smoothing State
+  let lightPos = { x: window.innerWidth/2, y: window.innerHeight/2 };
+  
+  let windowDimensions = { width: window.innerWidth, height: window.innerHeight };
 
-  if (container) {
-    // Clear existing static blobs potentially added by other scripts
+  window.addEventListener('resize', () => {
+    windowDimensions = { width: window.innerWidth, height: window.innerHeight };
+  });
+
+  window.addEventListener('mousemove', (e) => {
+    connectionState.mouseX = e.clientX;
+    connectionState.mouseY = e.clientY;
+    
+    // High-Fidelity: Dynamic Lighting
+    // Update the SVG light source to follow the mouse
+    const light = document.querySelector('#ambient-light');
+    if (light) {
+        // slight lag/smoothing or direct verify? Direct is punchier for UI.
+        light.setAttribute('x', e.clientX);
+        light.setAttribute('y', e.clientY);
+    }
+  });
+  
+  window.addEventListener('mousedown', () => connectionState.isMouseDown = true);
+  window.addEventListener('mouseup', () => connectionState.isMouseDown = false);
+
+  function init() {
+    const container = document.querySelector('.lava-lamp');
+    if (!container) return;
+    
     container.innerHTML = '';
+    particles = [];
 
-    for(let i=0; i<CONFIG.blobCount; i++) {
-        const div = document.createElement('div');
-        div.classList.add('blob');
-        container.appendChild(div);
-        
-        // Initialize some randomly on screen, some at bottom
-        const blob = new BlobEntity(div);
-        if (i < CONFIG.blobCount / 2) {
-             blob.y = Math.random() * window.innerHeight; // Start some on screen
-        }
-        blobs.push(blob);
+    for (let i = 0; i < CONFIG.blobCount; i++) {
+      const div = document.createElement('div');
+      div.classList.add('blob');
+      container.appendChild(div);
+      
+      const x = Math.random() * windowDimensions.width;
+      const y = Math.random() * windowDimensions.height;
+      
+      particles.push(new Particle(div, x, y));
     }
-
-    // Animation Loop
-    function loop() {
-      blobs.forEach(blob => blob.update());
-      requestAnimationFrame(loop);
-    }
-    requestAnimationFrame(loop);
-
-    // Interaction Handler
-    function handleInteraction(x, y) {
-      blobs.forEach(blob => blob.repel(x, y));
-    }
-
-    window.addEventListener('click', (e) => {
-      handleInteraction(e.clientX, e.clientY);
-    });
-
-    // Optional: Also repel on mouse move if mouse is down (dragging effect)
-    let isMouseDown = false;
-    window.addEventListener('mousedown', () => isMouseDown = true);
-    window.addEventListener('mouseup', () => isMouseDown = false);
-    window.addEventListener('mousemove', (e) => {
-      if (isMouseDown) {
-         handleInteraction(e.clientX, e.clientY);
-      }
-    });
+    
+    loop();
   }
+
+  function interact() {
+    const { mouseX, mouseY } = connectionState;
+
+    for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        const dx = p.pos.x - mouseX;
+        const dy = p.pos.y - mouseY;
+        const distSq = dx*dx + dy*dy;
+        
+        if (distSq < CONFIG.mouseRange * CONFIG.mouseRange && distSq > 0) {
+            const dist = Math.sqrt(distSq);
+            const force = (1 - dist / CONFIG.mouseRange) * CONFIG.mouseRepulsion;
+            p.applyForce((dx/dist) * force, (dy/dist) * force);
+        }
+    }
+  }
+
+  function computeCohesion() {
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const p1 = particles[i];
+        const p2 = particles[j];
+        
+        const dx = p2.pos.x - p1.pos.x;
+        const dy = p2.pos.y - p1.pos.y;
+        const distSq = dx*dx + dy*dy;
+        
+        // Effective "Merge" Radius
+        // Sigma is where the force is zero. We want them to overlap.
+        const sigma = (p1.radius + p2.radius) * 0.65; // Overlap factor (0.65 = deep merge)
+        const cutoff = sigma * 3; 
+        
+        if (distSq > cutoff * cutoff || distSq === 0) continue;
+        
+        const r = Math.sqrt(distSq);
+        const rNorm = r / sigma; 
+        
+        let force = 0;
+        
+        // Custom Potential for "Sticky Liquid"
+        if (rNorm < 0.8) {
+             // Repel only when VERY close (prevent explosion)
+             force = -1.0 * (0.8 - rNorm); 
+        } else if (rNorm < 1.5) {
+             // Strong Attraction (Cohesion/Surface Tension) in the middle
+             // This pulls them into a "single big blob"
+             force = 0.15 * (1.5 - rNorm); 
+        } else {
+             // Weak Gravity pull at distance
+             force = 0.02 * (3.0 - rNorm);
+        }
+        
+        const fx = (dx / r) * force * CONFIG.epsilon;
+        const fy = (dy / r) * force * CONFIG.epsilon;
+        
+        p1.applyForce(fx, fy);
+        p2.applyForce(-fx, -fy);
+      }
+    }
+  }
+
+  function updateLighting() {
+      // Smoothly interpolate light position towards mouse (The "Lantern" effect)
+      // Factor 0.08 = slow fluid lag. Feels like dragging a heavy light through water.
+      lightPos.x += (connectionState.mouseX - lightPos.x) * 0.08;
+      lightPos.y += (connectionState.mouseY - lightPos.y) * 0.08;
+
+      const light = document.querySelector('#ambient-light');
+      if (light) {
+          light.setAttribute('x', lightPos.x);
+          light.setAttribute('y', lightPos.y);
+      }
+  }
+
+  function loop() {
+    interact();
+    computeCohesion();
+    updateLighting(); // Apply smoothed lighting
+    
+    for (const p of particles) {
+      p.update();
+    }
+    
+    requestAnimationFrame(loop);
+  }
+
+  setTimeout(init, 100);
+
 </script>
 
 <style>
@@ -243,10 +357,12 @@
   /* Rise Animation: REMOVED - Handled by JS */
 
   /* Morph Animation: Handles Organic Shape Wobble */
+  /* Morph Animation: Handles Organic Shape Wobble - EXAGGERATED for visible "wave" */
   :global(@keyframes morph) {
     0% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
-    33% { border-radius: 40% 60% 70% 30% / 50% 60% 30% 60%; }
-    66% { border-radius: 50% 50% 30% 70% / 60% 30% 70% 40%; }
+    25% { border-radius: 45% 55% 20% 80% / 55% 25% 75% 45%; }
+    50% { border-radius: 20% 80% 60% 40% / 30% 70% 20% 80%; }
+    75% { border-radius: 70% 30% 80% 20% / 70% 30% 20% 80%; }
     100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
   }
 
