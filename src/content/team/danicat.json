@@ -1,0 +1,18 @@
+{
+    "order": 2,
+    "id": "danicat",
+    "name": "DANICAT",
+    "role": "CCO",
+    "badge": "CO-FOUNDER",
+    "bio": "Chief Creative Officer driving the vision and aesthetics of NekoCode projects. Passionate about creating delightful user experiences.",
+    "avatar": "/assets/team/nekocode.png",
+    "skills": [
+        "Creative Direction",
+        "Branding",
+        "Product Strategy"
+    ],
+    "links": {
+        "github": "https://github.com/username",
+        "twitter": "https://twitter.com/username"
+    }
+}

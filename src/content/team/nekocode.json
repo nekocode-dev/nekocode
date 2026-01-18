@@ -1,0 +1,20 @@
+{
+    "order": 1,
+    "id": "nekocode",
+    "name": "NekoCode",
+    "role": "Lead Developer",
+    "badge": "FOUNDER",
+    "bio": "Flutter enthusiast crafting beautiful mobile experiences. Creator of FlipFocus and believer in offline-first, privacy-respecting software.",
+    "avatar": "/assets/team/nekocode.png",
+    "skills": [
+        "Flutter",
+        "Dart",
+        "Mobile Apps",
+        "UI/UX",
+        "Spaced Repetition"
+    ],
+    "links": {
+        "github": "https://github.com/nekocode",
+        "twitter": "https://twitter.com/nekocode"
+    }
+}
