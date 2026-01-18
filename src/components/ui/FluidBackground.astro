@@ -178,19 +178,35 @@
     windowDimensions = { width: window.innerWidth, height: window.innerHeight };
   });
 
-  window.addEventListener('mousemove', (e) => {
-    connectionState.mouseX = e.clientX;
-    connectionState.mouseY = e.clientY;
+  const updateMouse = (x, y) => {
+    connectionState.mouseX = x;
+    connectionState.mouseY = y;
     
     // High-Fidelity: Dynamic Lighting
-    // Update the SVG light source to follow the mouse
     const light = document.querySelector('#ambient-light');
     if (light) {
-        // slight lag/smoothing or direct verify? Direct is punchier for UI.
-        light.setAttribute('x', e.clientX);
-        light.setAttribute('y', e.clientY);
+        light.setAttribute('x', x);
+        light.setAttribute('y', y);
     }
-  });
+  };
+
+  window.addEventListener('mousemove', (e) => updateMouse(e.clientX, e.clientY));
+  
+  // Touch Support
+  window.addEventListener('touchstart', (e) => {
+    if(e.touches.length > 0) {
+      updateMouse(e.touches[0].clientX, e.touches[0].clientY);
+      connectionState.isMouseDown = true;
+    }
+  }, { passive: true });
+
+  window.addEventListener('touchmove', (e) => {
+    if(e.touches.length > 0) {
+      updateMouse(e.touches[0].clientX, e.touches[0].clientY);
+    }
+  }, { passive: true });
+
+  window.addEventListener('touchend', () => connectionState.isMouseDown = false);
   
   window.addEventListener('mousedown', () => connectionState.isMouseDown = true);
   window.addEventListener('mouseup', () => connectionState.isMouseDown = false);
