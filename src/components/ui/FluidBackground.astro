@@ -333,9 +333,19 @@
       checkInterval: 2000, 
       lastCheck: 0,
       container: null,
+      
+      // Robustness: Prevent false positives on load/tab switch
+      warmup: true,
+      warmupTimer: null,
+      lowFpsStrikes: 0, // Require consecutive failures
 
       init() {
           this.container = document.querySelector('.lava-lamp');
+          // Ignore performance for first 4 seconds (Hydration/Load spike protection)
+          this.warmupTimer = setTimeout(() => {
+              this.warmup = false;
+              console.log('[Performance] Warmup complete. Monitoring active.');
+          }, 4000);
       },
 
       update(timestamp) {
@@ -353,11 +363,23 @@
       },
 
       evaluateTier() {
-          // Safety Net: If device is lagging (< 20 FPS), "Turn It Off".
-          // We switch to Tier C which removes the heavy Goo filter.
-          if (this.fps < 20 && this.tier === 'S') {
-              this.setTier('C');
-          } 
+          if (this.warmup) return; // Don't judge during warmup
+          if (document.hidden) return; // Don't judge background tabs
+
+          // Robust Logic:
+          // 1. Threshold: < 24 FPS (Cinematic limit)
+          // 2. Strikes: Must fail 3 times in a row (6 seconds of sustained lag)
+          if (this.fps < 24 && this.tier === 'S') {
+              this.lowFpsStrikes++;
+              console.warn(`[Performance] Strike ${this.lowFpsStrikes}/3 (FPS: ${this.fps})`);
+              
+              if (this.lowFpsStrikes >= 3) {
+                  this.setTier('C');
+              }
+          } else {
+              // Reset strikes if we hit a good frame
+              this.lowFpsStrikes = 0;
+          }
       },
 
       setTier(newTier) {
