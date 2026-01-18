@@ -277,32 +277,127 @@
     }
   }
 
+  // Cache DOM elements
+  const lightElement = document.querySelector('#ambient-light');
+
   function updateLighting() {
+      // Tier A Check: If not Tier S, skip dynamic lighting updates to save CPU.
+      if (PerformanceManager.tier !== 'S') return;
+
       // Smoothly interpolate light position towards mouse (The "Lantern" effect)
       // Factor 0.08 = slow fluid lag. Feels like dragging a heavy light through water.
       lightPos.x += (connectionState.mouseX - lightPos.x) * 0.08;
       lightPos.y += (connectionState.mouseY - lightPos.y) * 0.08;
 
-      const light = document.querySelector('#ambient-light');
-      if (light) {
-          light.setAttribute('x', lightPos.x);
-          light.setAttribute('y', lightPos.y);
+      if (lightElement) {
+          lightElement.setAttribute('x', lightPos.x);
+          lightElement.setAttribute('y', lightPos.y);
       }
   }
 
   function loop() {
     interact();
     computeCohesion();
-    updateLighting(); // Apply smoothed lighting
+    updateLighting(); // Checker inside handles optimization
     
     for (const p of particles) {
       p.update();
     }
     
-    requestAnimationFrame(loop);
+    // Pass timestamp to loop
+    requestAnimationFrame((timestamp) => {
+        PerformanceManager.update(timestamp);
+        loop();
+    });
   }
 
-  setTimeout(init, 100);
+  // --- Adaptive Performance Manager ("The Shapeshifter") ---
+  const PerformanceManager = {
+      fps: 60,
+      lastTime: 0,
+      frames: 0,
+      tier: 'S', // S (Ultra) or C (Potato)
+      checkInterval: 2000, 
+      lastCheck: 0,
+      container: null,
+
+      init() {
+          this.container = document.querySelector('.lava-lamp');
+      },
+
+      update(timestamp) {
+          this.frames++;
+          if (timestamp - this.lastTime >= 1000) {
+              this.fps = this.frames;
+              this.frames = 0;
+              this.lastTime = timestamp;
+          }
+
+          if (timestamp - this.lastCheck > this.checkInterval) {
+              this.evaluateTier();
+              this.lastCheck = timestamp;
+          }
+      },
+
+      evaluateTier() {
+          // Simplified Logic: > 30 = S, < 30 = C
+          if (this.fps < 30 && this.tier === 'S') {
+              this.setTier('C');
+          } 
+          // Optional: Upgrade back if performance stabilizes? 
+          // Usually better to stay downgraded to avoid flip-flopping.
+      },
+
+      setTier(newTier) {
+          if (this.tier === newTier) return;
+          console.log(`[Performance] Switching Tier: ${this.tier} -> ${newTier}`);
+          this.tier = newTier;
+          
+          // Helper to apply changes after fade-out
+          const applyChanges = () => {
+              if (newTier === 'C') {
+                  // Tier C: "Bokeh Mode" (Potato)
+                  // Disable expensive Goo filter.
+                  // Add simple blur (cheap) so it looks like out-of-focus lights (Bokeh)
+                  // instead of sharp raw dots. "Turns off the blob" effectively.
+                  this.container.style.filter = 'blur(12px)';
+                  this.container.style.opacity = '0.7'; // Dim slightly
+              } else {
+                  // Tier S: "Liquid Mode" (Ultra)
+                  // Restore full Goo filter
+                  this.container.style.filter = 'url(#goo)';
+                  this.container.style.opacity = '1';
+              }
+          };
+
+          // Smooth Transition: Fade Out -> Swap -> Fade In
+          if (this.container) {
+              // 1. Fade Out
+              this.container.style.transition = 'opacity 1s ease-in-out';
+              this.container.style.opacity = '0';
+              
+              setTimeout(() => {
+                  // 2. Change Filter checks
+                  applyChanges();
+                  
+                  // 3. Fade Back In
+                  setTimeout(() => {
+                    // Opacity needed for the specific tier is set in applyChanges, 
+                    // but we need to trigger the CSS transition to that value.
+                    // We simply remove the override or set explicit.
+                    // Tier C wants 0.7, Tier S wants 1.
+                    this.container.style.opacity = newTier === 'C' ? '0.7' : '1'; 
+                  }, 100); 
+              }, 1000); // Wait for 1s fade out
+          }
+      }
+  };
+
+
+  setTimeout(() => {
+    init();
+    PerformanceManager.init();
+  }, 100);
 
 </script>
 
@@ -332,7 +427,8 @@
     left: 0;
     /* Optimization: Force GPU layer */
     transform: translate3d(0, 0, 0);
-    will-change: filter;
+    will-change: filter, opacity;
+    transition: opacity 1s ease-in-out; /* Smooth transition for performance tier switching */
   }
 
   /* Global styles for dynamic blobs */
