@@ -85,7 +85,7 @@ const isNeko = name.toLowerCase().includes('nekocode');
     border: 1px solid var(--color-border);
     transition: all var(--duration-normal) var(--ease-out);
     position: relative;
-    margin-top: var(--space-16); /* Increased space for bigger head */
+    margin-top: 120px; /* Increased to fully clear the -110px/-125px avatar */
     height: 100%; /* Ensure card takes full height of grid cell */
   }
   
@@ -239,7 +239,7 @@ const isNeko = name.toLowerCase().includes('nekocode');
     }
     
     .team-card {
-        margin-top: var(--space-12);
+        margin-top: 90px; /* Match the -90px top offset so it doesn't hit card above */
         padding-top: var(--space-8);
     }
   }
