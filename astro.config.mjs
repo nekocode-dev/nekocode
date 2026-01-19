@@ -6,6 +6,13 @@ export default defineConfig({
     site: 'https://nekocode.dev',
     // base: '/nekocode/', // Removed for custom domain
     output: 'static',
+
+    // Prefetch links on hover for instant navigation
+    prefetch: {
+        prefetchAll: true,
+        defaultStrategy: 'hover'
+    },
+
     integrations: [
         mdx(),
         sitemap()

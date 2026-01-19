@@ -2,6 +2,24 @@
 
 Follow these steps to enable your contact form for free.
 
+---
+
+## ⚠️ Note on Visitor Counter Accuracy
+
+The unique visitor counter uses **localStorage** on the client side to track if a user has been counted before. This approach has known limitations:
+
+| Scenario | Result |
+|----------|--------|
+| Incognito/Private mode | Counts as new visitor (each session) |
+| Clearing browser data | Re-counts the same user |
+| Different browsers/devices | Same person = multiple counts |
+| Bots without JavaScript | Not counted (good!) |
+
+**Why not server-side?** Google Apps Script web apps don't expose the requester's IP address for security reasons. True IP-based unique visitor tracking isn't possible with this architecture.
+
+**Bottom line:** The counter provides a *reasonable estimate* for portfolio traffic, not an exact count. For precise analytics, consider services like Plausible or Fathom (privacy-friendly alternatives to Google Analytics).
+
+---
 ## 1. Create the Script
 1.  Open your [Google Drive](https://drive.google.com/).
 2.  Create a **New > Google Sheets** spreadsheet. Name it "NekoCode Inquiries".

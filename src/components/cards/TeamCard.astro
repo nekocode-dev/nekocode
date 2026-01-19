@@ -1,7 +1,12 @@
 ---
 /**
- * TeamCard - Team member display
+ * TeamCard - Team member display with optimized images
  */
+import { Image } from 'astro:assets';
+
+// Dynamic image imports for team avatars
+const teamImages = import.meta.glob<{ default: ImageMetadata }>('/src/assets/team/*.png', { eager: true });
+
 interface Props {
   name: string;
   role: string;
@@ -25,16 +30,38 @@ const {
 } = Astro.props;
 
 const isNeko = name.toLowerCase().includes('nekocode');
+
+// Map public path to src/assets path for optimization
+function getOptimizedImage(publicPath: string | undefined) {
+  if (!publicPath) return null;
+  // Convert /assets/team/image.png to /src/assets/team/image.png
+  const srcPath = publicPath.replace('/assets/', '/src/assets/');
+  return teamImages[srcPath]?.default || null;
+}
+
+const optimizedAvatar = getOptimizedImage(avatar);
+const initials = name.split(' ').map(n => n[0]).join('').toUpperCase();
 ---
 
 <div class:list={['team-card', className, { 'is-neko': isNeko }]}>
   <div class="avatar">
-    {avatar ? (
+    {optimizedAvatar ? (
+      <Image 
+        src={optimizedAvatar} 
+        alt={name} 
+        width={250} 
+        height={250}
+        format="webp"
+        quality={80}
+        loading="lazy"
+      />
+    ) : avatar ? (
       <img src={avatar} alt={name} loading="lazy" />
     ) : (
       <span class="initials">{initials}</span>
     )}
   </div>
+
   
   <div class="info">
     <h3 class="name">{name}</h3>
@@ -206,7 +233,7 @@ const isNeko = name.toLowerCase().includes('nekocode');
   
   .links {
     display: flex;
-    justify-content: center; /* Center since card is centered */
+    justify-content: flex-end; /* Align to the right */
     gap: var(--space-3);
     margin-top: auto; /* Push to the bottom! */
     padding-top: var(--space-6); 

@@ -54,8 +54,11 @@
    * Simulates Van der Waals forces: Attraction at range, Repulsion at close quarters.
    */
   
+  // === ACCESSIBILITY: Respect user's motion preferences ===
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  
   const CONFIG = {
-    blobCount: 15, 
+    blobCount: prefersReducedMotion ? 8 : 15, // Fewer blobs if reduced motion
     baseRadius: 40, // Much smaller base
     radiusVar: 100, // Massive variance (tiny to huge blobs)
     
@@ -76,6 +79,7 @@
     // Temperature
     temperature: 0.015, // Slight bump up
   };
+
 
   class Particle {
     constructor(element, x, y) {
@@ -238,11 +242,22 @@
       particles.push(new Particle(div, x, y));
     }
     
+    // === ACCESSIBILITY: Skip physics simulation for reduced-motion users ===
+    // Just show static blobs with CSS morph animation (no JavaScript loop)
+    if (prefersReducedMotion) {
+      // Position blobs randomly but don't animate via JS
+      container.style.filter = 'blur(20px)';
+      container.style.opacity = '0.4';
+      console.log('[FluidBackground] Reduced motion enabled - using static mode');
+      return; // Don't start the physics loop
+    }
+    
     // Reset PerformanceManager for the new page life
     PerformanceManager.init();
     
     loop();
   }
+
 
   function interact() {
     const { mouseX, mouseY } = connectionState;
@@ -520,4 +535,17 @@
     width: 0;
     height: 0;
   }
+
+  /* === ACCESSIBILITY: Reduced Motion Support === */
+  @media (prefers-reduced-motion: reduce) {
+    .lava-lamp {
+      filter: blur(20px) !important;
+      opacity: 0.4 !important;
+    }
+    
+    :global(.blob) {
+      animation: none !important;
+    }
+  }
 </style>
+
