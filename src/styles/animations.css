@@ -388,6 +388,87 @@
 }
 
 /* ========================================
+   Scroll-Driven Parallax (Modern CSS)
+   Uses scroll-timeline for GPU-accelerated
+   ======================================== */
+@supports (animation-timeline: scroll()) {
+    .parallax-slow {
+        animation: parallax-up linear;
+        animation-timeline: scroll();
+        animation-range: 0% 100%;
+    }
+
+    .parallax-fast {
+        animation: parallax-down linear;
+        animation-timeline: scroll();
+        animation-range: 0% 100%;
+    }
+
+    @keyframes parallax-up {
+        from {
+            transform: translateY(0);
+        }
+
+        to {
+            transform: translateY(-50px);
+        }
+    }
+
+    @keyframes parallax-down {
+        from {
+            transform: translateY(0);
+        }
+
+        to {
+            transform: translateY(50px);
+        }
+    }
+
+    /* Hero glow parallax */
+    .hero-glow-parallax {
+        animation: glow-parallax linear;
+        animation-timeline: scroll();
+        animation-range: 0% 50%;
+    }
+
+    @keyframes glow-parallax {
+        from {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        to {
+            opacity: 0.3;
+            transform: translateY(-100px) scale(1.2);
+        }
+    }
+}
+
+/* Fallback for browsers without scroll-timeline */
+@supports not (animation-timeline: scroll()) {
+
+    .parallax-slow,
+    .parallax-fast,
+    .hero-glow-parallax {
+        /* Graceful degradation: no transform needed, elements stay static */
+        transform: none;
+    }
+}
+
+/* ========================================
+   Enhanced Hover States
+   ======================================== */
+.hover-lift {
+    transition: transform var(--anim-duration-fast) var(--anim-ease-out),
+        box-shadow var(--anim-duration-fast) var(--anim-ease-out);
+}
+
+.hover-lift:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.3);
+}
+
+/* ========================================
    Reduced Motion Support
    ======================================== */
 @media (prefers-reduced-motion: reduce) {

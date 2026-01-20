@@ -146,7 +146,7 @@ const capabilities = [
   
   <!-- Team Spotlight -->
   <Section class="team-section">
-    <Container>
+    <Container size="narrow">
       <TeamSpotlight class="reveal" />
     </Container>
   </Section>
@@ -154,7 +154,7 @@ const capabilities = [
   <!-- CTA Section -->
   <Section size="lg" class="cta-section">
     <Container size="narrow">
-      <div class="cta-content reveal-scale">
+      <div class="cta-content glass reveal-scale">
         <h2 class="text-title-1">Let's build something great</h2>
         <p class="cta-description">
           Have a project in mind? I'd love to hear about it.
@@ -185,6 +185,21 @@ const capabilities = [
     height: 200%;
     background: radial-gradient(ellipse, var(--color-glow) 0%, transparent 70%);
     pointer-events: none;
+    /* Scroll-driven parallax - fades and moves as you scroll */
+    animation: hero-glow-scroll linear;
+    animation-timeline: scroll();
+    animation-range: 0% 60%;
+  }
+  
+  @keyframes hero-glow-scroll {
+    from { 
+      opacity: 1; 
+      transform: translateY(0) scale(1);
+    }
+    to { 
+      opacity: 0.2; 
+      transform: translateY(-80px) scale(1.15);
+    }
   }
   
   .hero-wrapper {
@@ -222,14 +237,43 @@ const capabilities = [
     background-clip: text;
   }
 
-  /* Color specific words in hero text */
+  /* Color specific words in hero text with animated shimmer */
   /* Line 3: "with craft and" -> craft is 2nd word */
   :global(.line-3 .word:nth-child(2)),
   /* Line 4: "care" -> care is 1st word */
   :global(.line-4 .word:nth-child(1)) {
-    color: var(--color-accent);
     position: relative;
     display: inline-block;
+    background: linear-gradient(
+      90deg,
+      var(--color-accent) 0%,
+      #f0d9b5 25%,
+      var(--color-accent) 50%,
+      #e8c9a0 75%,
+      var(--color-accent) 100%
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    /* Override word-reveal animation since shimmer replaces it */
+    opacity: 1;
+    transform: none;
+    animation: shimmer 4s linear infinite;
+  }
+  
+  @keyframes shimmer {
+    from { background-position: 200% center; }
+    to { background-position: 0% center; }
+  }
+  
+  @media (prefers-reduced-motion: reduce) {
+    :global(.line-3 .word:nth-child(2)),
+    :global(.line-4 .word:nth-child(1)) {
+      animation: none;
+      background: var(--color-accent);
+      -webkit-text-fill-color: currentColor;
+    }
   }
 
   
@@ -360,8 +404,6 @@ const capabilities = [
   .cta-content {
     text-align: center;
     padding: var(--space-12);
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
     border-radius: var(--radius-2xl);
   }
   

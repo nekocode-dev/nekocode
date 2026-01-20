@@ -39,7 +39,11 @@ function initScrollReveal() {
         }
     );
 
-    reveals.forEach((el) => observer.observe(el));
+    reveals.forEach((el) => {
+        // Skip already revealed elements (prevents re-animation on page transitions)
+        if (el.classList.contains('visible')) return;
+        observer.observe(el);
+    });
 }
 
 /**

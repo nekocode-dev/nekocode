@@ -107,26 +107,31 @@
       this.acc.y += fy;
     }
 
-    update() {
-      // 1. Environment Forces
+    update(delta) {
+      // Delta-time based physics: scale all movement by time elapsed
+      // This prevents jumps when RAF is throttled (scroll, tab switch, etc.)
+      
+      // 1. Environment Forces (scaled by delta)
       const buoyancyInfo = (this.radius / CONFIG.baseRadius); 
-      // Apply random speed factor to gravity
-      this.applyForce(0, -CONFIG.gravity * buoyancyInfo * this.speedFactor);
+      this.applyForce(0, -CONFIG.gravity * buoyancyInfo * this.speedFactor * delta * 60);
       
       this.applyForce(
-        (Math.random() - 0.5) * CONFIG.temperature * this.speedFactor, 
-        (Math.random() - 0.5) * CONFIG.temperature * this.speedFactor
+        (Math.random() - 0.5) * CONFIG.temperature * this.speedFactor * delta * 60, 
+        (Math.random() - 0.5) * CONFIG.temperature * this.speedFactor * delta * 60
       );
 
-      // 2. Integration
+      // 2. Integration (scaled by delta)
       this.vel.x += this.acc.x;
       this.vel.y += this.acc.y;
       
-      this.vel.x *= CONFIG.friction;
-      this.vel.y *= CONFIG.friction;
+      // Apply friction per-frame (use delta-adjusted friction)
+      const frictionPerFrame = Math.pow(CONFIG.friction, delta * 60);
+      this.vel.x *= frictionPerFrame;
+      this.vel.y *= frictionPerFrame;
       
-      this.pos.x += this.vel.x;
-      this.pos.y += this.vel.y;
+      // Position update scaled by delta
+      this.pos.x += this.vel.x * delta * 60;
+      this.pos.y += this.vel.y * delta * 60;
       
       this.acc.x = 0;
       this.acc.y = 0;
@@ -255,11 +260,13 @@
     // Reset PerformanceManager for the new page life
     PerformanceManager.init();
     
-    loop();
+    // Reset timestamp tracker and start loop with proper timestamp
+    lastLoopTimestamp = 0;
+    requestAnimationFrame(loop);
   }
 
 
-  function interact() {
+  function interact(delta) {
     const { mouseX, mouseY } = connectionState;
 
     for (let i = 0; i < particles.length; i++) {
@@ -276,7 +283,7 @@
     }
   }
 
-  function computeCohesion() {
+  function computeCohesion(delta) {
     for (let i = 0; i < particles.length; i++) {
       for (let j = i + 1; j < particles.length; j++) {
         const p1 = particles[i];
@@ -335,19 +342,29 @@
       }
   }
 
-  function loop() {
-    interact();
-    computeCohesion();
+  // Track last timestamp for delta-time calculation
+  let lastLoopTimestamp = 0;
+  
+  function loop(timestamp) {
+    // Calculate delta time in seconds
+    // Cap at 50ms (0.05s) to prevent huge jumps from throttled/paused states
+    const rawDelta = lastLoopTimestamp ? (timestamp - lastLoopTimestamp) / 1000 : 0.016;
+    const delta = Math.min(rawDelta, 0.05); // Max 50ms = ~3 missed frames at 60fps
+    lastLoopTimestamp = timestamp;
+    
+    // Always run physics with capped delta - no more skipping during scroll
+    interact(delta);
+    computeCohesion(delta);
     updateLighting(); 
     
     for (const p of particles) {
-      p.update();
+      p.update(delta);
     }
     
-    // Pass timestamp to loop
-    animationFrameId = requestAnimationFrame((timestamp) => {
-        PerformanceManager.update(timestamp);
-        loop();
+    // Continue animation loop
+    animationFrameId = requestAnimationFrame((ts) => {
+        PerformanceManager.update(ts);
+        loop(ts);
     });
   }
 
@@ -357,14 +374,16 @@
       lastTime: 0,
       frames: 0,
       tier: 'S', // S (Ultra) or C (Safety Mode)
-      checkInterval: 2000, 
+      checkInterval: 2000,
       lastCheck: 0,
       container: null,
-      
-      // Robustness: Prevent false positives on load/tab switch
+
+      // Robustness: Prevent false positives on load/tab switch/scroll
       warmup: true,
       warmupTimer: null,
       lowFpsStrikes: 0, // Require consecutive failures
+      isScrolling: false,
+      scrollTimer: null,
 
       init() {
           this.container = document.querySelector('.lava-lamp');
@@ -373,14 +392,39 @@
           this.lowFpsStrikes = 0;
           this.frames = 0;
           this.lastTime = performance.now();
-          
+          this.isScrolling = false;
+
           if (this.warmupTimer) clearTimeout(this.warmupTimer);
-          
-          // Ignore performance for first 4 seconds (Hydration/Load spike protection)
-          this.warmupTimer = setTimeout(() => {
-              this.warmup = false;
-              // console.log('[Performance] Warmup complete. Monitoring active.');
-          }, 4000);
+          if (this.scrollTimer) clearTimeout(this.scrollTimer);
+
+          // Wait for all resources to load before monitoring FPS
+          // This prevents counting initial page load as a performance issue
+          const startMonitoring = () => {
+              // Additional 2 second buffer after load for paint/layout settling
+              this.warmupTimer = setTimeout(() => {
+                  this.warmup = false;
+              }, 2000);
+          };
+
+          if (document.readyState === 'complete') {
+              // Page already loaded (e.g., Astro view transition)
+              startMonitoring();
+          } else {
+              // Wait for full page load (images, fonts, etc.)
+              window.addEventListener('load', startMonitoring, { once: true });
+          }
+
+          // Track scrolling to ignore FPS drops during scroll (browser throttles RAF)
+          window.addEventListener('scroll', this.onScroll.bind(this), { passive: true });
+      },
+
+      onScroll() {
+          this.isScrolling = true;
+          if (this.scrollTimer) clearTimeout(this.scrollTimer);
+          // Consider scroll "ended" after 500ms of no scroll events
+          this.scrollTimer = setTimeout(() => {
+              this.isScrolling = false;
+          }, 500);
       },
 
       update(timestamp) {
@@ -388,7 +432,6 @@
           // If >2 seconds passed since last frame, user was likely in another tab.
           // Don't count this massive gap as "0 FPS". Resume smoothly.
           if (timestamp - this.lastTime > 2000) {
-              // console.log('[Performance] Waking from sleep. Skipping stats.');
               this.lastTime = timestamp;
               this.lastCheck = timestamp;
               this.frames = 0;
@@ -411,15 +454,15 @@
       evaluateTier() {
           if (this.warmup) return; // Don't judge during warmup
           if (document.hidden) return; // Don't judge background tabs
+          if (this.isScrolling) return; // Don't judge during scroll (browser throttles RAF)
 
           // Robust Logic:
-          // 1. Threshold: < 24 FPS (Cinematic limit)
-          // 2. Strikes: Must fail 3 times in a row (6 seconds of sustained lag)
-          if (this.fps < 24 && this.tier === 'S') {
+          // 1. Threshold: < 12 FPS (true performance issue, not scroll throttling)
+          // 2. Strikes: Must fail 5 times in a row (10 seconds of sustained lag)
+          if (this.fps < 12 && this.tier === 'S') {
               this.lowFpsStrikes++;
-              // console.warn(`[Performance] Strike ${this.lowFpsStrikes}/3 (FPS: ${this.fps})`);
-              
-              if (this.lowFpsStrikes >= 3) {
+
+              if (this.lowFpsStrikes >= 5) {
                   this.setTier('C');
               }
           } else {

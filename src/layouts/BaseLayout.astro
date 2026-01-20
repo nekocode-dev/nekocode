@@ -62,7 +62,7 @@ const base = import.meta.env.BASE_URL;
     <!-- Theme Color -->
     <meta name="theme-color" content="#0D0D0F" />
   </head>
-  <body>
+  <body class="noise-overlay">
     <a href="#main-content" class="skip-link">Skip to main content</a>
     <FluidBackground />
     
@@ -89,30 +89,58 @@ const base = import.meta.env.BASE_URL;
     flex: 1;
   }
   
-  /* View Transition Animations */
+  /* ========================================
+     Enhanced View Transitions - Cinematic Feel
+     ======================================== */
   ::view-transition-old(root) {
-    animation: 90ms cubic-bezier(0.4, 0, 1, 1) both fade-out,
-      300ms cubic-bezier(0.4, 0, 0.2, 1) both slide-to-left;
+    animation: 
+      200ms cubic-bezier(0.4, 0, 1, 1) both page-fade-out,
+      400ms cubic-bezier(0.4, 0, 0.2, 1) both page-slide-out;
   }
 
   ::view-transition-new(root) {
-    animation: 210ms cubic-bezier(0, 0, 0.2, 1) 90ms both fade-in,
-      300ms cubic-bezier(0.4, 0, 0.2, 1) both slide-from-right;
+    animation: 
+      300ms cubic-bezier(0, 0, 0.2, 1) 100ms both page-fade-in,
+      400ms cubic-bezier(0.4, 0, 0.2, 1) both page-slide-in;
   }
 
-  @keyframes fade-in {
-    from { opacity: 0; }
+  @keyframes page-fade-in {
+    from { 
+      opacity: 0;
+      filter: blur(4px);
+    }
+    to {
+      opacity: 1;
+      filter: blur(0);
+    }
   }
 
-  @keyframes fade-out {
-    to { opacity: 0; }
+  @keyframes page-fade-out {
+    from {
+      opacity: 1;
+      filter: blur(0);
+    }
+    to { 
+      opacity: 0;
+      filter: blur(4px);
+    }
   }
 
-  @keyframes slide-from-right {
-    from { transform: translateY(20px); }
+  @keyframes page-slide-in {
+    from { transform: translateY(30px) scale(0.98); }
+    to { transform: translateY(0) scale(1); }
   }
 
-  @keyframes slide-to-left {
-    to { transform: translateY(-20px); }
+  @keyframes page-slide-out {
+    from { transform: translateY(0) scale(1); }
+    to { transform: translateY(-20px) scale(0.98); }
+  }
+  
+  /* Respect reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+      animation: none;
+    }
   }
 </style>
