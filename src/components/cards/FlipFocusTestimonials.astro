@@ -286,7 +286,8 @@ if (googleScriptUrl) {
   /* Testimonial Card - Clean readable design */
   .testimonial-card {
     position: relative;
-    height: 280px;
+    min-height: 280px;
+    height: auto;
     padding: var(--space-6) var(--space-8);
     background: var(--color-surface);
     border: 1px solid var(--color-border);
@@ -295,7 +296,7 @@ if (googleScriptUrl) {
     transform: perspective(1000px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
     transition: transform 0.15s ease-out, box-shadow 0.3s ease-out, border-color 0.3s ease-out;
     will-change: transform;
-    overflow: hidden;
+    overflow: visible;
     display: flex;
     flex-direction: column;
   }
@@ -465,6 +466,79 @@ if (googleScriptUrl) {
     
     .card-glow {
       display: none;
+    }
+  }
+  
+  /* Mobile responsiveness */
+  @media (max-width: 640px) {
+    .testimonials-section {
+      padding: var(--space-8) var(--space-4);
+    }
+    
+    .testimonials-header h2 {
+      font-size: var(--text-2xl);
+    }
+    
+    .section-subtitle {
+      font-size: var(--text-base);
+    }
+    
+    .embla {
+      max-width: 100%;
+    }
+    
+    .embla__slide {
+      padding: 0 var(--space-2);
+    }
+    
+    .testimonial-card {
+      min-height: auto;
+      padding: var(--space-5) var(--space-4);
+      border-radius: var(--radius-xl);
+    }
+    
+    .quote-mark svg {
+      width: 24px;
+      height: 24px;
+    }
+    
+    .testimonial-quote {
+      font-size: var(--text-base);
+      line-height: 1.7;
+      margin-bottom: var(--space-3);
+    }
+    
+    .testimonial-rating {
+      margin: var(--space-3) 0;
+    }
+    
+    .testimonial-author {
+      padding-top: var(--space-3);
+      gap: var(--space-2);
+    }
+    
+    .author-avatar {
+      width: 40px;
+      height: 40px;
+      font-size: var(--text-xs);
+    }
+    
+    .author-name {
+      font-size: var(--text-sm);
+    }
+    
+    .author-role {
+      font-size: 11px;
+    }
+    
+    .embla__controls {
+      margin-top: var(--space-6);
+      gap: var(--space-4);
+    }
+    
+    .embla__btn {
+      width: 40px;
+      height: 40px;
     }
   }
 </style>
