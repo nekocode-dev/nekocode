@@ -1,0 +1,57 @@
+---
+interface Props {
+  as?: 'section' | 'div' | 'article';
+  size?: 'default' | 'lg' | 'xl';
+  class?: string;
+  id?: string;
+}
+
+const { 
+  as: Element = 'section', 
+  size = 'default',
+  class: className = '',
+  id
+} = Astro.props;
+
+const paddingClass = {
+  default: 'section-default',
+  lg: 'section-lg',
+  xl: 'section-xl'
+}[size];
+---
+
+<Element id={id} class:list={['section', paddingClass, className]}>
+  <slot />
+</Element>
+
+<style>
+  .section {
+    position: relative;
+  }
+  
+  .section-default {
+    padding-block: var(--space-16);
+  }
+  
+  .section-lg {
+    padding-block: var(--space-20);
+  }
+  
+  .section-xl {
+    padding-block: var(--space-24);
+  }
+  
+  @media (min-width: 768px) {
+    .section-default {
+      padding-block: var(--space-20);
+    }
+    
+    .section-lg {
+      padding-block: var(--space-24);
+    }
+    
+    .section-xl {
+      padding-block: var(--space-32);
+    }
+  }
+</style>

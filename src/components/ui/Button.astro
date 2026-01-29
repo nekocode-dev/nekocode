@@ -1,0 +1,128 @@
+---
+/**
+ * Button - Primary UI component
+ */
+interface Props {
+  variant?: 'primary' | 'secondary' | 'ghost' | 'accent';
+  size?: 'sm' | 'md' | 'lg';
+  href?: string;
+  type?: 'button' | 'submit' | 'reset';
+  disabled?: boolean;
+  class?: string;
+}
+
+const {
+  variant = 'primary',
+  size = 'md',
+  href,
+  type = 'button',
+  disabled = false,
+  class: className = '',
+  ...rest
+} = Astro.props;
+
+const Element = href ? 'a' : 'button';
+const base = import.meta.env.BASE_URL;
+// Apply base URL to internal links (starting with /)
+const resolvedHref = href && href.startsWith('/') && !href.startsWith('//') 
+  ? `${base}${href.slice(1)}` 
+  : href;
+---
+
+<Element
+  class:list={[
+    'btn', 
+    `btn-${variant}`, 
+    `btn-${size}`, 
+    variant === 'accent' && 'btn-glow btn-ripple',
+    className
+  ]}
+  href={resolvedHref}
+  type={!href ? type : undefined}
+  disabled={disabled}
+  role={href ? 'button' : undefined}
+  data-magnetic={variant === 'accent' ? '' : undefined}
+  {...rest}
+>
+  <slot />
+</Element>
+
+<style>
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    font-family: var(--font-text);
+    font-weight: 500;
+    text-decoration: none;
+    border: none;
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease-out);
+  }
+  
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  /* Sizes */
+  .btn-sm {
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--text-sm);
+    border-radius: var(--radius-md);
+  }
+  
+  .btn-md {
+    padding: var(--space-3) var(--space-6);
+    font-size: var(--text-base);
+  }
+  
+  .btn-lg {
+    padding: var(--space-4) var(--space-8);
+    font-size: var(--text-lg);
+  }
+  
+  /* Variants */
+  .btn-primary {
+    background: var(--color-text);
+    color: var(--color-bg);
+  }
+  
+  .btn-primary:hover:not(:disabled) {
+    background: var(--color-text-secondary);
+    transform: translateY(-1px);
+  }
+  
+  .btn-secondary {
+    background: var(--color-surface);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+  }
+  
+  .btn-secondary:hover:not(:disabled) {
+    background: var(--color-border-subtle);
+    border-color: var(--color-text-secondary);
+  }
+  
+  .btn-ghost {
+    background: transparent;
+    color: var(--color-text);
+  }
+  
+  .btn-ghost:hover:not(:disabled) {
+    background: var(--color-border-subtle);
+  }
+  
+  .btn-accent {
+    background: var(--color-accent);
+    color: var(--color-accent-contrast);
+  }
+  
+  .btn-accent:hover:not(:disabled) {
+    background: var(--color-accent-hover);
+    box-shadow: var(--shadow-glow);
+    transform: translateY(-1px);
+  }
+</style>

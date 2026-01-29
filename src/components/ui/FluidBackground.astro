@@ -1,0 +1,594 @@
+---
+---
+<div id="lava-container">
+  <div class="lava-lamp">
+    <!-- Blobs will be injected here by JS for randomness -->
+  </div>
+
+  <!-- The Gooey Filter -->
+  <svg xmlns="http://www.w3.org/2000/svg" version="1.1" class="goo-filter">
+    <defs>
+      <filter id="goo" color-interpolation-filters="sRGB">
+        <!-- Blur the shapes -->
+        <feGaussianBlur in="SourceGraphic" stdDeviation="12" result="blur" />
+
+        <!-- Threshold to create the gooey shape -->
+        <!-- Alpha threshold reduced (19 -> 18) to allow slightly more merging -->
+        <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="goo" />
+
+        <!-- 3D Lighting Effect -->
+        <!-- Use the alpha channel of the goo as a height map -->
+        <feGaussianBlur in="goo" stdDeviation="2" result="softGoo"/>
+
+        <!-- Zen Lighting: Warmer, softer, more "premium oil" feel -->
+        <!-- specularConstant reduced (1.0 -> 0.7) for subtler gloss -->
+        <!-- specularExponent increased (35 -> 50) for smaller, sharper highlights -->
+        <feSpecularLighting in="softGoo" surfaceScale="6" specularConstant="0.7" specularExponent="50" result="specular" lighting-color="#fffff0">
+            <fePointLight id="ambient-light" x="200" y="-100" z="500"/>
+        </feSpecularLighting>
+
+        <!-- Composite the highlight over the goo -->
+        <feComposite in="specular" in2="goo" operator="in" result="specularOverGoo"/>
+        <feComposite in="SourceGraphic" in2="goo" operator="atop" result="mainShape"/>
+
+        <!-- Blend everything -->
+        <feBlend in="mainShape" mode="multiply" result="shaded"/>
+        <feBlend in="specularOverGoo" in2="shaded" mode="screen" result="final"/>
+
+        <!-- Fallback for simpler look if blend fails, but usually screen works well for gloss -->
+        <feComposite in="specularOverGoo" in2="goo" operator="atop" result="highlight"/>
+        <feComposite in="highlight" in2="goo" operator="xor" result="finalShim"/>
+
+        <!-- Simplified: Just put highlight on top of colored goo -->
+        <feComposite in="specularOverGoo" in2="goo" operator="atop" result="gloss"/>
+        <feComposite in="gloss" in2="goo" operator="over"/>
+      </filter>
+    </defs>
+  </svg>
+</div>
+
+<script>
+  /**
+   * Realistic Liquid Physics Engine
+   * Uses Lennard-Jones Potential for cohesive particle interaction.
+   * Simulates Van der Waals forces: Attraction at range, Repulsion at close quarters.
+   */
+  
+  // === ACCESSIBILITY: Respect user's motion preferences ===
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  
+  const CONFIG = {
+    blobCount: prefersReducedMotion ? 8 : 15, // Fewer blobs if reduced motion
+    baseRadius: 40, // Much smaller base
+    radiusVar: 100, // Massive variance (tiny to huge blobs)
+    
+    // Lennard-Jones Constants
+    epsilon: 0.1, 
+    sigmaScale: 2.2, 
+    
+    // Environment
+    gravity: 0.012, // Slight bump up (was 0.008)
+    friction: 0.96,
+    wallBounce: 0.5,
+    
+    // Zen Mode Interaction
+    // Increased push slightly (0.05 -> 0.2) based on user feedback "too low"
+    mouseRepulsion: 0.2, 
+    mouseRange: 250,
+    
+    // Temperature
+    temperature: 0.015, // Slight bump up
+  };
+
+
+  class Particle {
+    constructor(element, x, y) {
+      this.el = element;
+      this.pos = { x, y };
+      this.vel = { x: (Math.random() - 0.5) * 0.5, y: (Math.random() - 0.5) * 0.5 };
+      this.acc = { x: 0, y: 0 };
+      this.radius = CONFIG.baseRadius + Math.random() * CONFIG.radiusVar;
+      
+      // Randomize speed: "Goldilocks" Zone
+      // Range: 0.3x (slow) to 0.8x (gentle drift). 
+      this.speedFactor = 0.3 + Math.random() * 0.5; 
+      
+      this.el.style.width = `${this.radius * 2}px`;
+      this.el.style.height = `${this.radius * 2}px`;
+      
+      const duration = 20 + Math.random() * 15;
+      const direction = Math.random() > 0.5 ? 'alternate' : 'alternate-reverse';
+      this.el.style.animation = `morph ${duration}s linear infinite ${direction}`;
+      this.el.style.animationDelay = `-${Math.random() * 20}s`;
+    }
+
+    applyForce(fx, fy) {
+      this.acc.x += fx;
+      this.acc.y += fy;
+    }
+
+    update(delta) {
+      // Delta-time based physics: scale all movement by time elapsed
+      // This prevents jumps when RAF is throttled (scroll, tab switch, etc.)
+      
+      // 1. Environment Forces (scaled by delta)
+      const buoyancyInfo = (this.radius / CONFIG.baseRadius); 
+      this.applyForce(0, -CONFIG.gravity * buoyancyInfo * this.speedFactor * delta * 60);
+      
+      this.applyForce(
+        (Math.random() - 0.5) * CONFIG.temperature * this.speedFactor * delta * 60, 
+        (Math.random() - 0.5) * CONFIG.temperature * this.speedFactor * delta * 60
+      );
+
+      // 2. Integration (scaled by delta)
+      this.vel.x += this.acc.x;
+      this.vel.y += this.acc.y;
+      
+      // Apply friction per-frame (use delta-adjusted friction)
+      const frictionPerFrame = Math.pow(CONFIG.friction, delta * 60);
+      this.vel.x *= frictionPerFrame;
+      this.vel.y *= frictionPerFrame;
+      
+      // Position update scaled by delta
+      this.pos.x += this.vel.x * delta * 60;
+      this.pos.y += this.vel.y * delta * 60;
+      
+      this.acc.x = 0;
+      this.acc.y = 0;
+
+      // 3. Constraints
+      this.checkWalls();
+      this.updateDOM();
+    }
+
+    checkWalls() {
+      if (this.pos.y < -this.radius * 2) {
+        this.pos.y = windowDimensions.height + this.radius;
+        this.vel.y *= 0.2;
+        this.pos.x = Math.random() * windowDimensions.width;
+      } 
+      else if (this.pos.y > windowDimensions.height + this.radius * 2) {
+          this.pos.y = -this.radius;
+      }
+
+      if (this.pos.x < 0) {
+        this.pos.x = 0;
+        this.vel.x *= -CONFIG.wallBounce;
+      } else if (this.pos.x > windowDimensions.width) {
+        this.pos.x = windowDimensions.width;
+        this.vel.x *= -CONFIG.wallBounce;
+      }
+    }
+
+    updateDOM() {
+      // Revert: User reported rotation feels unrealistic.
+      // Removed velocity-based squash & stretch (rotation/scale).
+      // Just use simple position translation for proper liquid feel.
+      const transform = `translate3d(${this.pos.x - this.radius}px, ${this.pos.y - this.radius}px, 0)`;
+      this.el.style.transform = transform;
+    }
+  }
+
+  // --- Physics System ---
+  
+  let particles = [];
+  let connectionState = { 
+      mouseX: window.innerWidth/2, 
+      mouseY: window.innerHeight/2, 
+      isMouseDown: false 
+  };
+  
+  // High-Fidelity: Lighting Smoothing State
+  let lightPos = { x: window.innerWidth/2, y: window.innerHeight/2 };
+  
+  let windowDimensions = { width: window.innerWidth, height: window.innerHeight };
+
+  window.addEventListener('resize', () => {
+    windowDimensions = { width: window.innerWidth, height: window.innerHeight };
+  });
+
+  const updateMouse = (x, y) => {
+    connectionState.mouseX = x;
+    connectionState.mouseY = y;
+    
+    // High-Fidelity: Dynamic Lighting
+    const light = document.querySelector('#ambient-light');
+    if (light) {
+        light.setAttribute('x', x);
+        light.setAttribute('y', y);
+    }
+  };
+
+  window.addEventListener('mousemove', (e) => updateMouse(e.clientX, e.clientY));
+  
+  // Touch Support
+  window.addEventListener('touchstart', (e) => {
+    if(e.touches.length > 0) {
+      updateMouse(e.touches[0].clientX, e.touches[0].clientY);
+      connectionState.isMouseDown = true;
+    }
+  }, { passive: true });
+
+  window.addEventListener('touchmove', (e) => {
+    if(e.touches.length > 0) {
+      updateMouse(e.touches[0].clientX, e.touches[0].clientY);
+    }
+  }, { passive: true });
+
+  window.addEventListener('touchend', () => connectionState.isMouseDown = false);
+  
+  window.addEventListener('mousedown', () => connectionState.isMouseDown = true);
+  window.addEventListener('mouseup', () => connectionState.isMouseDown = false);
+
+  // Global animation frame ID to manage cancellation
+  let animationFrameId;
+
+  function init() {
+    // 1. Cleanup previous loop to prevent double-speed/memory leaks
+    if (animationFrameId) {
+      cancelAnimationFrame(animationFrameId);
+    }
+    
+    const container = document.querySelector('.lava-lamp');
+    if (!container) return;
+    
+    // Clear any existing blobs (vital for View Transitions navigation)
+    container.innerHTML = '';
+    particles = [];
+
+    for (let i = 0; i < CONFIG.blobCount; i++) {
+      const div = document.createElement('div');
+      div.classList.add('blob');
+      container.appendChild(div);
+      
+      const x = Math.random() * windowDimensions.width;
+      const y = Math.random() * windowDimensions.height;
+      
+      particles.push(new Particle(div, x, y));
+    }
+    
+    // === ACCESSIBILITY: Skip physics simulation for reduced-motion users ===
+    // Just show static blobs with CSS morph animation (no JavaScript loop)
+    if (prefersReducedMotion) {
+      // Position blobs randomly but don't animate via JS
+      container.style.filter = 'blur(20px)';
+      container.style.opacity = '0.4';
+      console.log('[FluidBackground] Reduced motion enabled - using static mode');
+      return; // Don't start the physics loop
+    }
+    
+    // Reset PerformanceManager for the new page life
+    PerformanceManager.init();
+    
+    // Reset timestamp tracker and start loop with proper timestamp
+    lastLoopTimestamp = 0;
+    requestAnimationFrame(loop);
+  }
+
+
+  function interact(delta) {
+    const { mouseX, mouseY } = connectionState;
+
+    for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        const dx = p.pos.x - mouseX;
+        const dy = p.pos.y - mouseY;
+        const distSq = dx*dx + dy*dy;
+        
+        if (distSq < CONFIG.mouseRange * CONFIG.mouseRange && distSq > 0) {
+            const dist = Math.sqrt(distSq);
+            const force = (1 - dist / CONFIG.mouseRange) * CONFIG.mouseRepulsion;
+            p.applyForce((dx/dist) * force, (dy/dist) * force);
+        }
+    }
+  }
+
+  function computeCohesion(delta) {
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const p1 = particles[i];
+        const p2 = particles[j];
+        
+        const dx = p2.pos.x - p1.pos.x;
+        const dy = p2.pos.y - p1.pos.y;
+        const distSq = dx*dx + dy*dy;
+        
+        // Effective "Merge" Radius
+        // Sigma is where the force is zero. We want them to overlap.
+        const sigma = (p1.radius + p2.radius) * 0.65; // Overlap factor (0.65 = deep merge)
+        const cutoff = sigma * 3; 
+        
+        if (distSq > cutoff * cutoff || distSq === 0) continue;
+        
+        const r = Math.sqrt(distSq);
+        const rNorm = r / sigma; 
+        
+        let force = 0;
+        
+        // Custom Potential for "Sticky Liquid"
+        if (rNorm < 0.8) {
+             // Repel only when VERY close (prevent explosion)
+             force = -1.0 * (0.8 - rNorm); 
+        } else if (rNorm < 1.5) {
+             // Strong Attraction (Cohesion/Surface Tension) in the middle
+             // This pulls them into a "single big blob"
+             force = 0.15 * (1.5 - rNorm); 
+        } else {
+             // Weak Gravity pull at distance
+             force = 0.02 * (3.0 - rNorm);
+        }
+        
+        const fx = (dx / r) * force * CONFIG.epsilon;
+        const fy = (dy / r) * force * CONFIG.epsilon;
+        
+        p1.applyForce(fx, fy);
+        p2.applyForce(-fx, -fy);
+      }
+    }
+  }
+
+  // Cache DOM elements
+  const lightElement = document.querySelector('#ambient-light');
+
+  function updateLighting() {
+      // Smoothly interpolate light position towards mouse (The "Lantern" effect)
+      // Factor 0.08 = slow fluid lag. Feels like dragging a heavy light through water.
+      lightPos.x += (connectionState.mouseX - lightPos.x) * 0.08;
+      lightPos.y += (connectionState.mouseY - lightPos.y) * 0.08;
+
+      if (lightElement) {
+          lightElement.setAttribute('x', lightPos.x);
+          lightElement.setAttribute('y', lightPos.y);
+      }
+  }
+
+  // Track last timestamp for delta-time calculation
+  let lastLoopTimestamp = 0;
+  
+  function loop(timestamp) {
+    // Calculate delta time in seconds
+    // Cap at 50ms (0.05s) to prevent huge jumps from throttled/paused states
+    const rawDelta = lastLoopTimestamp ? (timestamp - lastLoopTimestamp) / 1000 : 0.016;
+    const delta = Math.min(rawDelta, 0.05); // Max 50ms = ~3 missed frames at 60fps
+    lastLoopTimestamp = timestamp;
+    
+    // Always run physics with capped delta - no more skipping during scroll
+    interact(delta);
+    computeCohesion(delta);
+    updateLighting(); 
+    
+    for (const p of particles) {
+      p.update(delta);
+    }
+    
+    // Continue animation loop
+    animationFrameId = requestAnimationFrame((ts) => {
+        PerformanceManager.update(ts);
+        loop(ts);
+    });
+  }
+
+  // --- Adaptive Performance Manager ("The Shapeshifter") ---
+  const PerformanceManager = {
+      fps: 60,
+      lastTime: 0,
+      frames: 0,
+      tier: 'S', // S (Ultra) or C (Safety Mode)
+      checkInterval: 2000,
+      lastCheck: 0,
+      container: null,
+
+      // Robustness: Prevent false positives on load/tab switch/scroll
+      warmup: true,
+      warmupTimer: null,
+      lowFpsStrikes: 0, // Require consecutive failures
+      isScrolling: false,
+      scrollTimer: null,
+
+      init() {
+          this.container = document.querySelector('.lava-lamp');
+          // Reset state for new page
+          this.warmup = true;
+          this.lowFpsStrikes = 0;
+          this.frames = 0;
+          this.lastTime = performance.now();
+          this.isScrolling = false;
+
+          if (this.warmupTimer) clearTimeout(this.warmupTimer);
+          if (this.scrollTimer) clearTimeout(this.scrollTimer);
+
+          // Wait for all resources to load before monitoring FPS
+          // This prevents counting initial page load as a performance issue
+          const startMonitoring = () => {
+              // Additional 2 second buffer after load for paint/layout settling
+              this.warmupTimer = setTimeout(() => {
+                  this.warmup = false;
+              }, 2000);
+          };
+
+          if (document.readyState === 'complete') {
+              // Page already loaded (e.g., Astro view transition)
+              startMonitoring();
+          } else {
+              // Wait for full page load (images, fonts, etc.)
+              window.addEventListener('load', startMonitoring, { once: true });
+          }
+
+          // Track scrolling to ignore FPS drops during scroll (browser throttles RAF)
+          window.addEventListener('scroll', this.onScroll.bind(this), { passive: true });
+      },
+
+      onScroll() {
+          this.isScrolling = true;
+          if (this.scrollTimer) clearTimeout(this.scrollTimer);
+          // Consider scroll "ended" after 500ms of no scroll events
+          this.scrollTimer = setTimeout(() => {
+              this.isScrolling = false;
+          }, 500);
+      },
+
+      update(timestamp) {
+          // Sleep/Tab Switch Detection
+          // If >2 seconds passed since last frame, user was likely in another tab.
+          // Don't count this massive gap as "0 FPS". Resume smoothly.
+          if (timestamp - this.lastTime > 2000) {
+              this.lastTime = timestamp;
+              this.lastCheck = timestamp;
+              this.frames = 0;
+              return;
+          }
+
+          this.frames++;
+          if (timestamp - this.lastTime >= 1000) {
+              this.fps = this.frames;
+              this.frames = 0;
+              this.lastTime = timestamp;
+          }
+
+          if (timestamp - this.lastCheck > this.checkInterval) {
+              this.evaluateTier();
+              this.lastCheck = timestamp;
+          }
+      },
+
+      evaluateTier() {
+          if (this.warmup) return; // Don't judge during warmup
+          if (document.hidden) return; // Don't judge background tabs
+          if (this.isScrolling) return; // Don't judge during scroll (browser throttles RAF)
+
+          // Robust Logic:
+          // 1. Threshold: < 12 FPS (true performance issue, not scroll throttling)
+          // 2. Strikes: Must fail 5 times in a row (10 seconds of sustained lag)
+          if (this.fps < 12 && this.tier === 'S') {
+              this.lowFpsStrikes++;
+
+              if (this.lowFpsStrikes >= 5) {
+                  this.setTier('C');
+              }
+          } else {
+              // Reset strikes if we hit a good frame
+              this.lowFpsStrikes = 0;
+          }
+      },
+
+      setTier(newTier) {
+          if (this.tier === newTier) return;
+          if (!this.container) return;
+          
+          // console.log(`[Performance] Switching Tier: ${this.tier} -> ${newTier}`);
+          this.tier = newTier;
+          
+          // Helper to apply changes after fade-out
+          const applyChanges = () => {
+              if (newTier === 'C') {
+                  // Tier C: "Safety Mode"
+                  this.container.style.filter = 'blur(12px)'; 
+                  this.container.style.opacity = '0.5'; 
+              } else {
+                  // Tier S: "Liquid Mode" (Ultra)
+                  this.container.style.filter = 'url(#goo)';
+                  this.container.style.opacity = '1';
+              }
+          };
+
+          // Smooth Transition: Fade Out -> Swap -> Fade In
+          this.container.style.transition = 'opacity 1s ease-in-out';
+          this.container.style.opacity = '0';
+          
+          setTimeout(() => {
+              applyChanges();
+              
+              setTimeout(() => {
+                this.container.style.opacity = newTier === 'C' ? '0.5' : '1'; 
+              }, 100); 
+          }, 1000); 
+      }
+  };
+
+  // Re-Initialize on every Astro page navigation (View Transitions)
+  document.addEventListener('astro:page-load', () => {
+      init();
+  });
+
+</script>
+
+<style>
+  #lava-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -10;
+    /* Premium "Deep Space Magma" Background */
+    background: radial-gradient(circle at 50% 120%, #2b0f42 0%, #050511 60%, #000000 100%);
+    overflow: hidden;
+    /* Optimization: Create a new stacking context and isolate repaints */
+    isolation: isolate;
+    contain: paint;
+  }
+
+  .lava-lamp {
+    width: 100%;
+    height: 100%;
+    /* Apply custom filter with 3D lighting */
+    filter: url('#goo');
+    position: absolute;
+    top: 0;
+    left: 0;
+    /* Optimization: Force GPU layer */
+    transform: translate3d(0, 0, 0);
+    will-change: filter, opacity;
+  }
+
+  /* Global styles for dynamic blobs */
+  :global(.blob) {
+    position: absolute;
+    /* Golden Magma Gradient - works well with specular highlights */
+    background: linear-gradient(180deg, #ff9068 0%, #ff4b4b 60%, #900d2f 100%);
+    border-radius: 50%;
+    
+    /* Default position off-screen, handled by JS */
+    top: 0;
+    left: 0; 
+    
+    /* Optimization: Reduce paint cost on movement */
+    will-change: transform;
+    backface-visibility: hidden;
+
+    /* Box shadow for internal glow before filtering */
+    box-shadow: inset 0 0 40px rgba(255, 230, 0, 0.3);
+  }
+
+  /* Rise Animation: REMOVED - Handled by JS */
+
+  /* Morph Animation: Handles Organic Shape Wobble */
+  /* Morph Animation: Handles Organic Shape Wobble - EXAGGERATED for visible "wave" */
+  :global(@keyframes morph) {
+    0% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+    25% { border-radius: 45% 55% 20% 80% / 55% 25% 75% 45%; }
+    50% { border-radius: 20% 80% 60% 40% / 30% 70% 20% 80%; }
+    75% { border-radius: 70% 30% 80% 20% / 70% 30% 20% 80%; }
+    100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+  }
+
+  .goo-filter {
+    visibility: hidden;
+    position: absolute;
+    width: 0;
+    height: 0;
+  }
+
+  /* === ACCESSIBILITY: Reduced Motion Support === */
+  @media (prefers-reduced-motion: reduce) {
+    .lava-lamp {
+      filter: blur(20px) !important;
+      opacity: 0.4 !important;
+    }
+    
+    :global(.blob) {
+      animation: none !important;
+    }
+  }
+</style>
+

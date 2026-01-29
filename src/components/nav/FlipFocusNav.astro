@@ -1,0 +1,147 @@
+---
+/**
+ * FlipFocusNav - Custom navigation for FlipFocus app pages
+ * Shows FlipFocus branding and app-specific links
+ */
+const base = import.meta.env.BASE_URL;
+const currentPath = Astro.url.pathname;
+---
+
+<header class="nav-header">
+  <nav class="nav glass" aria-label="FlipFocus navigation">
+    <a href={`${base}apps/flipfocus`} class="nav-logo" aria-label="FlipFocus Home">
+      <img src={`${base}assets/projects/flipfocus/icon.png`} alt="" width="40" height="40" />
+      <span class="logo-text">FLIPFOCUS</span>
+    </a>
+    
+    <div class="nav-links">
+      <a href={`${base}apps/flipfocus#features`} class="nav-link">Features</a>
+      <a href={`${base}apps/flipfocus/pricing`} class="nav-link">Pricing</a>
+      <a href={`${base}apps/flipfocus#download`} class="nav-link">Download</a>
+      <a href={`${base}apps/flipfocus/privacy`} class="nav-link">Privacy</a>
+      <a href={`${base}apps/flipfocus/report-bug`} class="nav-link bug-link">Report Bug</a>
+    </div>
+    
+    <div class="nav-actions">
+      <a href={base} class="back-to-portfolio">
+        ← NekoCode
+      </a>
+    </div>
+  </nav>
+</header>
+
+<style>
+  .nav-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding: var(--space-3);
+  }
+  
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-6);
+    padding: var(--space-3) var(--space-6);
+    border-radius: var(--radius-xl);
+    max-width: var(--container-max);
+    margin-inline: auto;
+  }
+  
+  .glass {
+    background: rgba(12, 12, 16, 0.9);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  [data-theme="light"] .glass {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: rgba(0, 0, 0, 0.1);
+  }
+  
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    text-decoration: none;
+  }
+  
+  .nav-logo img {
+    border-radius: 10px;
+  }
+  
+  .logo-text {
+    font-family: 'Press Start 2P', var(--font-display), monospace;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text);
+    letter-spacing: 0.02em;
+  }
+  
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+  }
+  
+  @media (max-width: 640px) {
+    .nav-links {
+      display: none;
+    }
+  }
+  
+  .nav-link {
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    transition: all var(--duration-fast) var(--ease-out);
+  }
+  
+  .nav-link:hover {
+    color: var(--color-text);
+    background: var(--color-border-subtle);
+  }
+  
+  .nav-actions {
+    display: flex;
+    align-items: center;
+  }
+  
+  .back-to-portfolio {
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-accent);
+    border: 1px solid var(--color-accent);
+    transition: all var(--duration-fast) var(--ease-out);
+  }
+  
+  .back-to-portfolio:hover {
+    background: var(--color-accent);
+    color: var(--color-accent-contrast);
+  }
+  
+  .bug-link {
+    color: var(--color-accent) !important;
+  }
+</style>
+
+<script>
+  // Smooth scroll for hash links
+  document.querySelectorAll('.nav-link[href^="#"]').forEach(link => {
+    link.addEventListener('click', (e) => {
+      const href = link.getAttribute('href');
+      if (href && href.startsWith('#')) {
+        e.preventDefault();
+        const target = document.querySelector(href);
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+    });
+  });
+</script>

@@ -1,0 +1,97 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import NavBar from '@/components/nav/NavBar.astro';
+import Footer from '@/components/nav/Footer.astro';
+import Container from '@/components/layout/Container.astro';
+import Section from '@/components/layout/Section.astro';
+import BentoGrid from '@/components/layout/BentoGrid.astro';
+import ProjectCard from '@/components/cards/ProjectCard.astro';
+import Tag from '@/components/ui/Tag.astro';
+import { getCollection } from 'astro:content';
+
+// Get apps only
+const allProjects = await getCollection('projects');
+const apps = allProjects.filter(p => p.data.type === 'app');
+
+// Extract categories
+const categories = [...new Set(apps.map(p => p.data.category).filter(Boolean))];
+---
+
+<BaseLayout title="Apps" description="Mobile and desktop applications I have built">
+  <NavBar slot="header" />
+  
+  <Section size="lg">
+    <Container>
+      <div class="page-header">
+        <h1 class="text-title-1">Apps</h1>
+        <p class="page-description">
+          Mobile and desktop applications. Each one is a story of problem-solving and craft.
+        </p>
+      </div>
+      
+      <!-- Category Chips -->
+      {categories.length > 0 && (
+        <div class="category-bar">
+          <Tag variant="accent">All</Tag>
+          {categories.map(cat => (
+            <Tag variant="outline">{cat}</Tag>
+          ))}
+        </div>
+      )}
+      
+      <!-- Apps Grid -->
+      <BentoGrid columns={3} gap="md">
+        {apps.map((project, index) => (
+          <ProjectCard
+            slug={project.slug}
+            title={project.data.title}
+            tagline={project.data.tagline}
+            coverImage={project.data.media.coverImage}
+            type={project.data.type}
+            platforms={project.data.platforms}
+            tech={project.data.tech}
+            status={project.data.status}
+            featured={project.data.featured}
+          />
+        ))}
+      </BentoGrid>
+      
+      {apps.length === 0 && (
+        <div class="empty-state">
+          <p>No apps to show yet. Check back soon!</p>
+        </div>
+      )}
+    </Container>
+  </Section>
+  
+  <Footer slot="footer" />
+</BaseLayout>
+
+<style>
+  .page-header {
+    margin-bottom: var(--space-8);
+  }
+  
+  .page-header h1 {
+    margin-bottom: var(--space-3);
+  }
+  
+  .page-description {
+    font-size: var(--text-lg);
+    color: var(--color-text-secondary);
+    max-width: 560px;
+  }
+  
+  .category-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-bottom: var(--space-8);
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: var(--space-16);
+    color: var(--color-muted);
+  }
+</style>

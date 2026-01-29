@@ -1,0 +1,314 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import NavBar from '@/components/nav/NavBar.astro';
+import Footer from '@/components/nav/Footer.astro';
+import Container from '@/components/layout/Container.astro';
+import Section from '@/components/layout/Section.astro';
+import BentoGrid from '@/components/layout/BentoGrid.astro';
+import ProjectCard from '@/components/cards/ProjectCard.astro';
+import Button from '@/components/ui/Button.astro';
+import Tag from '@/components/ui/Tag.astro';
+import { getCollection, type CollectionEntry } from 'astro:content';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+  return projects.map(project => ({
+    params: { slug: project.slug },
+    props: { project }
+  }));
+}
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+}
+
+const { project } = Astro.props;
+const { Content } = await project.render();
+
+// Get related projects
+const allProjects = await getCollection('projects');
+const relatedProjects = allProjects
+  .filter(p => p.slug !== project.slug)
+  .slice(0, 3);
+
+const platformLabels = {
+  web: 'Web',
+  ios: 'iOS',
+  android: 'Android'
+};
+---
+
+<BaseLayout 
+  title={project.data.title}
+  description={project.data.summary}
+  image={project.data.media.coverImage}
+  type="article"
+>
+  <NavBar slot="header" />
+  
+  <!-- Hero -->
+  <Section size="lg" class="project-hero">
+    <Container>
+      <a href="/apps" class="back-link">← Back to Apps</a>
+      
+      <div class="hero-content">
+        <div class="hero-meta">
+          {project.data.status === 'in_progress' && (
+            <Tag variant="accent">In Progress</Tag>
+          )}
+          <span class="year">{project.data.year}</span>
+        </div>
+        
+        <h1 class="text-hero">{project.data.title}</h1>
+        <p class="tagline">{project.data.tagline}</p>
+        
+        <div class="hero-details">
+          <div class="platforms">
+            {project.data.platforms.map(p => (
+              <Tag>{platformLabels[p]}</Tag>
+            ))}
+          </div>
+          
+          <div class="links">
+            {project.data.links?.repo && (
+              <Button href={project.data.links.repo} variant="secondary" size="sm">
+                GitHub →
+              </Button>
+            )}
+            {project.data.links?.live && (
+              <Button href={project.data.links.live} variant="accent" size="sm">
+                View Live →
+              </Button>
+            )}
+            {project.data.links?.store && (
+              <Button href={project.data.links.store} variant="accent" size="sm">
+                App Store →
+              </Button>
+            )}
+          </div>
+        </div>
+      </div>
+    </Container>
+  </Section>
+  
+  <!-- Cover Image -->
+  <Section class="cover-section">
+    <Container>
+      <div class="cover-image">
+        <img 
+          src={project.data.media.coverImage} 
+          alt={`${project.data.title} cover`}
+          loading="eager"
+        />
+      </div>
+    </Container>
+  </Section>
+  
+  <!-- Content -->
+  <Section>
+    <Container size="narrow">
+      <div class="project-content prose">
+        <Content />
+      </div>
+    </Container>
+  </Section>
+  
+  <!-- Tech Stack -->
+  <Section class="tech-section">
+    <Container size="narrow">
+      <h2 class="text-title-2">Tech Stack</h2>
+      <div class="tech-grid">
+        {project.data.tech.map(tech => (
+          <div class="tech-item">
+            <Tag size="md">{tech}</Tag>
+          </div>
+        ))}
+      </div>
+    </Container>
+  </Section>
+  
+  <!-- Roles -->
+  <Section class="roles-section">
+    <Container size="narrow">
+      <h2 class="text-title-2">My Role</h2>
+      <div class="roles-list">
+        {project.data.roles.map(role => (
+          <span class="role">{role}</span>
+        ))}
+      </div>
+    </Container>
+  </Section>
+  
+  <!-- More Projects -->
+  {relatedProjects.length > 0 && (
+    <Section size="lg" class="related-section">
+      <Container>
+        <h2 class="text-title-2">More Projects</h2>
+        <BentoGrid columns={3} gap="md">
+          {relatedProjects.map(p => (
+            <ProjectCard
+              slug={p.slug}
+              title={p.data.title}
+              tagline={p.data.tagline}
+              coverImage={p.data.media.coverImage}
+              type={p.data.type}
+              platforms={p.data.platforms}
+              tech={p.data.tech}
+              status={p.data.status}
+            />
+          ))}
+        </BentoGrid>
+      </Container>
+    </Section>
+  )}
+  
+  <Footer slot="footer" />
+</BaseLayout>
+
+<style>
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-6);
+    color: var(--color-muted);
+    font-size: var(--text-sm);
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+  
+  .back-link:hover {
+    color: var(--color-text);
+  }
+  
+  .hero-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+  }
+  
+  .year {
+    font-size: var(--text-sm);
+    color: var(--color-muted);
+  }
+  
+  .hero-content h1 {
+    margin-bottom: var(--space-4);
+  }
+  
+  .tagline {
+    font-size: var(--text-xl);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-6);
+    max-width: 600px;
+  }
+  
+  .hero-details {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+    flex-wrap: wrap;
+  }
+  
+  .platforms {
+    display: flex;
+    gap: var(--space-2);
+  }
+  
+  .links {
+    display: flex;
+    gap: var(--space-3);
+  }
+  
+  .cover-image {
+    aspect-ratio: 16 / 9;
+    border-radius: var(--radius-2xl);
+    overflow: hidden;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+  }
+  
+  .cover-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  /* Prose styles for MDX content */
+  .prose {
+    color: var(--color-text);
+    line-height: var(--leading-relaxed);
+  }
+  
+  .prose :global(h2) {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: 600;
+    margin-top: var(--space-10);
+    margin-bottom: var(--space-4);
+  }
+  
+  .prose :global(h3) {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: 600;
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-3);
+  }
+  
+  .prose :global(p) {
+    margin-bottom: var(--space-4);
+  }
+  
+  .prose :global(ul),
+  .prose :global(ol) {
+    margin-bottom: var(--space-4);
+    padding-left: var(--space-6);
+  }
+  
+  .prose :global(li) {
+    margin-bottom: var(--space-2);
+  }
+  
+  .prose :global(strong) {
+    font-weight: 600;
+  }
+  
+  .prose :global(code) {
+    padding: var(--space-1) var(--space-2);
+    background: var(--color-border-subtle);
+    border-radius: var(--radius-sm);
+    font-size: var(--text-sm);
+  }
+  
+  .tech-section h2,
+  .roles-section h2,
+  .related-section h2 {
+    margin-bottom: var(--space-6);
+  }
+  
+  .tech-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+  
+  .roles-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+  }
+  
+  .role {
+    font-size: var(--text-lg);
+    color: var(--color-text-secondary);
+  }
+  
+  .role:not(:last-child)::after {
+    content: '•';
+    margin-left: var(--space-4);
+    color: var(--color-muted);
+  }
+  
+  .related-section {
+    border-top: 1px solid var(--color-border);
+  }
+</style>
