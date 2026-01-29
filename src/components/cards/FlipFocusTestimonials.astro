@@ -1,24 +1,46 @@
 ---
 /**
  * FlipFocusTestimonials - Premium testimonial carousel for FlipFocus
- * Static HTML with Embla Carousel for smooth sliding
+ * Fetches testimonials from Google Sheet via Apps Script API
+ * Falls back to placeholder data if API unavailable
  */
 
 interface Props {
   class?: string;
 }
 
+interface Testimonial {
+  name: string;
+  initials: string;
+  role: string;
+  rating: number;
+  quote: string;
+  gradient: string;
+}
+
 const { class: className } = Astro.props;
 
-// 3 testimonials for optimal conversion
-const testimonials = [
+// Gradient options for testimonial cards
+const gradients = [
+  "linear-gradient(135deg, #F5E6D3 0%, #D4C5B0 100%)",
+  "linear-gradient(135deg, #E8D5C4 0%, #C9B8A3 100%)",
+  "linear-gradient(135deg, #D4C5B0 0%, #BBA896 100%)",
+];
+
+// Helper to get initials from name
+function getInitials(name: string): string {
+  return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+}
+
+// Fallback testimonials (used if API fails or during development)
+const fallbackTestimonials: Testimonial[] = [
   {
     name: "Alex Chen",
     initials: "AC",
     role: "Medical Student",
     rating: 5,
     quote: "FlipFocus transformed my USMLE prep. The FSRS algorithm helps me retain so much more!",
-    gradient: "linear-gradient(135deg, #F5E6D3 0%, #D4C5B0 100%)"
+    gradient: gradients[0]
   },
   {
     name: "Sarah Kim",
@@ -26,7 +48,7 @@ const testimonials = [
     role: "Language Learner",
     rating: 5,
     quote: "The most beautiful flashcard app I've used. Game modes make studying addictive!",
-    gradient: "linear-gradient(135deg, #E8D5C4 0%, #C9B8A3 100%)"
+    gradient: gradients[1]
   },
   {
     name: "Marcus Johnson",
@@ -34,9 +56,34 @@ const testimonials = [
     role: "Software Developer",
     rating: 5,
     quote: "OCR scanning is a game changer. I create cards from textbooks in seconds!",
-    gradient: "linear-gradient(135deg, #D4C5B0 0%, #BBA896 100%)"
+    gradient: gradients[2]
   }
 ];
+
+// Fetch testimonials from Google Apps Script API
+let testimonials: Testimonial[] = fallbackTestimonials;
+
+const googleScriptUrl = import.meta.env.PUBLIC_GOOGLE_SCRIPT_URL;
+
+if (googleScriptUrl) {
+  try {
+    const response = await fetch(`${googleScriptUrl}?action=get_testimonials`);
+    const data = await response.json();
+    
+    if (data.status === 'success' && data.testimonials?.length > 0) {
+      testimonials = data.testimonials.map((t: any, index: number) => ({
+        name: t.name,
+        initials: getInitials(t.name),
+        role: t.role || '',
+        rating: t.rating || 5,
+        quote: t.quote,
+        gradient: gradients[index % gradients.length]
+      }));
+    }
+  } catch (error) {
+    console.warn('Failed to fetch testimonials, using fallback:', error);
+  }
+}
 ---
 
 <section class:list={["testimonials-section", className]}>

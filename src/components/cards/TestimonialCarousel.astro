@@ -15,9 +15,10 @@ interface Props {
 }
 
 const { class: className } = Astro.props;
+const googleScriptUrl = import.meta.env.PUBLIC_GOOGLE_SCRIPT_URL || '';
 ---
 
-<section class:list={["testimonials-section", className]}>
+<section class:list={["testimonials-section", className]} data-script-url={googleScriptUrl}>
   <div class="testimonials-header">
     <h2 class="text-title-2">What People Say</h2>
     <p class="testimonials-subtitle">Feedback from our amazing users</p>
@@ -189,8 +190,8 @@ const { class: className } = Astro.props;
     async function loadTestimonials() {
       try {
         // Try to load from Google Sheets
-        const scriptUrl = (document.querySelector('[data-testimonial-url]') as HTMLElement)?.dataset?.testimonialUrl ||
-          import.meta.env.PUBLIC_GOOGLE_SCRIPT_URL;
+        const section = document.querySelector('.testimonials-section');
+        const scriptUrl = section?.getAttribute('data-script-url') || '';
         
         if (scriptUrl) {
           const response = await fetch(`${scriptUrl}?action=get_testimonials`);
