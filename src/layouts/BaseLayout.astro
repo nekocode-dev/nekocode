@@ -3,6 +3,7 @@ import '@/styles/fonts.css';
 import '@/styles/global.css';
 import '@/styles/animations.css';
 import FluidBackground from '@/components/ui/FluidBackground.astro';
+import SmoothScroll from '@/components/SmoothScroll.astro';
 import { ClientRouter } from 'astro:transitions';
 
 interface Props {
@@ -75,6 +76,7 @@ const base = import.meta.env.BASE_URL;
     <slot name="footer" />
     
     <script src="@/scripts/animations.js"></script>
+    <SmoothScroll />
   </body>
 </html>
 

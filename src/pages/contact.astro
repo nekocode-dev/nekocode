@@ -5,6 +5,10 @@ import Footer from '@/components/nav/Footer.astro';
 import Container from '@/components/layout/Container.astro';
 import Section from '@/components/layout/Section.astro';
 import Button from '@/components/ui/Button.astro';
+
+// Get the Google Script URL from environment variable
+// Falls back to empty string if not set (will show error to user)
+const googleScriptUrl = import.meta.env.PUBLIC_GOOGLE_SCRIPT_URL || '';
 ---
 
 <BaseLayout title="Contact" description="Get in touch with NekoCode">
@@ -60,9 +64,9 @@ import Button from '@/components/ui/Button.astro';
         </Button>
       </form>
       
-<script>
-  // PASTE YOUR GOOGLE APP SCRIPT URL HERE
-  const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxCC0oUW7_S29DkdmSqzNxOV0CMYxIzQOPwedk6b4bIlv3-neNo3gByQ8X-4tnlcntr/exec';
+<script define:vars={{ googleScriptUrl }}>
+  // Google Script URL is loaded from environment variable for security
+  const GOOGLE_SCRIPT_URL = googleScriptUrl;
 
   const form = document.getElementById('contact-form');
   const statusDiv = document.getElementById('form-status');

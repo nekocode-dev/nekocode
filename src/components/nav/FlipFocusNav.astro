@@ -19,6 +19,7 @@ const currentPath = Astro.url.pathname;
       <a href={`${base}apps/flipfocus/pricing`} class="nav-link">Pricing</a>
       <a href={`${base}apps/flipfocus#download`} class="nav-link">Download</a>
       <a href={`${base}apps/flipfocus/privacy`} class="nav-link">Privacy</a>
+      <a href={`${base}apps/flipfocus/report-bug`} class="nav-link bug-link">Report Bug</a>
     </div>
     
     <div class="nav-actions">
@@ -122,6 +123,10 @@ const currentPath = Astro.url.pathname;
   .back-to-portfolio:hover {
     background: var(--color-accent);
     color: var(--color-accent-contrast);
+  }
+  
+  .bug-link {
+    color: var(--color-accent) !important;
   }
 </style>
 

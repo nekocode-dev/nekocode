@@ -6,6 +6,7 @@ import Container from '@/components/layout/Container.astro';
 import Section from '@/components/layout/Section.astro';
 import Button from '@/components/ui/Button.astro';
 import Tag from '@/components/ui/Tag.astro';
+import FlipFocusTestimonials from '@/components/cards/FlipFocusTestimonials.astro';
 
 const base = import.meta.env.BASE_URL;
 
@@ -265,8 +266,6 @@ const appStoreUrl = ''; // Empty = coming soon
     </Container>
   </Section>
   
-
-  
   <!-- Download Section -->
   <Section id="download" size="lg" class="download-section">
     <Container size="narrow">
@@ -305,6 +304,9 @@ const appStoreUrl = ''; // Empty = coming soon
       </div>
     </Container>
   </Section>
+  
+  <!-- Testimonials Section -->
+  <FlipFocusTestimonials />
   
   <!-- Legal Links -->
   <Section class="legal-section">

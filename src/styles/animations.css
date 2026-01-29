@@ -1,29 +1,68 @@
 /*
  * NekoCode Animation System
  * 2025-2026 UI Polish - Scroll reveals, micro-interactions, and enhanced effects
+ * Enhanced with spring physics and modern CSS linear() easing
  */
 
 /* ========================================
-   Animation Tokens
+   Animation Tokens - Premium Easing
    ======================================== */
 :root {
+    /* Duration tokens */
     --anim-duration-fast: 0.3s;
     --anim-duration-normal: 0.6s;
     --anim-duration-slow: 1s;
+    --anim-duration-spring: 0.8s;
+    
+    /* Standard easing curves */
     --anim-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
     --anim-ease-elastic: cubic-bezier(0.34, 1.56, 0.64, 1);
     --anim-ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Premium spring physics - fallback cubic-bezier */
+    --anim-ease-spring: cubic-bezier(0.22, 1.2, 0.36, 1);
+    --anim-ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --anim-ease-snap: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    
+    /* Cinematic easing for page transitions */
+    --anim-ease-cinematic: cubic-bezier(0.83, 0, 0.17, 1);
+}
+
+/* Modern spring physics using linear() - with fallback */
+@supports (animation-timing-function: linear(0, 1)) {
+    :root {
+        /* Spring easing - natural overshoot and settle */
+        --anim-ease-spring: linear(
+            0, 0.006, 0.025 2.8%, 0.101 6.1%, 0.539 18.9%, 0.721 25.3%, 0.849 31.5%,
+            0.937 38.1%, 0.968 41.8%, 0.991 45.7%, 1.006 50%, 1.015 55%, 1.017 63.9%,
+            1.001 83%, 1
+        );
+        
+        /* Bounce easing - playful bounce effect */
+        --anim-ease-bounce: linear(
+            0, 0.004, 0.016, 0.035, 0.063 9.1%, 0.141 13.6%, 0.25, 0.391, 0.563, 0.765,
+            1 45.5%, 1.127 54.5%, 1.175, 1.195, 1.187 72.7%, 1.109 81.8%, 1 90.9%,
+            0.973, 1
+        );
+        
+        /* Snap easing - quick with subtle settle */
+        --anim-ease-snap: linear(
+            0, 0.095 8.8%, 0.372 17.6%, 0.925 29.4%, 1.052 35.3%, 1.088 41.2%,
+            1.074 47.1%, 1.027 58.8%, 1.003 76.5%, 1
+        );
+    }
 }
 
 /* ========================================
-   Scroll Reveal Animations
+   Scroll Reveal Animations - Spring Physics
    ======================================== */
 .reveal {
     opacity: 0;
     transform: translateY(30px);
     transition:
         opacity var(--anim-duration-normal) var(--anim-ease-out),
-        transform var(--anim-duration-normal) var(--anim-ease-out);
+        transform var(--anim-duration-spring) var(--anim-ease-spring);
+    will-change: opacity, transform;
 }
 
 .reveal.visible {
@@ -31,13 +70,14 @@
     transform: translateY(0);
 }
 
-/* Directional Variants */
+/* Directional Variants with spring physics */
 .reveal-left {
     opacity: 0;
     transform: translateX(-40px);
     transition:
         opacity var(--anim-duration-normal) var(--anim-ease-out),
-        transform var(--anim-duration-normal) var(--anim-ease-out);
+        transform var(--anim-duration-spring) var(--anim-ease-spring);
+    will-change: opacity, transform;
 }
 
 .reveal-left.visible {
@@ -50,7 +90,8 @@
     transform: translateX(40px);
     transition:
         opacity var(--anim-duration-normal) var(--anim-ease-out),
-        transform var(--anim-duration-normal) var(--anim-ease-out);
+        transform var(--anim-duration-spring) var(--anim-ease-spring);
+    will-change: opacity, transform;
 }
 
 .reveal-right.visible {
@@ -63,12 +104,31 @@
     transform: scale(0.9);
     transition:
         opacity var(--anim-duration-normal) var(--anim-ease-out),
-        transform var(--anim-duration-normal) var(--anim-ease-elastic);
+        transform var(--anim-duration-spring) var(--anim-ease-bounce);
+    will-change: opacity, transform;
 }
 
 .reveal-scale.visible {
     opacity: 1;
     transform: scale(1);
+}
+
+/* Reveal with blur effect - premium feel */
+.reveal-blur {
+    opacity: 0;
+    transform: translateY(20px);
+    filter: blur(10px);
+    transition:
+        opacity var(--anim-duration-normal) var(--anim-ease-out),
+        transform var(--anim-duration-spring) var(--anim-ease-spring),
+        filter var(--anim-duration-normal) var(--anim-ease-out);
+    will-change: opacity, transform, filter;
+}
+
+.reveal-blur.visible {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
 }
 
 /* Stagger Delays */
@@ -105,21 +165,23 @@
 }
 
 /* ========================================
-   Button Micro-interactions
+   Button Micro-interactions - Spring Physics
    ======================================== */
 .btn-magnetic {
     position: relative;
     transition:
-        transform var(--anim-duration-fast) var(--anim-ease-out),
+        transform var(--anim-duration-fast) var(--anim-ease-spring),
         box-shadow var(--anim-duration-fast) var(--anim-ease-out);
+    will-change: transform;
 }
 
 .btn-magnetic:hover {
-    transform: translateY(-2px) scale(1.02);
+    transform: translateY(-3px) scale(1.02);
 }
 
 .btn-magnetic:active {
-    transform: translateY(0) scale(0.98);
+    transform: translateY(0) scale(0.97);
+    transition-duration: 0.1s;
 }
 
 /* Glow Effect for Accent Buttons */
@@ -456,16 +518,50 @@
 }
 
 /* ========================================
-   Enhanced Hover States
+   Enhanced Hover States - Spring Physics
    ======================================== */
 .hover-lift {
-    transition: transform var(--anim-duration-fast) var(--anim-ease-out),
+    transition: 
+        transform var(--anim-duration-fast) var(--anim-ease-spring),
         box-shadow var(--anim-duration-fast) var(--anim-ease-out);
+    will-change: transform;
 }
 
 .hover-lift:hover {
     transform: translateY(-8px);
     box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.3);
+}
+
+/* Magnetic hover - follows cursor slightly */
+.hover-magnetic {
+    transition: transform var(--anim-duration-fast) var(--anim-ease-spring);
+    will-change: transform;
+}
+
+/* Subtle scale on hover */
+.hover-grow {
+    transition: transform var(--anim-duration-fast) var(--anim-ease-spring);
+    will-change: transform;
+}
+
+.hover-grow:hover {
+    transform: scale(1.03);
+}
+
+/* Premium card hover with 3D depth */
+.hover-3d {
+    transition: 
+        transform var(--anim-duration-fast) var(--anim-ease-spring),
+        box-shadow var(--anim-duration-fast) var(--anim-ease-out);
+    transform-style: preserve-3d;
+    will-change: transform;
+}
+
+.hover-3d:hover {
+    transform: translateY(-4px) rotateX(2deg) rotateY(-1deg);
+    box-shadow: 
+        0 25px 50px -12px rgba(0, 0, 0, 0.25),
+        0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 
 /* ========================================
@@ -476,9 +572,11 @@
     .reveal,
     .reveal-left,
     .reveal-right,
-    .reveal-scale {
+    .reveal-scale,
+    .reveal-blur {
         opacity: 1;
         transform: none;
+        filter: none;
         transition: none;
     }
 
@@ -499,5 +597,20 @@
     .custom-cursor,
     .cursor-trail {
         display: none;
+    }
+    
+    .hover-lift,
+    .hover-grow,
+    .hover-3d,
+    .hover-magnetic,
+    .btn-magnetic {
+        transition: none;
+        will-change: auto;
+    }
+    
+    .hover-lift:hover,
+    .hover-grow:hover,
+    .hover-3d:hover {
+        transform: none;
     }
 }

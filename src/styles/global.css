@@ -138,6 +138,29 @@ html {
   scroll-behavior: smooth;
   scroll-padding-top: 100px;
   /* Offset for sticky navigation */
+  
+  /* Performance optimizations for smooth scrolling */
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: none;
+}
+
+/* GPU acceleration hints for animated elements */
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Contain layout/paint for performance */
+.contain-layout {
+  contain: layout;
+}
+
+.contain-paint {
+  contain: paint;
+}
+
+.contain-strict {
+  contain: strict;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -297,12 +320,17 @@ ol {
   background: var(--color-surface);
   border-radius: var(--radius-xl);
   border: 1px solid var(--color-border);
-  transition: all var(--duration-normal) var(--ease-out);
+  transition: 
+    box-shadow var(--duration-normal) var(--ease-out),
+    transform var(--duration-normal) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out);
+  will-change: transform;
 }
 
 .card:hover {
   box-shadow: var(--shadow-lg);
-  transform: translateY(-2px);
+  transform: translateY(-4px);
+  border-color: var(--color-border-subtle);
 }
 
 .accent-glow {
