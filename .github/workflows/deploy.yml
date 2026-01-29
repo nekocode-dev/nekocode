@@ -32,6 +32,9 @@ jobs:
       
       - name: Build Astro site
         run: npm run build
+        env:
+          # Single URL handles all features (contact, bug reports, visitor counter, testimonials)
+          PUBLIC_GOOGLE_SCRIPT_URL: ${{ secrets.PUBLIC_GOOGLE_SCRIPT_URL }}
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
