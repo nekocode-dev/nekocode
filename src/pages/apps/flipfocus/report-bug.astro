@@ -8,6 +8,9 @@ import Button from '@/components/ui/Button.astro';
 
 const base = import.meta.env.BASE_URL;
 
+// Get the Google Script URL from environment variable
+const googleScriptUrl = import.meta.env.PUBLIC_GOOGLE_SCRIPT_URL || '';
+
 const bugCategories = [
   { value: 'crash', label: 'App Crash' },
   { value: 'ui', label: 'UI/Display' },
@@ -159,6 +162,9 @@ const severityLevels = [
           <input type="text" id="website" name="website" tabindex="-1" autocomplete="off" />
         </div>
         
+        <!-- Time-based spam protection (set by JS on page load) -->
+        <input type="hidden" id="form_loaded_at" name="form_loaded_at" value="" />
+        
         <div id="form-status" class="form-status hidden"></div>
         
         <div class="form-actions">
@@ -187,7 +193,7 @@ const severityLevels = [
   <Footer slot="footer" />
 </BaseLayout>
 
-<script>
+<script define:vars={{ googleScriptUrl }}>
   document.addEventListener('astro:page-load', () => {
     const form = document.getElementById('bug-report-form') as HTMLFormElement;
     const statusDiv = document.getElementById('form-status');
@@ -198,6 +204,10 @@ const severityLevels = [
     const deviceSelect = document.getElementById('device') as HTMLSelectElement;
     
     if (!form) return;
+    
+    // Set form load time for anti-spam validation
+    const formLoadedAt = document.getElementById('form_loaded_at') as HTMLInputElement;
+    if (formLoadedAt) formLoadedAt.value = Date.now().toString();
     
     // Auto-detect phone model from user agent
     const detectPhoneModel = () => {
@@ -269,10 +279,8 @@ const severityLevels = [
         
         const jsonData = Object.fromEntries(formData.entries());
         
-        // Get the Google Script URL from the data attribute or environment
-        // For security, this should ideally come from an environment variable
-        const GOOGLE_SCRIPT_URL = form.dataset.scriptUrl || 
-          'https://script.google.com/macros/s/AKfycbxCC0oUW7_S29DkdmSqzNxOV0CMYxIzQOPwedk6b4bIlv3-neNo3gByQ8X-4tnlcntr/exec';
+        // Get the Google Script URL from environment variable (passed via define:vars)
+        const GOOGLE_SCRIPT_URL = googleScriptUrl;
         
         const response = await fetch(GOOGLE_SCRIPT_URL, {
           method: 'POST',

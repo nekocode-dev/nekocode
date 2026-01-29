@@ -57,6 +57,9 @@ const googleScriptUrl = import.meta.env.PUBLIC_GOOGLE_SCRIPT_URL || '';
           <input type="text" id="website_url" name="website_url" tabindex="-1" autocomplete="off" />
         </div>
         
+        <!-- Time-based spam protection (set by JS on page load) -->
+        <input type="hidden" id="form_loaded_at" name="form_loaded_at" value="" />
+        
         <div id="form-status" class="form-status hidden"></div>
 
         <Button type="submit" variant="accent" size="lg" id="submit-btn">
@@ -71,6 +74,10 @@ const googleScriptUrl = import.meta.env.PUBLIC_GOOGLE_SCRIPT_URL || '';
   const form = document.getElementById('contact-form');
   const statusDiv = document.getElementById('form-status');
   const submitBtn = document.getElementById('submit-btn');
+  
+  // Set form load time for anti-spam validation
+  const formLoadedAt = document.getElementById('form_loaded_at') as HTMLInputElement;
+  if (formLoadedAt) formLoadedAt.value = Date.now().toString();
 
   form?.addEventListener('submit', async (e) => {
     e.preventDefault();
