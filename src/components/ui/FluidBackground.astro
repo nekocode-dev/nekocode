@@ -54,11 +54,12 @@
    * Simulates Van der Waals forces: Attraction at range, Repulsion at close quarters.
    */
   
-  // === ACCESSIBILITY: Respect user's motion preferences ===
+  // === ACCESSIBILITY + PERFORMANCE GUARDRAILS ===
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const forceStaticMode = prefersReducedMotion;
   
   const CONFIG = {
-    blobCount: prefersReducedMotion ? 8 : 15, // Fewer blobs if reduced motion
+    blobCount: forceStaticMode ? 8 : 12,
     baseRadius: 40, // Much smaller base
     radiusVar: 100, // Massive variance (tiny to huge blobs)
     
@@ -199,26 +200,28 @@
     }
   };
 
-  window.addEventListener('mousemove', (e) => updateMouse(e.clientX, e.clientY));
-  
-  // Touch Support
-  window.addEventListener('touchstart', (e) => {
-    if(e.touches.length > 0) {
-      updateMouse(e.touches[0].clientX, e.touches[0].clientY);
-      connectionState.isMouseDown = true;
-    }
-  }, { passive: true });
+  if (!forceStaticMode) {
+    window.addEventListener('mousemove', (e) => updateMouse(e.clientX, e.clientY));
+    
+    // Touch Support
+    window.addEventListener('touchstart', (e) => {
+      if(e.touches.length > 0) {
+        updateMouse(e.touches[0].clientX, e.touches[0].clientY);
+        connectionState.isMouseDown = true;
+      }
+    }, { passive: true });
 
-  window.addEventListener('touchmove', (e) => {
-    if(e.touches.length > 0) {
-      updateMouse(e.touches[0].clientX, e.touches[0].clientY);
-    }
-  }, { passive: true });
+    window.addEventListener('touchmove', (e) => {
+      if(e.touches.length > 0) {
+        updateMouse(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    }, { passive: true });
 
-  window.addEventListener('touchend', () => connectionState.isMouseDown = false);
-  
-  window.addEventListener('mousedown', () => connectionState.isMouseDown = true);
-  window.addEventListener('mouseup', () => connectionState.isMouseDown = false);
+    window.addEventListener('touchend', () => connectionState.isMouseDown = false);
+    
+    window.addEventListener('mousedown', () => connectionState.isMouseDown = true);
+    window.addEventListener('mouseup', () => connectionState.isMouseDown = false);
+  }
 
   // Global animation frame ID to manage cancellation
   let animationFrameId;
@@ -247,13 +250,11 @@
       particles.push(new Particle(div, x, y));
     }
     
-    // === ACCESSIBILITY: Skip physics simulation for reduced-motion users ===
+    // Skip physics simulation for low-power/non-home/reduced-motion contexts.
     // Just show static blobs with CSS morph animation (no JavaScript loop)
-    if (prefersReducedMotion) {
-      // Position blobs randomly but don't animate via JS
+    if (forceStaticMode) {
       container.style.filter = 'blur(20px)';
       container.style.opacity = '0.4';
-      console.log('[FluidBackground] Reduced motion enabled - using static mode');
       return; // Don't start the physics loop
     }
     
@@ -352,9 +353,11 @@
     const delta = Math.min(rawDelta, 0.05); // Max 50ms = ~3 missed frames at 60fps
     lastLoopTimestamp = timestamp;
     
-    // Always run physics with capped delta - no more skipping during scroll
-    interact(delta);
-    computeCohesion(delta);
+    // During active scroll, run lighter physics to avoid jank.
+    if (!PerformanceManager.isScrolling) {
+      interact(delta);
+      computeCohesion(delta);
+    }
     updateLighting(); 
     
     for (const p of particles) {
@@ -505,10 +508,13 @@
       }
   };
 
-  // Re-Initialize on every Astro page navigation (View Transitions)
-  document.addEventListener('astro:page-load', () => {
-      init();
-  });
+  // Initialize on normal load and Astro navigation events.
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init, { once: true });
+  } else {
+    init();
+  }
+  document.addEventListener('astro:page-load', init);
 
 </script>
 
@@ -591,4 +597,3 @@
     }
   }
 </style>
-

@@ -52,6 +52,8 @@ const categories = [...new Set(apps.map(p => p.data.category).filter(Boolean))];
             tech={project.data.tech}
             status={project.data.status}
             featured={project.data.featured}
+            priority={index < 3 ? 'high' : 'auto'}
+            class={`reveal stagger-${(index % 8) + 1}`}
           />
         ))}
       </BentoGrid>

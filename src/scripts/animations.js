@@ -3,10 +3,15 @@
  * Scroll reveals, split-text, counters, 3D tilt, and custom cursor
  */
 
-// Wait for DOM and Astro page transitions
+let animationsInitialized = false;
+
+// Support both regular page loads and Astro navigation events.
+document.addEventListener('DOMContentLoaded', initAnimations);
 document.addEventListener('astro:page-load', initAnimations);
 
 function initAnimations() {
+    if (animationsInitialized) return;
+    animationsInitialized = true;
     initScrollReveal();
     initSplitText();
     initCounterAnimation();
@@ -34,8 +39,9 @@ function initScrollReveal() {
             });
         },
         {
-            threshold: 0.1, // Wait for 10% visibility
-            rootMargin: '0px 0px -50px 0px' // Slightly negative margin to ensure element is actually entering
+            // Trigger before elements fully enter viewport to avoid "late" feel.
+            threshold: 0,
+            rootMargin: '0px 0px 15% 0px'
         }
     );
 
@@ -63,7 +69,7 @@ function initSplitText() {
                 }
             });
         },
-        { threshold: 0.1 }
+        { threshold: 0, rootMargin: '0px 0px 12% 0px' }
     );
 
     elements.forEach((el) => {
@@ -110,7 +116,7 @@ function initCounterAnimation() {
                 }
             });
         },
-        { threshold: 0.5 }
+        { threshold: 0.15, rootMargin: '0px 0px 18% 0px' }
     );
 
     counters.forEach((el) => observer.observe(el));

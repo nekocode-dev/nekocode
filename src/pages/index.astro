@@ -13,7 +13,8 @@ import Tag from '@/components/ui/Tag.astro';
 import { getCollection } from 'astro:content';
 
 // Get featured projects
-const allProjects = await getCollection('projects');
+const allProjects = (await getCollection('projects'))
+  .filter((project) => project.slug !== 'nekocode-site' && project.id !== 'nekocode-site');
 // Sort: FlipFocus first, then featured, then others
 allProjects.sort((a, b) => {
   if (a.id === 'flipfocus') return -1;
@@ -87,7 +88,6 @@ const capabilities = [
             slug={project.slug}
             title={project.data.title}
             subtitle={project.data.subtitle}
-            logo={project.data.media.logo}
             tagline={project.data.tagline}
             coverImage={project.data.media.coverImage}
             type={project.data.type}
@@ -95,6 +95,7 @@ const capabilities = [
             tech={project.data.tech}
             status={project.data.status}
             featured={index === 0}
+            priority={index < 3 ? 'high' : 'auto'}
             class={`reveal stagger-${index + 1}`}
           />
         ))}
@@ -132,7 +133,7 @@ const capabilities = [
         <h3 class="text-title-2">FlipFocus</h3>
         <p class="now-mono">FLASHCARD_SYSTEM // FSRS-5</p>
         <p class="now-description">
-          Smart flashcards with spaced repetition, gamification & OCR scanning.
+          Smart flashcards with spaced repetition, gamification, and OCR scanning.
         </p>
         
         <div class="now-actions">
@@ -358,14 +359,6 @@ const capabilities = [
   }
   
   .now-icon {
-    width: 120px;
-    height: 120px;
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: var(--radius-lg);
     margin-top: var(--space-6);
   }
   
@@ -373,6 +366,8 @@ const capabilities = [
     border-radius: 22%;
     width: 80px;
     height: 80px;
+    object-fit: contain;
+    object-position: center;
   }
   
   .now-card h3 {

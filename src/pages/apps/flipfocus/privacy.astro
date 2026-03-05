@@ -27,7 +27,7 @@ const base = import.meta.env.BASE_URL;
         <p class="last-updated">Last Updated: December 2025</p>
       </div>
       
-      <div class="legal-content">
+      <div class="legal-content glass-panel">
         <div class="highlight-box primary">
           <h3>🎯 TL;DR - Our Privacy Promise</h3>
           <p>FlipFocus is designed with privacy at its core. Your flashcards and learning data stay on YOUR device. We don't have servers collecting your information, and we never sell your data.</p>
@@ -174,10 +174,18 @@ const base = import.meta.env.BASE_URL;
   
   .legal-content {
     line-height: 1.8;
+    padding: var(--space-6);
+    margin-top: var(--space-2);
   }
   
   .legal-content section {
     margin-bottom: var(--space-10);
+  }
+
+  @media (max-width: 768px) {
+    .legal-content {
+      padding: var(--space-4);
+    }
   }
   
   .legal-content h2 {

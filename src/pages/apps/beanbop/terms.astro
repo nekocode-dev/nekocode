@@ -1,0 +1,289 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import BeanBopNav from '@/components/nav/BeanBopNav.astro';
+import Footer from '@/components/nav/Footer.astro';
+import Container from '@/components/layout/Container.astro';
+import Section from '@/components/layout/Section.astro';
+
+const base = import.meta.env.BASE_URL;
+---
+
+<BaseLayout
+  title="Terms of Service | BeanBop"
+  description="Terms of Service for BeanBop coffee tracker"
+>
+  <BeanBopNav slot="header" />
+
+  <Section size="lg" class="legal-page">
+    <Container size="narrow">
+      <a href={`${base}apps/beanbop`} class="back-link">← Back to BeanBop</a>
+
+      <div class="legal-header glass-panel">
+        <span class="legal-icon">📜</span>
+        <div>
+          <h1 class="text-title-1">Terms of Service</h1>
+          <p class="legal-subtitle">BeanBop by NekoCode</p>
+        </div>
+        <p class="last-updated">Last Updated: March 5, 2026</p>
+      </div>
+
+      <div class="legal-content glass-panel">
+        <div class="highlight-box primary">
+          <h3>☕ Quick Summary</h3>
+          <p>
+            BeanBop is a personal wellness tracking app. You keep ownership of your entered data,
+            and the app is provided as-is without medical advice.
+          </p>
+        </div>
+
+        <section>
+          <h2>Agreement to Terms</h2>
+          <p>
+            By downloading, installing, or using BeanBop ("the App"), you agree to these Terms of Service ("Terms").
+            If you do not agree, do not use the App.
+          </p>
+        </section>
+
+        <section>
+          <h2>Description of Service</h2>
+          <p>BeanBop is a caffeine and wellness tracking app with local-first data storage. Features may include:</p>
+          <ul>
+            <li>Caffeine and hydration logging</li>
+            <li>Sleep and habit tracking</li>
+            <li>Insights, achievements, and progress features</li>
+            <li>Optional export/import tools</li>
+            <li>Optional Pro features</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>No Medical Advice</h2>
+          <p>
+            BeanBop is an informational and self-tracking tool. It is not medical advice, diagnosis, or treatment.
+            Always seek qualified medical guidance for health concerns.
+          </p>
+        </section>
+
+        <section>
+          <h2>Eligibility and Acceptable Use</h2>
+          <p>You may use the App for personal, lawful purposes.</p>
+          <p>You may not:</p>
+          <ul>
+            <li>Use the App for unlawful, harmful, or abusive activity</li>
+            <li>Attempt to disrupt, reverse engineer, or compromise the App</li>
+            <li>Infringe intellectual property or other legal rights</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>User Data and Content</h2>
+          <ul>
+            <li>You retain ownership of the data and content you enter into BeanBop</li>
+            <li>You are responsible for the accuracy and legality of your content</li>
+            <li>Local data control remains on your device unless you choose to share or export it</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Pro Features and Purchases</h2>
+          <p>BeanBop may offer paid features now or in the future. If purchases are enabled through an app store:</p>
+          <ul>
+            <li>Billing, cancellation, and refunds are handled by the app store platform</li>
+            <li>App store terms also apply to purchases</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Privacy</h2>
+          <p>Your use of BeanBop is also governed by the Privacy Policy.</p>
+          <ul>
+            <li><a href={`${base}apps/beanbop/privacy`}>View Privacy Policy</a></li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Intellectual Property</h2>
+          <p>
+            BeanBop branding, app design, and software are protected by applicable intellectual property laws.
+            These Terms do not transfer ownership of our intellectual property to you.
+          </p>
+        </section>
+
+        <section>
+          <h2>Disclaimers</h2>
+          <p>
+            The App is provided "as is" and "as available" to the fullest extent permitted by law.
+            We do not guarantee uninterrupted operation or error-free performance.
+          </p>
+        </section>
+
+        <section>
+          <h2>Limitation of Liability</h2>
+          <p>
+            To the fullest extent permitted by law, we are not liable for indirect, incidental, special,
+            consequential, or punitive damages arising from use of the App.
+          </p>
+        </section>
+
+        <section>
+          <h2>Termination</h2>
+          <p>
+            You may stop using BeanBop at any time. We may suspend or terminate access where legally required
+            or where these Terms are violated.
+          </p>
+        </section>
+
+        <section>
+          <h2>Changes to Terms</h2>
+          <p>
+            We may update these Terms from time to time. Continued use of the App after updates means
+            you accept the revised Terms.
+          </p>
+        </section>
+
+        <section>
+          <h2>Governing Law</h2>
+          <p>
+            These Terms are governed by applicable laws in your operating jurisdiction,
+            unless local consumer protection laws require otherwise.
+          </p>
+        </section>
+
+        <section>
+          <h2>Contact</h2>
+          <ul>
+            <li><strong>Email:</strong> nekocode.dev@gmail.com</li>
+          </ul>
+        </section>
+      </div>
+    </Container>
+  </Section>
+
+  <Footer slot="footer" />
+</BaseLayout>
+
+<style>
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-6);
+    color: var(--color-muted);
+    font-size: var(--text-sm);
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  .back-link:hover {
+    color: var(--color-text);
+  }
+
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-xl);
+  }
+
+  [data-theme="light"] .glass-panel {
+    background: rgba(255, 255, 255, 0.8);
+    border-color: rgba(0, 0, 0, 0.08);
+  }
+
+  .legal-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-6);
+    margin-bottom: var(--space-8);
+  }
+
+  .legal-icon {
+    font-size: var(--text-3xl);
+  }
+
+  .legal-subtitle {
+    color: var(--color-muted);
+    font-size: var(--text-sm);
+    margin: 0;
+  }
+
+  .last-updated {
+    margin-left: auto;
+    font-size: var(--text-xs);
+    color: var(--color-accent);
+    font-family: monospace;
+  }
+
+  .legal-content {
+    line-height: 1.8;
+    padding: var(--space-6);
+  }
+
+  .legal-content section {
+    margin-bottom: var(--space-10);
+  }
+
+  @media (max-width: 768px) {
+    .legal-content {
+      padding: var(--space-4);
+    }
+  }
+
+  .legal-content h2 {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-accent);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .legal-content h3 {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0 0 var(--space-3);
+  }
+
+  .legal-content p {
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-4);
+  }
+
+  .legal-content ul {
+    list-style: none;
+    padding: 0;
+    margin-bottom: var(--space-4);
+  }
+
+  .legal-content li {
+    padding: var(--space-2) 0 var(--space-2) var(--space-6);
+    color: var(--color-text-secondary);
+    position: relative;
+  }
+
+  .legal-content li::before {
+    content: '›';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: bold;
+  }
+
+  .legal-content a {
+    color: var(--color-accent);
+  }
+
+  .highlight-box {
+    padding: var(--space-6);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-8);
+    background: rgba(var(--color-accent-rgb, 193, 154, 107), 0.1);
+    border: 1px solid rgba(var(--color-accent-rgb, 193, 154, 107), 0.3);
+  }
+
+  .highlight-box h3 {
+    margin-bottom: var(--space-2);
+    color: var(--color-accent);
+  }
+</style>

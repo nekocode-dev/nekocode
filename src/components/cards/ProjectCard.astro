@@ -8,7 +8,6 @@ interface Props {
   slug: string;
   title: string;
   subtitle?: string;
-  logo?: string;
   tagline: string;
   coverImage: string;
   type: 'app' | 'website' | 'research' | 'open_source';
@@ -16,6 +15,7 @@ interface Props {
   tech: string[];
   featured?: boolean;
   status?: 'live' | 'in_progress' | 'archived';
+  priority?: 'high' | 'auto';
   class?: string;
 }
 
@@ -29,11 +29,12 @@ const {
   tech,
   featured = false,
   status = 'live',
+  priority = 'auto',
   class: className = '',
   ...rest
 } = Astro.props;
 
-
+const prioritized = featured || priority === 'high';
 
 const base = import.meta.env.BASE_URL;
 const baseUrl = type === 'app' ? `${base}apps` : `${base}work`;
@@ -47,25 +48,14 @@ const resolvedCoverImage = coverImage.startsWith('/') ? `${base}${coverImage.sli
   data-tilt
   {...rest}
 >
-  <div class="card-media">
-    {Astro.props.logo ? (
-      <div class="card-logo-container">
-        <img 
-          src={Astro.props.logo.startsWith('/') ? `${base}${Astro.props.logo.slice(1)}` : Astro.props.logo}
-          alt={`${title} logo`}
-          class="card-logo"
-          loading="lazy"
-          decoding="async"
-        />
-      </div>
-    ) : (
-      <img 
-        src={resolvedCoverImage} 
-        alt={`${title} cover`}
-        loading="lazy"
-        decoding="async"
-      />
-    )}
+  <div class="card-media" style={`--card-media-image: url('${resolvedCoverImage}')`}>
+    <img 
+      src={resolvedCoverImage} 
+      alt={`${title} cover`}
+      loading={prioritized ? 'eager' : 'lazy'}
+      fetchpriority={prioritized ? 'high' : 'auto'}
+      decoding="async"
+    />
     {status === 'coming_soon' ? (
       <div class="coming-soon-overlay">
         <span class="coming-soon-badge">Coming Soon</span>
@@ -132,13 +122,41 @@ const resolvedCoverImage = coverImage.startsWith('/') ? `${base}${coverImage.sli
     position: relative;
     aspect-ratio: 16 / 10;
     overflow: hidden;
-    background: var(--color-border-subtle);
+    background: #111;
+  }
+
+  .card-media::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: var(--card-media-image);
+    background-size: cover;
+    background-position: center;
+    filter: blur(18px) saturate(1.1);
+    transform: scale(1.08);
+    opacity: 0.7;
+    z-index: 0;
+  }
+
+  .card-media::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.08) 0%,
+      rgba(0, 0, 0, 0.18) 100%
+    );
+    z-index: 1;
   }
   
   .card-media > img {
+    position: relative;
+    z-index: 2;
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
+    object-position: center;
     transition: transform var(--duration-slow) var(--ease-out);
   }
   
@@ -149,6 +167,7 @@ const resolvedCoverImage = coverImage.startsWith('/') ? `${base}${coverImage.sli
   .card-overlay {
     position: absolute;
     inset: 0;
+    z-index: 3;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -235,6 +254,7 @@ const resolvedCoverImage = coverImage.startsWith('/') ? `${base}${coverImage.sli
   .coming-soon-overlay {
     position: absolute;
     inset: 0;
+    z-index: 3;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -256,26 +276,4 @@ const resolvedCoverImage = coverImage.startsWith('/') ? `${base}${coverImage.sli
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
   }
   
-  .card-logo-container {
-    width: 100%;
-    height: 100%;
-    background: #111; /* Dark background */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-bottom: 1px solid var(--color-border-subtle);
-  }
-  
-  .card-logo {
-    width: 80px !important;
-    height: 80px !important;
-    object-fit: contain !important;
-    border-radius: 22%; /* App icon shape */
-    transition: transform var(--duration-normal) var(--ease-out);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  }
-  
-  .project-card:hover .card-logo {
-    transform: scale(1.1);
-  }
 </style>
