@@ -1,0 +1,77 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import NavBar from '@/components/nav/NavBar.astro';
+import Footer from '@/components/nav/Footer.astro';
+import Container from '@/components/layout/Container.astro';
+import Section from '@/components/layout/Section.astro';
+import Button from '@/components/ui/Button.astro';
+
+const base = import.meta.env.BASE_URL;
+---
+
+<BaseLayout title="Page Not Found">
+  <NavBar slot="header" />
+  
+  <Section size="xl" class="error-section">
+    <Container size="narrow">
+      <div class="error-content">
+        <div class="error-icon">
+          <img src={`${base}favicon.svg`} alt="" width="80" height="80" />
+        </div>
+        
+        <h1 class="text-hero">404</h1>
+        <p class="error-message">
+          This page seems to have wandered off. Even cats get lost sometimes.
+        </p>
+        
+        <div class="error-actions">
+          <Button href="/" variant="accent" size="lg">
+            Back to Home
+          </Button>
+          <Button href="/work" variant="secondary" size="lg">
+            Browse Work
+          </Button>
+        </div>
+      </div>
+    </Container>
+  </Section>
+  
+  <Footer slot="footer" />
+</BaseLayout>
+
+<style>
+  .error-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+  }
+  
+  .error-content {
+    text-align: center;
+  }
+  
+  .error-icon {
+    margin-bottom: var(--space-6);
+    opacity: 0.5;
+  }
+  
+  .error-content h1 {
+    margin-bottom: var(--space-4);
+  }
+  
+  .error-message {
+    font-size: var(--text-xl);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-8);
+    max-width: 400px;
+    margin-inline: auto;
+  }
+  
+  .error-actions {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+  }
+</style>

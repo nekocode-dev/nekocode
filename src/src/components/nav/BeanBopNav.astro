@@ -1,0 +1,120 @@
+---
+const base = import.meta.env.BASE_URL;
+---
+
+<header class="nav-header">
+  <nav class="nav glass" aria-label="BeanBop navigation">
+    <a href={`${base}apps/beanbop`} class="nav-logo" aria-label="BeanBop Home">
+      <img src={`${base}assets/projects/beanbop/logo.webp`} alt="" width="40" height="40" />
+      <span class="logo-text">BEANBOP</span>
+    </a>
+
+    <div class="nav-links">
+      <a href={`${base}apps/beanbop#features`} class="nav-link">Features</a>
+      <a href={`${base}apps/beanbop#download`} class="nav-link">Download</a>
+      <a href={`${base}apps/beanbop/privacy`} class="nav-link">Privacy</a>
+      <a href={`${base}apps/beanbop/terms`} class="nav-link">Terms</a>
+    </div>
+
+    <div class="nav-actions">
+      <a href={base} class="back-to-portfolio">← NekoCode</a>
+    </div>
+  </nav>
+</header>
+
+<style>
+  .nav-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding: var(--space-3);
+  }
+
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-6);
+    padding: var(--space-3) var(--space-6);
+    border-radius: var(--radius-xl);
+    max-width: var(--container-max);
+    margin-inline: auto;
+  }
+
+  .glass {
+    background: rgba(12, 12, 16, 0.9);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  [data-theme="light"] .glass {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: rgba(0, 0, 0, 0.1);
+  }
+
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    text-decoration: none;
+  }
+
+  .nav-logo img {
+    border-radius: 10px;
+    object-fit: cover;
+  }
+
+  .logo-text {
+    font-family: 'Press Start 2P', var(--font-display), monospace;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text);
+    letter-spacing: 0.02em;
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+  }
+
+  @media (max-width: 640px) {
+    .nav-links {
+      display: none;
+    }
+  }
+
+  .nav-link {
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    transition: all var(--duration-fast) var(--ease-out);
+  }
+
+  .nav-link:hover {
+    color: var(--color-text);
+    background: var(--color-border-subtle);
+  }
+
+  .nav-actions {
+    display: flex;
+    align-items: center;
+  }
+
+  .back-to-portfolio {
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-accent);
+    border: 1px solid var(--color-accent);
+    transition: all var(--duration-fast) var(--ease-out);
+  }
+
+  .back-to-portfolio:hover {
+    background: var(--color-accent);
+    color: var(--color-accent-contrast);
+  }
+</style>

@@ -1,0 +1,632 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import FlipFocusNav from '@/components/nav/FlipFocusNav.astro';
+import Footer from '@/components/nav/Footer.astro';
+import Container from '@/components/layout/Container.astro';
+import Section from '@/components/layout/Section.astro';
+import Button from '@/components/ui/Button.astro';
+
+const base = import.meta.env.BASE_URL;
+
+// Get the Google Script URL from environment variable
+const googleScriptUrl = import.meta.env.PUBLIC_GOOGLE_SCRIPT_URL || '';
+
+const bugCategories = [
+  { value: 'crash', label: 'App Crash' },
+  { value: 'ui', label: 'UI/Display' },
+  { value: 'feature', label: 'Feature Bug' },
+  { value: 'performance', label: 'Performance' },
+  { value: 'data', label: 'Data/Sync' },
+  { value: 'other', label: 'Other' },
+];
+
+const severityLevels = [
+  { value: 'critical', label: 'Critical - App unusable', color: '#ef4444' },
+  { value: 'major', label: 'Major - Feature broken', color: '#f59e0b' },
+  { value: 'minor', label: 'Minor - Inconvenient', color: '#22c55e' },
+];
+---
+
+<BaseLayout 
+  title="Report a Bug | FlipFocus"
+  description="Report a bug or issue with FlipFocus. Help us improve the app by sharing your feedback."
+>
+  <FlipFocusNav slot="header" />
+  
+  <Section size="lg" class="report-section">
+    <Container size="narrow">
+      <div class="report-header">
+        <h1 class="text-title-1">Report a Bug</h1>
+        <p class="report-description">
+          Found something that doesn't work right? Help us squash the bug! 
+          Your feedback helps make FlipFocus better for everyone.
+        </p>
+      </div>
+      
+      <form id="bug-report-form" class="bug-form glass-panel">
+        <div class="form-section">
+          <h2 class="form-section-title">Bug Category</h2>
+          <div class="category-grid">
+            {bugCategories.map((cat, index) => (
+              <label class="category-option">
+                <input type="radio" name="category" value={cat.value} required />
+                <span class="category-card">
+                  <span class="category-label">{cat.label}</span>
+                </span>
+              </label>
+            ))}
+          </div>
+        </div>
+        
+        <div class="form-section">
+          <h2 class="form-section-title">Severity</h2>
+          <div class="severity-options">
+            {severityLevels.map((sev) => (
+              <label class="severity-option">
+                <input type="radio" name="severity" value={sev.value} required />
+                <span class="severity-card" style={`--severity-color: ${sev.color}`}>
+                  <span class="severity-indicator"></span>
+                  <span class="severity-label">{sev.label}</span>
+                </span>
+              </label>
+            ))}
+          </div>
+        </div>
+        
+        <div class="form-section">
+          <h2 class="form-section-title">Bug Details</h2>
+          
+          <div class="form-group">
+            <label for="title">Bug Title <span class="required">*</span></label>
+            <input 
+              type="text" 
+              id="title" 
+              name="title" 
+              required 
+              placeholder="Brief description of the issue"
+              maxlength="100"
+            />
+            <span class="char-count"><span id="title-count">0</span>/100</span>
+          </div>
+          
+          <div class="form-group">
+            <label for="description">What happened? <span class="required">*</span></label>
+            <textarea 
+              id="description" 
+              name="description" 
+              rows="4" 
+              required
+              placeholder="Describe what went wrong..."
+            ></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label for="steps">Steps to Reproduce</label>
+            <textarea 
+              id="steps" 
+              name="steps" 
+              rows="3"
+              placeholder="1. Open the app&#10;2. Go to...&#10;3. Click on..."
+            ></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label for="expected">Expected Behavior</label>
+            <textarea 
+              id="expected" 
+              name="expected" 
+              rows="2"
+              placeholder="What should have happened instead?"
+            ></textarea>
+          </div>
+        </div>
+        
+        <div class="form-section">
+          <h2 class="form-section-title">Your Information</h2>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="email">Email <span class="required">*</span></label>
+              <input 
+                type="email" 
+                id="email" 
+                name="email" 
+                required 
+                placeholder="your@email.com"
+              />
+            </div>
+            
+            <div class="form-group">
+              <label for="phone-model">Phone Model</label>
+              <input 
+                type="text" 
+                id="phone-model" 
+                name="phone_model" 
+                placeholder="e.g., Samsung Galaxy S24, iPhone 15 Pro"
+              />
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="device">Device <span class="required">*</span></label>
+            <select id="device" name="device" required>
+              <option value="" disabled selected>Select your device</option>
+              <option value="android">Android</option>
+              <option value="ios">iOS</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="form-group honeypot" aria-hidden="true">
+          <label for="website">Website (Do not fill)</label>
+          <input type="text" id="website" name="website" tabindex="-1" autocomplete="off" />
+        </div>
+        
+        <!-- Time-based spam protection (set by JS on page load) -->
+        <input type="hidden" id="form_loaded_at" name="form_loaded_at" value="" />
+        
+        <div id="form-status" class="form-status hidden"></div>
+        
+        <div class="form-actions">
+          <Button type="submit" variant="accent" size="lg" id="submit-btn">
+            Submit Bug Report
+          </Button>
+        </div>
+        
+        <p class="privacy-note">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+          Your information is secure and only used to follow up on this bug report.
+        </p>
+      </form>
+      
+      <div class="alternative-contact">
+        <p>Prefer email?</p>
+        <a href="mailto:support@nekocode.dev?subject=FlipFocus Bug Report" class="email-link">
+          support@nekocode.dev
+        </a>
+      </div>
+    </Container>
+  </Section>
+  
+  <Footer slot="footer" />
+</BaseLayout>
+
+<script define:vars={{ googleScriptUrl }}>
+  document.addEventListener('astro:page-load', () => {
+    const form = document.getElementById('bug-report-form');
+    const statusDiv = document.getElementById('form-status');
+    const submitBtn = document.getElementById('submit-btn');
+    const titleInput = document.getElementById('title');
+    const titleCount = document.getElementById('title-count');
+    const phoneModelInput = document.getElementById('phone-model');
+    const deviceSelect = document.getElementById('device');
+    
+    if (!form) return;
+    
+    // Check if URL is configured
+    if (!googleScriptUrl) {
+      console.error('Google Script URL not configured');
+      if (statusDiv) {
+        statusDiv.innerHTML = '⚠️ Bug report form not configured. Please email support@nekocode.dev';
+        statusDiv.className = 'form-status error';
+        statusDiv.classList.remove('hidden');
+      }
+      return;
+    }
+    
+    // Set form load time for anti-spam validation
+    const formLoadedAt = document.getElementById('form_loaded_at');
+    if (formLoadedAt) formLoadedAt.value = Date.now().toString();
+    
+    // Auto-detect phone model from user agent
+    const detectPhoneModel = () => {
+      const ua = navigator.userAgent;
+      let phoneModel = '';
+      
+      if (/Android/i.test(ua)) {
+        const androidMatch = ua.match(/Android[^;]*;\s*([^)]+)\)/);
+        if (androidMatch) {
+          phoneModel = androidMatch[1].trim().split(' Build')[0];
+        }
+        // Pre-select Android in dropdown
+        if (deviceSelect) deviceSelect.value = 'android';
+      } else if (/iPhone/i.test(ua)) {
+        phoneModel = 'iPhone';
+        if (deviceSelect) deviceSelect.value = 'ios';
+      } else if (/iPad/i.test(ua)) {
+        phoneModel = 'iPad';
+        if (deviceSelect) deviceSelect.value = 'ios';
+      } else if (/iPod/i.test(ua)) {
+        phoneModel = 'iPod';
+        if (deviceSelect) deviceSelect.value = 'ios';
+      }
+      
+      if (phoneModelInput && phoneModel) {
+        phoneModelInput.value = phoneModel;
+      }
+    };
+    
+    detectPhoneModel();
+    
+    // Character count for title
+    titleInput?.addEventListener('input', () => {
+      if (titleCount) {
+        titleCount.textContent = String(titleInput.value.length);
+      }
+    });
+    
+    // Form submission
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!statusDiv || !submitBtn) return;
+      
+      // Honeypot check
+      const honeypot = document.getElementById('website');
+      if (honeypot && honeypot.value) {
+        await new Promise(r => setTimeout(r, 1000));
+        statusDiv.innerHTML = '✅ Bug report submitted successfully! Thank you for helping improve FlipFocus.';
+        statusDiv.className = 'form-status success';
+        form.reset();
+        detectPhoneModel();
+        return;
+      }
+      
+      // UI Loading State
+      const originalBtnHTML = submitBtn.innerHTML;
+      submitBtn.innerHTML = 'Submitting...';
+      submitBtn.setAttribute('disabled', 'true');
+      statusDiv.classList.add('hidden');
+      
+      try {
+        const formData = new FormData(form);
+        formData.delete('website');
+        
+        // Add metadata
+        formData.append('submitted_at', new Date().toISOString());
+        formData.append('page_url', window.location.href);
+        formData.append('user_agent', navigator.userAgent);
+        
+        const jsonData = Object.fromEntries(formData.entries());
+        
+        // Get the Google Script URL from environment variable (passed via define:vars)
+        const GOOGLE_SCRIPT_URL = googleScriptUrl;
+        
+        const response = await fetch(GOOGLE_SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors', // Required for Google Apps Script
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({ ...jsonData, type: 'bug_report' })
+        });
+        
+        statusDiv.innerHTML = '✅ Bug report submitted successfully! Thank you for helping improve FlipFocus. We\'ll look into this and may reach out if we need more details.';
+        statusDiv.className = 'form-status success';
+        form.reset();
+        detectPhoneModel();
+        
+      } catch (error) {
+        console.error('Submission error:', error);
+        statusDiv.innerHTML = '❌ Something went wrong. Please try again or email us directly at support@nekocode.dev';
+        statusDiv.className = 'form-status error';
+      } finally {
+        submitBtn.innerHTML = originalBtnHTML;
+        submitBtn.removeAttribute('disabled');
+      }
+    });
+  });
+</script>
+
+<style>
+  .report-section {
+    position: relative;
+  }
+  
+  .report-header {
+    text-align: center;
+    margin-bottom: var(--space-10);
+  }
+  
+  .report-header h1 {
+    margin-bottom: var(--space-4);
+  }
+  
+  .report-description {
+    font-size: var(--text-lg);
+    color: var(--color-text-secondary);
+    max-width: 500px;
+    margin-inline: auto;
+    line-height: 1.6;
+  }
+  
+  .bug-form {
+    padding: var(--space-8);
+    border-radius: var(--radius-2xl);
+  }
+  
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  
+  [data-theme="light"] .glass-panel {
+    background: rgba(255, 255, 255, 0.8);
+    border-color: rgba(0, 0, 0, 0.08);
+  }
+  
+  .form-section {
+    margin-bottom: var(--space-8);
+    padding-bottom: var(--space-8);
+    border-bottom: 1px solid var(--color-border);
+  }
+  
+  .form-section:last-of-type {
+    border-bottom: none;
+    margin-bottom: var(--space-6);
+    padding-bottom: 0;
+  }
+  
+  .form-section-title {
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: 600;
+    margin-bottom: var(--space-4);
+    color: var(--color-text);
+  }
+  
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-3);
+  }
+  
+  @media (max-width: 500px) {
+    .category-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  .category-option input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+  
+  .category-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-4);
+    background: var(--color-surface);
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease-out);
+  }
+  
+  .category-option input:checked + .category-card {
+    border-color: var(--color-accent);
+    background: rgba(var(--color-accent-rgb, 193, 154, 107), 0.1);
+  }
+  
+  .category-card:hover {
+    border-color: var(--color-accent);
+    transform: translateY(-2px);
+  }
+  
+  .category-icon {
+    font-size: var(--text-2xl);
+  }
+  
+  .category-label {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    text-align: center;
+  }
+  
+  .severity-options {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  
+  .severity-option input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+  
+  .severity-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    background: var(--color-surface);
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease-out);
+  }
+  
+  .severity-option input:checked + .severity-card {
+    border-color: var(--severity-color);
+    background: color-mix(in srgb, var(--severity-color) 10%, transparent);
+  }
+  
+  .severity-card:hover {
+    border-color: var(--severity-color);
+  }
+  
+  .severity-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--severity-color);
+  }
+  
+  .severity-label {
+    font-size: var(--text-sm);
+    font-weight: 500;
+  }
+  
+  .form-group {
+    margin-bottom: var(--space-5);
+    position: relative;
+  }
+  
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+  }
+  
+  @media (max-width: 500px) {
+    .form-row {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  .form-group label {
+    display: block;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-text);
+    margin-bottom: var(--space-2);
+  }
+  
+  .required {
+    color: var(--color-error);
+  }
+  
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    width: 100%;
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    font-size: var(--text-base);
+    color: var(--color-text);
+    transition: all var(--duration-fast) var(--ease-out);
+  }
+  
+  .form-group select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right var(--space-4) center;
+    padding-right: var(--space-10);
+  }
+  
+  .form-group input:focus,
+  .form-group textarea:focus,
+  .form-group select:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px var(--color-glow);
+  }
+  
+  .form-group input[readonly] {
+    background: var(--color-border-subtle);
+    color: var(--color-text-secondary);
+  }
+  
+  .form-group input::placeholder,
+  .form-group textarea::placeholder {
+    color: var(--color-muted);
+  }
+  
+  .form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+  
+  .char-count {
+    position: absolute;
+    right: var(--space-3);
+    top: var(--space-2);
+    font-size: var(--text-xs);
+    color: var(--color-muted);
+  }
+  
+  .honeypot {
+    position: absolute;
+    left: -9999px;
+    visibility: hidden;
+  }
+  
+  .form-status {
+    padding: var(--space-4);
+    border-radius: var(--radius-lg);
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-4);
+    line-height: 1.5;
+  }
+  
+  .form-status.success {
+    background: rgba(34, 197, 94, 0.1);
+    color: #22c55e;
+    border: 1px solid rgba(34, 197, 94, 0.2);
+  }
+  
+  .form-status.error {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+  }
+  
+  .form-status.hidden {
+    display: none;
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: center;
+  }
+  
+  .form-actions :global(button) {
+    min-width: 200px;
+  }
+  
+  .btn-icon {
+    margin-right: var(--space-2);
+  }
+  
+  .privacy-note {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+    font-size: var(--text-xs);
+    color: var(--color-muted);
+  }
+  
+  .alternative-contact {
+    text-align: center;
+    margin-top: var(--space-8);
+    padding-top: var(--space-8);
+    border-top: 1px solid var(--color-border);
+  }
+  
+  .alternative-contact p {
+    font-size: var(--text-sm);
+    color: var(--color-muted);
+    margin-bottom: var(--space-2);
+  }
+  
+  .email-link {
+    font-size: var(--text-lg);
+    font-weight: 500;
+    color: var(--color-accent);
+    transition: opacity var(--duration-fast) var(--ease-out);
+  }
+  
+  .email-link:hover {
+    opacity: 0.8;
+  }
+</style>

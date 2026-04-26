@@ -1,0 +1,261 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import BeanBopNav from '@/components/nav/BeanBopNav.astro';
+import Footer from '@/components/nav/Footer.astro';
+import Container from '@/components/layout/Container.astro';
+import Section from '@/components/layout/Section.astro';
+
+const base = import.meta.env.BASE_URL;
+---
+
+<BaseLayout
+  title="Privacy Policy | BeanBop"
+  description="Privacy Policy for BeanBop coffee tracker"
+>
+  <BeanBopNav slot="header" />
+
+  <Section size="lg" class="legal-page">
+    <Container size="narrow">
+      <a href={`${base}apps/beanbop`} class="back-link">← Back to BeanBop</a>
+
+      <div class="legal-header glass-panel">
+        <span class="legal-icon">🔒</span>
+        <div>
+          <h1 class="text-title-1">Privacy Policy</h1>
+          <p class="legal-subtitle">BeanBop by NekoCode</p>
+        </div>
+        <p class="last-updated">Last Updated: March 5, 2026</p>
+      </div>
+
+      <div class="legal-content glass-panel">
+        <div class="highlight-box primary">
+          <h3>☕ TL;DR - Local-First Privacy</h3>
+          <p>
+            BeanBop is built to keep your tracking data on your device. We do not run a cloud backend for account sync,
+            and we do not sell your personal information.
+          </p>
+        </div>
+
+        <section>
+          <h2>Introduction</h2>
+          <p>
+            BeanBop ("we," "our," or "us") is a caffeine tracking app designed to run primarily on your device.
+            This Privacy Policy explains what data BeanBop handles, where it is stored, and when data may be shared.
+          </p>
+        </section>
+
+        <section>
+          <h2>Information We Process</h2>
+          <p>BeanBop processes data that you enter, such as:</p>
+          <ul>
+            <li>Drink logs (name, caffeine amount, size, time)</li>
+            <li>Preferences (theme, units, bedtime, reminder settings)</li>
+            <li>Wellness inputs (sleep logs, water logs, sensitivity profile)</li>
+            <li>Optional profile data (age, gender, weight, height)</li>
+            <li>Custom drinks, favorites, achievements, and notes</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Where Data Is Stored</h2>
+          <ul>
+            <li>On mobile, app data is stored locally using SQLite</li>
+            <li>On web, app data is stored locally in browser storage</li>
+            <li>We do not upload this app state to our own servers</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Data Sharing and Third Parties</h2>
+          <p>Data may leave your device only in specific user-initiated or third-party cases:</p>
+          <ul>
+            <li>Share feature: selected content goes only to the app or service you choose</li>
+            <li>Export feature: files are saved where you choose</li>
+            <li>External links: opening map links sends request data to destination providers</li>
+            <li>Web font delivery: web builds may request Google Fonts and send technical data like IP address</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Ads and Analytics</h2>
+          <ul>
+            <li>BeanBop currently does not include third-party ad network SDKs in this codebase</li>
+            <li>BeanBop currently does not include third-party analytics SDKs in this codebase</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Permissions</h2>
+          <p>
+            BeanBop may request network access (<code>INTERNET</code>) for features that rely on external services
+            such as links and web assets. It does not request invasive permissions like location, camera, contacts,
+            or microphone in this codebase.
+          </p>
+        </section>
+
+        <section>
+          <h2>Data Retention and Deletion</h2>
+          <ul>
+            <li>Your data remains on your device until you delete it</li>
+            <li>You can remove data by clearing app data or uninstalling the app</li>
+            <li>If you export files, you control deletion of those files</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Children's Privacy</h2>
+          <p>
+            BeanBop is not designed to knowingly collect personal information directly from children through a remote backend.
+            Since data is stored locally, parents or guardians can control and delete app data directly on the device.
+          </p>
+        </section>
+
+        <section>
+          <h2>International Users</h2>
+          <p>
+            Because BeanBop does not operate a user cloud backend, we do not perform our own cross-border transfers of app state.
+            Third-party services you choose to use may process data under their own terms.
+          </p>
+        </section>
+
+        <section>
+          <h2>Changes to This Policy</h2>
+          <p>
+            We may update this Privacy Policy from time to time. Updates will be posted with a new "Last Updated" date.
+          </p>
+        </section>
+
+        <section>
+          <h2>Contact</h2>
+          <ul>
+            <li><strong>Email:</strong> nekocode.dev@gmail.com</li>
+          </ul>
+        </section>
+      </div>
+    </Container>
+  </Section>
+
+  <Footer slot="footer" />
+</BaseLayout>
+
+<style>
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-6);
+    color: var(--color-muted);
+    font-size: var(--text-sm);
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  .back-link:hover {
+    color: var(--color-text);
+  }
+
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-xl);
+  }
+
+  [data-theme="light"] .glass-panel {
+    background: rgba(255, 255, 255, 0.8);
+    border-color: rgba(0, 0, 0, 0.08);
+  }
+
+  .legal-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-6);
+    margin-bottom: var(--space-8);
+  }
+
+  .legal-icon {
+    font-size: var(--text-3xl);
+  }
+
+  .legal-subtitle {
+    color: var(--color-muted);
+    font-size: var(--text-sm);
+    margin: 0;
+  }
+
+  .last-updated {
+    margin-left: auto;
+    font-size: var(--text-xs);
+    color: var(--color-accent);
+    font-family: monospace;
+  }
+
+  .legal-content {
+    line-height: 1.8;
+    padding: var(--space-6);
+  }
+
+  .legal-content section {
+    margin-bottom: var(--space-10);
+  }
+
+  @media (max-width: 768px) {
+    .legal-content {
+      padding: var(--space-4);
+    }
+  }
+
+  .legal-content h2 {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-accent);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .legal-content h3 {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0 0 var(--space-3);
+  }
+
+  .legal-content p {
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-4);
+  }
+
+  .legal-content ul {
+    list-style: none;
+    padding: 0;
+    margin-bottom: var(--space-4);
+  }
+
+  .legal-content li {
+    padding: var(--space-2) 0 var(--space-2) var(--space-6);
+    color: var(--color-text-secondary);
+    position: relative;
+  }
+
+  .legal-content li::before {
+    content: '›';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: bold;
+  }
+
+  .highlight-box {
+    padding: var(--space-6);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-8);
+    background: rgba(var(--color-accent-rgb, 193, 154, 107), 0.1);
+    border: 1px solid rgba(var(--color-accent-rgb, 193, 154, 107), 0.3);
+  }
+
+  .highlight-box h3 {
+    margin-bottom: var(--space-2);
+    color: var(--color-accent);
+  }
+</style>

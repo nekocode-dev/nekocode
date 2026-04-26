@@ -1,0 +1,159 @@
+---
+const { class: className } = Astro.props;
+
+// Get the Google Script URL from environment variable
+// Single URL handles all features (contact, bug reports, visitor counter, testimonials)
+const scriptUrl = import.meta.env.PUBLIC_GOOGLE_SCRIPT_URL || '';
+---
+
+<visitor-counter class={className} data-script-url={scriptUrl}>
+  <div class="counter-container" title="Unique Visitors">
+    <span class="status-dot"></span>
+    <span class="label">UNIQUE VISITORS:</span>
+    <span class="count">...</span>
+  </div>
+</visitor-counter>
+
+<style>
+  .counter-container {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--color-muted);
+    opacity: 0.6;
+    padding: 0.2rem 0;
+    transition: all 0.3s ease;
+    cursor: help;
+  }
+
+  .counter-container:hover {
+    opacity: 1;
+    color: var(--color-text-secondary);
+  }
+
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    background-color: var(--color-accent);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  .label {
+    letter-spacing: 0.05em;
+    font-weight: 500;
+  }
+
+  .count {
+    font-weight: 600;
+    min-width: 2ch;
+  }
+
+  @keyframes pulse {
+    0% { opacity: 0.4; }
+    50% { opacity: 1; }
+    100% { opacity: 0.4; }
+  }
+</style>
+
+<script>
+  class VisitorCounter extends HTMLElement {
+    constructor() {
+      super();
+      this.init();
+    }
+
+    /**
+     * Generate a simple browser fingerprint for more accurate unique visitor tracking.
+     * This combines multiple browser attributes into a hash for better uniqueness
+     * than localStorage alone.
+     */
+    generateFingerprint() {
+      const components = [
+        navigator.userAgent,
+        navigator.language,
+        screen.width + 'x' + screen.height,
+        screen.colorDepth,
+        new Date().getTimezoneOffset(),
+        navigator.hardwareConcurrency || 'unknown',
+        navigator.deviceMemory || 'unknown',
+        navigator.platform || 'unknown'
+      ];
+      
+      // Simple hash function (djb2)
+      const str = components.join('|');
+      let hash = 5381;
+      for (let i = 0; i < str.length; i++) {
+        hash = ((hash << 5) + hash) + str.charCodeAt(i);
+      }
+      return 'fp_' + Math.abs(hash).toString(36);
+    }
+
+    async init() {
+      const scriptUrl = this.dataset.scriptUrl;
+      const countElement = this.querySelector('.count');
+      if (!scriptUrl || !countElement) return;
+
+      // Generate or retrieve fingerprint
+      const fingerprintKey = 'neko_visitor_fp';
+      const recordedKey = 'neko_visitor_recorded';
+      const sessionKey = 'neko_session_counted';
+      
+      let fingerprint = localStorage.getItem(fingerprintKey);
+      if (!fingerprint) {
+        fingerprint = this.generateFingerprint();
+        localStorage.setItem(fingerprintKey, fingerprint);
+      }
+      
+      // Check if this session has already been counted (prevents multiple counts on SPA navigation)
+      const sessionCounted = sessionStorage.getItem(sessionKey);
+      const hasVisited = localStorage.getItem(recordedKey);
+      
+      // Determine action: only increment if never visited OR new session with different fingerprint
+      let action = 'get_count';
+      let shouldIncrement = false;
+      
+      if (!hasVisited) {
+        // First time visitor - increment
+        action = 'increment_visitor';
+        shouldIncrement = true;
+      } else if (!sessionCounted) {
+        // Returning visitor, new session - just get count (don't increment)
+        // This prevents over-counting when localStorage is cleared but fingerprint changes
+        action = 'get_count';
+      }
+
+      try {
+        const url = new URL(scriptUrl);
+        url.searchParams.set('action', action);
+        if (shouldIncrement) {
+          url.searchParams.set('fingerprint', fingerprint);
+        }
+        
+        const response = await fetch(url.toString());
+        
+        if (!response.ok) throw new Error('Network response was not ok');
+        
+        const data = await response.json();
+        
+        if (data.count !== undefined) {
+          // Format number with locale (e.g., 1,024)
+          countElement.textContent = new Intl.NumberFormat('en-US').format(data.count);
+          
+          if (shouldIncrement) {
+            localStorage.setItem(recordedKey, fingerprint);
+          }
+          // Mark this session as counted to prevent re-counting on SPA navigation
+          sessionStorage.setItem(sessionKey, 'true');
+        }
+      } catch (err) {
+        console.error('Visitor counter error:', err);
+        countElement.textContent = '---';
+      }
+    }
+  }
+
+  customElements.define('visitor-counter', VisitorCounter);
+</script>

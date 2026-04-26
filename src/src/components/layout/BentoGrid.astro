@@ -1,0 +1,88 @@
+---
+/**
+ * BentoGrid - Active Bento Grid layout (2026 trend)
+ * Modular, responsive grid with variable aspect ratios
+ */
+interface Props {
+  columns?: 2 | 3 | 4;
+  gap?: 'sm' | 'md' | 'lg';
+  class?: string;
+}
+
+const { 
+  columns = 3,
+  gap = 'md',
+  class: className = ''
+} = Astro.props;
+
+const gapValue = {
+  sm: 'var(--space-3)',
+  md: 'var(--space-4)',
+  lg: 'var(--space-6)'
+}[gap];
+---
+
+<div 
+  class:list={['bento-grid', `bento-cols-${columns}`, className]}
+  style={`--gap: ${gapValue}`}
+>
+  <slot />
+</div>
+
+<style>
+  .bento-grid {
+    display: grid;
+    gap: var(--gap);
+    grid-auto-flow: dense;
+  }
+  
+  /* Mobile: 1 column */
+  .bento-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  /* Tablet: 2 columns */
+  @media (min-width: 640px) {
+    .bento-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  /* Desktop: configured columns */
+  @media (min-width: 1024px) {
+    .bento-cols-2 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .bento-cols-3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .bento-cols-4 {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+  
+  /* Global styles for bento items */
+  .bento-grid :global(.bento-wide) {
+    grid-column: span 2;
+  }
+  
+  .bento-grid :global(.bento-tall) {
+    grid-row: span 2;
+  }
+  
+  .bento-grid :global(.bento-featured) {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+  
+  @media (max-width: 639px) {
+    .bento-grid :global(.bento-wide),
+    .bento-grid :global(.bento-tall),
+    .bento-grid :global(.bento-featured) {
+      grid-column: span 1;
+      grid-row: span 1;
+    }
+  }
+</style>
