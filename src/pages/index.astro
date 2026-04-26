@@ -15,10 +15,10 @@ import { getCollection } from 'astro:content';
 // Get featured projects
 const allProjects = (await getCollection('projects'))
   .filter((project) => project.slug !== 'nekocode-site' && project.id !== 'nekocode-site');
-// Sort: FlipFocus first, then featured, then others
+// Sort: FrendLyst first, then featured, then others
 allProjects.sort((a, b) => {
-  if (a.id === 'flipfocus') return -1;
-  if (b.id === 'flipfocus') return 1;
+  if (a.slug === 'frendlyst') return -1;
+  if (b.slug === 'frendlyst') return 1;
   if (a.data.featured && !b.data.featured) return -1;
   if (!a.data.featured && b.data.featured) return 1;
   return 0;

@@ -14,7 +14,7 @@ interface Props {
   platforms: ('web' | 'ios' | 'android')[];
   tech: string[];
   featured?: boolean;
-  status?: 'live' | 'in_progress' | 'archived';
+  status?: 'live' | 'in_progress' | 'archived' | 'coming_soon';
   priority?: 'high' | 'auto';
   class?: string;
 }
@@ -26,7 +26,6 @@ const {
   coverImage,
   type,
   platforms,
-  tech,
   featured = false,
   status = 'live',
   priority = 'auto',
@@ -86,15 +85,6 @@ const resolvedCoverImage = coverImage.startsWith('/') ? `${base}${coverImage.sli
     {Astro.props.subtitle && (
       <p class="card-subtitle">{Astro.props.subtitle}</p>
     )}
-    
-    <div class="tech-stack">
-      {tech.slice(0, 3).map(t => (
-        <Tag size="sm">{t}</Tag>
-      ))}
-      {tech.length > 3 && (
-        <Tag size="sm" variant="outline">+{tech.length - 3}</Tag>
-      )}
-    </div>
     
     <p class="card-tagline">{tagline}</p>
   </div>

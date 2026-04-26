@@ -12,7 +12,7 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 
 export async function getStaticPaths() {
   const projects = await getCollection('projects');
-  const dedicatedRoutes = new Set(['flipfocus', 'beanbop', 'nekocode-site']);
+  const dedicatedRoutes = new Set(['flipfocus', 'beanbop', 'frendlyst', 'nekocode-site']);
 
   return projects
     .filter(project => !dedicatedRoutes.has(project.slug))
@@ -32,6 +32,7 @@ const base = import.meta.env.BASE_URL;
 const resolvedCoverImage = project.data.media.coverImage.startsWith('/')
   ? `${base}${project.data.media.coverImage.slice(1)}`
   : project.data.media.coverImage;
+const visibleProjectTech = project.data.tech.filter(tech => !['react', 'typescript'].includes(tech.toLowerCase()));
 
 // Get related projects
 const allProjects = await getCollection('projects');
@@ -126,7 +127,7 @@ const platformLabels = {
     <Container size="narrow">
       <h2 class="text-title-2">Tech Stack</h2>
       <div class="tech-grid">
-        {project.data.tech.map(tech => (
+        {visibleProjectTech.map(tech => (
           <div class="tech-item">
             <Tag size="md">{tech}</Tag>
           </div>

@@ -59,26 +59,26 @@
   const forceStaticMode = prefersReducedMotion;
   
   const CONFIG = {
-    blobCount: forceStaticMode ? 8 : 12,
-    baseRadius: 40, // Much smaller base
-    radiusVar: 100, // Massive variance (tiny to huge blobs)
+    blobCount: forceStaticMode ? 5 : 8,
+    baseRadius: 34,
+    radiusVar: 72,
     
     // Lennard-Jones Constants
     epsilon: 0.1, 
     sigmaScale: 2.2, 
     
     // Environment
-    gravity: 0.012, // Slight bump up (was 0.008)
-    friction: 0.96,
+    gravity: 0.009,
+    friction: 0.965,
     wallBounce: 0.5,
     
     // Zen Mode Interaction
     // Increased push slightly (0.05 -> 0.2) based on user feedback "too low"
-    mouseRepulsion: 0.2, 
-    mouseRange: 250,
+    mouseRepulsion: 0.12, 
+    mouseRange: 210,
     
     // Temperature
-    temperature: 0.015, // Slight bump up
+    temperature: 0.01,
   };
 
 
@@ -254,7 +254,7 @@
     // Just show static blobs with CSS morph animation (no JavaScript loop)
     if (forceStaticMode) {
       container.style.filter = 'blur(20px)';
-      container.style.opacity = '0.4';
+      container.style.opacity = '0.28';
       return; // Don't start the physics loop
     }
     
@@ -486,11 +486,11 @@
               if (newTier === 'C') {
                   // Tier C: "Safety Mode"
                   this.container.style.filter = 'blur(12px)'; 
-                  this.container.style.opacity = '0.5'; 
+                  this.container.style.opacity = '0.32'; 
               } else {
                   // Tier S: "Liquid Mode" (Ultra)
                   this.container.style.filter = 'url(#goo)';
-                  this.container.style.opacity = '1';
+                  this.container.style.opacity = '0.58';
               }
           };
 
@@ -502,7 +502,7 @@
               applyChanges();
               
               setTimeout(() => {
-                this.container.style.opacity = newTier === 'C' ? '0.5' : '1'; 
+                this.container.style.opacity = newTier === 'C' ? '0.32' : '0.58'; 
               }, 100); 
           }, 1000); 
       }
@@ -526,12 +526,23 @@
     width: 100%;
     height: 100%;
     z-index: -10;
-    /* Premium "Deep Space Magma" Background */
-    background: radial-gradient(circle at 50% 120%, #2b0f42 0%, #050511 60%, #000000 100%);
+    background:
+      radial-gradient(circle at 50% 115%, rgba(86, 31, 42, 0.62) 0%, rgba(5, 5, 17, 0.88) 54%, #000000 100%);
     overflow: hidden;
     /* Optimization: Create a new stacking context and isolate repaints */
     isolation: isolate;
     contain: paint;
+  }
+
+  #lava-container::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 50% 22%, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.42) 56%, rgba(0, 0, 0, 0.78) 100%),
+      linear-gradient(180deg, rgba(0, 0, 0, 0.16) 0%, rgba(0, 0, 0, 0.7) 100%);
   }
 
   .lava-lamp {
@@ -542,6 +553,7 @@
     position: absolute;
     top: 0;
     left: 0;
+    opacity: 0.58;
     /* Optimization: Force GPU layer */
     transform: translate3d(0, 0, 0);
     will-change: filter, opacity;
@@ -550,8 +562,7 @@
   /* Global styles for dynamic blobs */
   :global(.blob) {
     position: absolute;
-    /* Golden Magma Gradient - works well with specular highlights */
-    background: linear-gradient(180deg, #ff9068 0%, #ff4b4b 60%, #900d2f 100%);
+    background: linear-gradient(180deg, #ffb184 0%, #ed6a5d 62%, #8e2a3b 100%);
     border-radius: 50%;
     
     /* Default position off-screen, handled by JS */
@@ -563,7 +574,7 @@
     backface-visibility: hidden;
 
     /* Box shadow for internal glow before filtering */
-    box-shadow: inset 0 0 40px rgba(255, 230, 0, 0.3);
+    box-shadow: inset 0 0 28px rgba(255, 226, 172, 0.18);
   }
 
   /* Rise Animation: REMOVED - Handled by JS */
@@ -589,7 +600,7 @@
   @media (prefers-reduced-motion: reduce) {
     .lava-lamp {
       filter: blur(20px) !important;
-      opacity: 0.4 !important;
+      opacity: 0.28 !important;
     }
     
     :global(.blob) {

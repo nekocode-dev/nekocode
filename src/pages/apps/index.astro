@@ -12,6 +12,13 @@ import { getCollection } from 'astro:content';
 // Get apps only
 const allProjects = await getCollection('projects');
 const apps = allProjects.filter(p => p.data.type === 'app');
+apps.sort((a, b) => {
+  if (a.slug === 'frendlyst') return -1;
+  if (b.slug === 'frendlyst') return 1;
+  if (a.data.featured && !b.data.featured) return -1;
+  if (!a.data.featured && b.data.featured) return 1;
+  return a.data.title.localeCompare(b.data.title);
+});
 
 // Extract categories
 const categories = [...new Set(apps.map(p => p.data.category).filter(Boolean))];

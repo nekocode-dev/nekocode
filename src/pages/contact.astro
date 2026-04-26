@@ -81,10 +81,10 @@ const googleScriptUrl = import.meta.env.PUBLIC_GOOGLE_SCRIPT_URL || '';
     
     // Check if URL is configured
     if (!GOOGLE_SCRIPT_URL) {
-      console.error('Google Script URL not configured');
-      statusDiv.innerHTML = '⚠️ Contact form not configured. Please email directly.';
-      statusDiv.className = 'form-status error';
+      statusDiv.innerHTML = 'Contact form is offline right now. Please email hello@nekocode.dev directly.';
+      statusDiv.className = 'form-status info';
       statusDiv.classList.remove('hidden');
+      submitBtn.setAttribute('disabled', 'true');
       return;
     }
     
@@ -322,6 +322,12 @@ const googleScriptUrl = import.meta.env.PUBLIC_GOOGLE_SCRIPT_URL || '';
     background: rgba(239, 68, 68, 0.1);
     color: #ef4444;
     border: 1px solid rgba(239, 68, 68, 0.2);
+  }
+
+  .form-status.info {
+    background: rgba(245, 230, 211, 0.08);
+    color: var(--color-text-secondary);
+    border: 1px solid rgba(245, 230, 211, 0.18);
   }
 
   .hidden, 
