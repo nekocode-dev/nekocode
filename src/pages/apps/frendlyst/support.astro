@@ -1,0 +1,207 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import FrendLystNav from '@/components/nav/FrendLystNav.astro';
+import Footer from '@/components/nav/Footer.astro';
+import Container from '@/components/layout/Container.astro';
+import Section from '@/components/layout/Section.astro';
+
+const base = import.meta.env.BASE_URL;
+const LAST_UPDATED = 'May 20, 2026';
+
+const supportSections = [
+  {
+    title: 'Contact Support',
+    content: [
+      'General support: nekocode.dev@gmail.com',
+      'Privacy requests: nekocode.dev@gmail.com',
+      'Safety or security concerns: use in-app reporting when available, or email nekocode.dev@gmail.com with FrendLyst in the subject.',
+    ],
+  },
+  {
+    title: 'Account Deletion',
+    content: [
+      'In the FrendLyst app, open Settings and choose Delete Account to request account deletion.',
+      'If you already uninstalled the app or cannot access your account, email nekocode.dev@gmail.com from the email address associated with your account and request FrendLyst account deletion.',
+      'Some records may be retained where needed for legal compliance, safety, fraud prevention, chargebacks, accounting, backups, audit logs, or unresolved disputes.',
+    ],
+  },
+  {
+    title: 'Purchase Help',
+    content: [
+      'Digital purchases and subscriptions are generally processed by Apple or Google.',
+      'For refunds, subscription cancellation, or billing disputes, use the App Store or Google Play account tools first, then contact FrendLyst support if you need app-side help restoring access.',
+    ],
+  },
+  {
+    title: 'Safety Reports',
+    content: [
+      'For content or account safety issues, use the in-app report and block controls where possible.',
+      'Include your username, the other user or content involved, and a short description of the issue when contacting support by email.',
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="Support | FrendLyst"
+  description="Support, privacy, safety, and account deletion help for FrendLyst"
+>
+  <FrendLystNav slot="header" />
+
+  <Section size="lg" class="legal-page">
+    <Container size="narrow">
+      <a href={`${base}apps/frendlyst`} class="back-link">← Back to FrendLyst</a>
+
+      <div class="legal-header glass-panel">
+        <span class="legal-icon" aria-hidden="true">✉</span>
+        <div>
+          <h1 class="text-title-1">FrendLyst Support</h1>
+          <p class="legal-subtitle">
+            Contact, account deletion, purchase, and safety help for FrendLyst.
+          </p>
+        </div>
+        <p class="last-updated">Last Updated: {LAST_UPDATED}</p>
+      </div>
+
+      <div class="legal-content glass-panel">
+        {supportSections.map(section => (
+          <section>
+            <h2>{section.title}</h2>
+            <ul>
+              {section.content.map(item => (
+                <li>{item}</li>
+              ))}
+            </ul>
+          </section>
+        ))}
+
+        <div class="contact-box">
+          <h2>Legal Links</h2>
+          <ul>
+            <li><a href={`${base}apps/frendlyst/privacy`}>Privacy Policy</a></li>
+            <li><a href={`${base}apps/frendlyst/terms`}>Terms of Service</a></li>
+          </ul>
+        </div>
+      </div>
+    </Container>
+  </Section>
+
+  <Footer slot="footer" />
+</BaseLayout>
+
+<style>
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-6);
+    color: rgba(255, 255, 255, 0.72);
+    font-size: var(--text-sm);
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  .back-link:hover {
+    color: var(--color-text);
+  }
+
+  .glass-panel {
+    background: rgba(14, 14, 16, 0.86);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: var(--radius-xl);
+  }
+
+  [data-theme="light"] .glass-panel {
+    background: rgba(255, 255, 255, 0.86);
+    border-color: rgba(0, 0, 0, 0.08);
+  }
+
+  .legal-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: var(--space-4);
+    padding: var(--space-8);
+    margin-bottom: var(--space-6);
+  }
+
+  .legal-icon {
+    font-size: 2rem;
+    line-height: 1;
+  }
+
+  .legal-subtitle {
+    color: var(--color-text-secondary);
+    margin-top: var(--space-3);
+    max-width: 680px;
+  }
+
+  .last-updated {
+    margin-left: auto;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .legal-content {
+    padding: var(--space-8);
+  }
+
+  .legal-content section {
+    padding-block: var(--space-5);
+    border-bottom: 1px solid var(--color-border-subtle);
+  }
+
+  .legal-content section:first-child {
+    padding-top: 0;
+  }
+
+  .legal-content h2 {
+    margin-bottom: var(--space-3);
+    font-size: var(--text-xl);
+  }
+
+  .legal-content ul {
+    display: grid;
+    gap: var(--space-3);
+    color: var(--color-text-secondary);
+  }
+
+  .legal-content li {
+    position: relative;
+    padding-left: var(--space-5);
+    line-height: 1.7;
+  }
+
+  .legal-content li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.75em;
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: var(--color-accent);
+  }
+
+  .legal-content a {
+    color: var(--color-accent);
+  }
+
+  .contact-box {
+    margin-top: var(--space-6);
+    padding: var(--space-6);
+    border-radius: var(--radius-lg);
+    background: rgba(237, 106, 93, 0.1);
+    border: 1px solid rgba(237, 106, 93, 0.2);
+  }
+
+  @media (max-width: 640px) {
+    .legal-header,
+    .legal-content {
+      padding: var(--space-6);
+    }
+
+    .last-updated {
+      margin-left: 0;
+      width: 100%;
+    }
+  }
+</style>

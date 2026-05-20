@@ -6,7 +6,7 @@ import Container from '@/components/layout/Container.astro';
 import Section from '@/components/layout/Section.astro';
 
 const base = import.meta.env.BASE_URL;
-const LAST_UPDATED = 'April 24, 2026';
+const LAST_UPDATED = 'May 20, 2026';
 
 const commitments = [
   'We do not sell your personal data for money.',
@@ -21,9 +21,10 @@ const sections = [
     id: 'overview',
     title: 'Who Controls Your Data',
     content: [
-      'Operator: FrendLyst is operated by an independent developer based in the Philippines. In this policy, "we", "us", and "our" mean that independent operator.',
+      'Operator: FrendLyst is operated by NekoCode. NekoCode is an independent developer based in the Philippines. In this policy, "we", "us", and "our" mean NekoCode as the FrendLyst operator.',
       'Privacy Role: For personal data where we decide the purpose and method of processing, we act as the personal information controller under the Philippine Data Privacy Act of 2012.',
-      'Privacy Contact: You can contact the privacy owner for FrendLyst at nekocode.dev@gmail.com.',
+      'Privacy Contact: You can contact NekoCode about this Privacy Policy at nekocode.dev@gmail.com.',
+      'Operations Team: FrendLyst is operated by NekoCode with authorized admins, moderators, support staff, and safety tools that help handle privacy, safety, security, support, and purchase issues.',
       'Scope: This policy covers the FrendLyst mobile app, web app surfaces, admin/support workflows, and related backend services.',
     ],
   },
@@ -34,6 +35,7 @@ const sections = [
       'Account Data: Email address, user ID, authentication records, username, display name, date of birth or age-gate state, account status, and login/security events.',
       'Profile Data: Photos, avatar, bio, tags, city or region, profile number, badges, levels, stats, public profile details, verification status, and preferences.',
       'Face Verification Data: If you choose Face Verification, we collect a live selfie, liveness challenge metadata, profile photos used for reviewer comparison, submission status, reviewer decision, and rejection or retake reason.',
+      'Private Storage: Face Verification selfies and review records are stored in protected FrendLyst/Supabase storage and reviewer tables.',
       'User Content: Posts, comments, chat messages, club messages, photos, reactions, gifts, reports, support tickets, profile edits, and other content you submit.',
       'Social and Game Activity: Connections, blocks, reports, profile views, ownership activity, virtual balances, purchases, rewards, quests, referrals, leaderboard activity, club participation, and moderation history.',
       'Purchase Data: Product IDs, store platform, purchase tokens or receipts, subscription status, transaction metadata, refund or chargeback signals, and fraud-prevention records. We do not receive your full card number from Apple or Google.',
@@ -86,6 +88,7 @@ const sections = [
       'Other Users: We share public profile, social, and game data with other users as part of FrendLyst features.',
       'Service Providers: We use trusted providers for hosting, database, authentication, storage, edge functions, crash/error monitoring, push notifications, ad services, purchase validation, moderation, support, email, analytics, and security.',
       'Current Providers: Providers may include Supabase, Apple, Google, Firebase or platform push services, Google AdMob, Sentry, OpenAI moderation services when enabled, OpenStreetMap/Nominatim for reverse geocoding, and similar infrastructure providers.',
+      'Third-Party Sharing: Face Verification data is not sold and is not shared with other users. It may be processed by FrendLyst service providers only where needed for protected storage, security, reviewer access, audit logging, support, legal compliance, or safety enforcement.',
       'App Stores and Payment Providers: Purchase, subscription, receipt, refund, and entitlement data may be shared with Apple, Google, or other approved stores to process digital purchases.',
       'Safety and Law: We may share information with law enforcement, regulators, courts, app stores, legal advisers, safety organizations, or affected users when required by law or when necessary to prevent harm, fraud, abuse, or rights violations.',
       'Business Transfer: If the app, assets, or operation are transferred to another operator, user data may transfer as part of that transaction subject to this policy or a replacement notice.',
@@ -129,6 +132,7 @@ const sections = [
     title: 'Retention',
     content: [
       'Active Account Data: We keep account, profile, subscription, economy, and safety data while your account is active and as needed to operate the app.',
+      'Face Verification Retention: Selfies, liveness challenge metadata, reviewer decisions, and appeal/audit records are retained while needed for badge review, fraud prevention, abuse prevention, appeals, audit logs, safety enforcement, legal compliance, and unresolved disputes.',
       'Chats and Reports: Chat messages, reports, enforcement records, fraud signals, and safety evidence may be retained for moderation, dispute, appeal, abuse-prevention, and legal reasons.',
       'Deletion Requests: Account deletion removes or de-identifies many user records, but some data may remain where needed for legal compliance, safety, fraud prevention, chargebacks, accounting, backups, audit logs, or unresolved disputes.',
       'Backups and Logs: Deleted data may remain in backups, logs, or cache for a limited period until normal rotation or deletion processes complete.',
@@ -253,8 +257,9 @@ const splitLead = (item: string) => {
             For privacy requests, account data questions, or concerns about how your data is handled, contact the FrendLyst privacy owner.
           </p>
           <ul>
-            <li><strong>Privacy:</strong> nekocode.dev@gmail.com</li>
-            <li><strong>Account deletion:</strong> Settings - Delete Account</li>
+            <li><strong>Privacy:</strong> <a href="mailto:nekocode.dev@gmail.com">nekocode.dev@gmail.com</a></li>
+            <li><strong>Support and safety:</strong> <a href={`${base}apps/frendlyst/support`}>FrendLyst Support</a></li>
+            <li><strong>Account deletion:</strong> Use Settings - Delete Account in the app, or use <a href={`${base}apps/frendlyst/support`}>FrendLyst Support</a> if you no longer have app access.</li>
           </ul>
         </div>
       </div>
