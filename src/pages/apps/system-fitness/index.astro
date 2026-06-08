@@ -1,11 +1,11 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import AppLandingContent from '@/components/apps/AppLandingContent.astro';
-import FrendLystNav from '@/components/nav/FrendLystNav.astro';
+import NavBar from '@/components/nav/NavBar.astro';
 import Footer from '@/components/nav/Footer.astro';
 import { appLandingPages, appStructuredData } from '@/data/appLanding';
 
-const app = appLandingPages.frendlyst;
+const app = appLandingPages['system-fitness'];
 const siteURL = new URL(Astro.site ?? 'https://nekocode.dev');
 const pageURL = new URL(Astro.url.pathname, siteURL).href;
 ---
@@ -18,7 +18,7 @@ const pageURL = new URL(Astro.url.pathname, siteURL).href;
   mainEntityId={`${pageURL}#app`}
   structuredData={appStructuredData(app, pageURL, siteURL.href)}
 >
-  <FrendLystNav slot="header" />
+  <NavBar slot="header" />
   <AppLandingContent app={app} />
   <Footer slot="footer" />
 </BaseLayout>

@@ -14,15 +14,19 @@ interface Props {
 
 const { items = [
   { label: 'Home', href: '/' },
-  { label: 'Work', href: '/work' },
-  { label: 'Apps', href: '/apps' },
+  { label: 'Catalog', href: '/apps' },
   { label: 'Team', href: '/team' },
-  { label: 'About', href: '/about' },
   { label: 'Contact', href: '/contact' }
 ] } = Astro.props;
 
 const currentPath = Astro.url.pathname;
 const base = import.meta.env.BASE_URL;
+
+const isActive = (href: string) => {
+  if (href === '/') return currentPath === href;
+  if (href === '/apps') return currentPath === href;
+  return currentPath === href || currentPath.startsWith(`${href}/`);
+};
 ---
 
 <header class="nav-header">
@@ -37,8 +41,8 @@ const base = import.meta.env.BASE_URL;
         <li>
           <a 
             href={`${base}${item.href.slice(1)}`} 
-            class:list={['nav-link', { active: currentPath === item.href || (item.href !== '/' && currentPath.startsWith(item.href)) }]}
-            aria-current={currentPath === item.href ? 'page' : undefined}
+            class:list={['nav-link', { active: isActive(item.href) }]}
+            aria-current={isActive(item.href) ? 'page' : undefined}
           >
             {item.label}
           </a>
@@ -67,7 +71,7 @@ const base = import.meta.env.BASE_URL;
         <li>
           <a 
             href={`${base}${item.href.slice(1)}`} 
-            class:list={['mobile-link', { active: currentPath === item.href }]}
+            class:list={['mobile-link', { active: isActive(item.href) }]}
           >
             {item.label}
           </a>
@@ -89,8 +93,8 @@ const base = import.meta.env.BASE_URL;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: var(--space-8);
-    padding: var(--space-3) var(--space-6);
+    gap: var(--space-4);
+    padding: var(--space-3) var(--space-5);
     border-radius: var(--radius-xl);
     max-width: var(--container-max);
     margin-inline: auto;
@@ -119,14 +123,14 @@ const base = import.meta.env.BASE_URL;
     gap: var(--space-1);
   }
   
-  @media (min-width: 768px) {
+  @media (min-width: 960px) {
     .nav-links {
       display: flex;
     }
   }
   
   .nav-link {
-    padding: var(--space-2) var(--space-4);
+    padding: var(--space-2) var(--space-3);
     border-radius: var(--radius-md);
     font-size: var(--text-sm);
     font-weight: 500;
@@ -142,6 +146,13 @@ const base = import.meta.env.BASE_URL;
   .nav-link.active {
     color: var(--color-accent-contrast);
     background: var(--color-accent);
+  }
+
+  @media (max-width: 980px) {
+    .nav-link {
+      padding-inline: var(--space-2);
+      font-size: var(--text-xs);
+    }
   }
   
   .nav-actions {
@@ -164,7 +175,7 @@ const base = import.meta.env.BASE_URL;
     cursor: pointer;
   }
   
-  @media (min-width: 768px) {
+  @media (min-width: 960px) {
     .mobile-menu-toggle {
       display: none;
     }

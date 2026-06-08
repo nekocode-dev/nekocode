@@ -4,411 +4,1175 @@ import NavBar from '@/components/nav/NavBar.astro';
 import Footer from '@/components/nav/Footer.astro';
 import Container from '@/components/layout/Container.astro';
 import Section from '@/components/layout/Section.astro';
-import BentoGrid from '@/components/layout/BentoGrid.astro';
-import ProjectCard from '@/components/cards/ProjectCard.astro';
 import TeamSpotlight from '@/components/cards/TeamSpotlight.astro';
 import Button from '@/components/ui/Button.astro';
-import Tag from '@/components/ui/Tag.astro';
+import { appLandingPages } from '@/data/appLanding';
 
-import { getCollection } from 'astro:content';
+import { getCollection, type CollectionEntry } from 'astro:content';
 
-// Get featured projects
-const allProjects = (await getCollection('projects'))
-  .filter((project) => project.slug !== 'nekocode-site' && project.id !== 'nekocode-site');
-// Sort: FrendLyst first, then featured, then others
-allProjects.sort((a, b) => {
+type Project = CollectionEntry<'projects'>;
+
+// Get app products for the homepage showcase.
+const appProjects: Project[] = (await getCollection('projects'))
+  .filter((project: Project) => project.data.type === 'app');
+// Sort: FrendLyst first, then featured, then others.
+appProjects.sort((a: Project, b: Project) => {
   if (a.slug === 'frendlyst') return -1;
   if (b.slug === 'frendlyst') return 1;
   if (a.data.featured && !b.data.featured) return -1;
   if (!a.data.featured && b.data.featured) return 1;
   return 0;
 });
-const recentProjects = allProjects.slice(0, 6);
+const appLineup = appProjects.slice(0, 4);
+const frendLystProject = appProjects.find((project: Project) => project.slug === 'frendlyst') ?? appProjects[0];
+const frendLystLanding = appLandingPages.frendlyst;
+const googlePlayLink = frendLystLanding.storeLinks.find((link) => link.label === 'Google Play')?.href ?? '/apps/frendlyst';
+const appStoreLink = frendLystLanding.storeLinks.find((link) => link.label === 'App Store')?.href ?? '/apps/frendlyst';
 
 const base = import.meta.env.BASE_URL;
+const pageDescription =
+  "Explore NekoCode apps including FrendLyst, FlipFocus, BeanBop, and SYSTEM Fitness: privacy-first social, learning, wellness, and gamified mobile products.";
 
-const capabilities = [
-  { icon: '📱', label: 'Mobile Apps' },
-  { icon: '🌐', label: 'Web Development' },
-  { icon: '🎨', label: 'UI/UX Design' },
-  { icon: '⚡', label: 'Product Strategy' },
-  { icon: '🔧', label: 'Systems Design' },
-  { icon: '📝', label: 'Documentation' }
-];
+const statusLabels: Record<Project['data']['status'], string> = {
+  live: 'Live',
+  in_progress: 'In development',
+  archived: 'Archived',
+  coming_soon: 'Coming soon'
+};
+
+const platformLabels: Record<Project['data']['platforms'][number], string> = {
+  ios: 'iOS',
+  android: 'Android',
+  web: 'Web'
+};
+
+const resolveAsset = (path?: string) => {
+  if (!path) return '';
+  return path.startsWith('/') ? `${base}${path.slice(1)}` : path;
+};
+
+type AppLandingSlug = keyof typeof appLandingPages;
+
+const isAppLandingSlug = (slug: string): slug is AppLandingSlug => slug in appLandingPages;
+
+const heroFeatureOverrides: Record<string, string[]> = {
+  frendlyst: ['Profile Worth', 'Friend Market', 'Clubs', 'Gifts']
+};
+
+const heroCopyOverrides: Record<string, Partial<{
+  profileLabel: string;
+  profileHeadline: string;
+  marketLabel: string;
+  marketText: string;
+}>> = {
+  frendlyst: {
+    profileLabel: 'Profile Worth',
+    profileHeadline: 'Social discovery',
+    marketLabel: 'Friend Market',
+    marketText: 'Find people through rankings, gifts, and clubs.'
+  }
+};
+
+const carouselApps = appLineup.map((project: Project) => {
+  const landing = isAppLandingSlug(project.slug) ? appLandingPages[project.slug] : undefined;
+  const copyOverride = heroCopyOverrides[project.slug] ?? {};
+  const features = heroFeatureOverrides[project.slug] ?? landing?.features.slice(0, 4).map((feature) => feature.title) ?? [
+    project.data.category ?? project.data.title,
+    statusLabels[project.data.status],
+    ...project.data.platforms.map((platform) => platformLabels[platform])
+  ];
+  const workflow = landing?.workflow ?? [];
+
+  return {
+    slug: project.slug,
+    title: project.data.title,
+    status: statusLabels[project.data.status],
+    statusUpper: statusLabels[project.data.status].toUpperCase(),
+    tagline: project.data.tagline,
+    logo: resolveAsset(project.data.media.logo ?? project.data.media.coverImage),
+    profileLabel: copyOverride.profileLabel ?? landing?.features[0]?.title ?? project.data.category ?? project.data.title,
+    profileHeadline: copyOverride.profileHeadline ?? landing?.category ?? project.data.category ?? project.data.title,
+    marketLabel: copyOverride.marketLabel ?? workflow[1]?.title ?? landing?.workflow[0]?.title ?? project.data.subtitle ?? project.data.title,
+    marketText: copyOverride.marketText ?? workflow[1]?.description ?? landing?.heroDescription ?? project.data.tagline,
+    features: features.slice(0, 4)
+  };
+});
+
+const initialCarouselApp = carouselApps[0];
+
 ---
 
-<BaseLayout title="Home">
+<BaseLayout
+  title="NekoCode Apps | Privacy-First Mobile App Showcase"
+  description={pageDescription}
+  image="/og-image.png"
+>
   <NavBar slot="header" />
   
   <!-- Hero Section -->
   <Section size="xl" class="hero">
     <Container>
-      <div class="hero-wrapper">
+      <div class="hero-wrapper" data-testid="app-showcase-hero">
         <div class="hero-content">
-
-          
-          
           <h1 class="text-hero">
-            <div class="line-1" data-split-text>Building</div>
-            <div class="line-2" data-split-text>products</div>
-            <div class="line-3" data-split-text>with craft and</div>
-            <div class="line-4" data-split-text>care</div>
+            <div class="line-1" data-split-text>NekoCode Apps</div>
           </h1>
           
           <p class="hero-description reveal stagger-2">
-            Building software with feline agility and curiosity. Crafting purr-fect digital experiences with nine lives of code.
+            Privacy-first mobile apps, playful systems, and product experiments led by FrendLyst, a live social discovery game for Android and iOS.
           </p>
           
-          <div class="hero-actions reveal stagger-3">
-            <Button href="/work" variant="accent" size="lg">
-              View Work
-            </Button>
-            <Button href="/contact" variant="secondary" size="lg">
-              Get in Touch
+          <div class="hero-actions reveal stagger-3" data-testid="hero-actions">
+            <a class="store-badge store-badge-primary" href={googlePlayLink} target="_blank" rel="noopener noreferrer" aria-label="Download on Google Play">
+              <svg class="store-icon store-icon-play" viewBox="0 0 24 24" aria-hidden="true">
+                <path class="play-wing play-wing-top" d="M4.9 2.7c-.5.3-.8.9-.8 1.6v15.4c0 .7.3 1.3.8 1.6l8.7-9.3L4.9 2.7Z" />
+                <path class="play-wing play-wing-right" d="m15.1 10.4 2.9 1.7c.8.5.8 1.5 0 2l-2.9 1.7-2.9-2.8 2.9-2.6Z" />
+                <path class="play-wing play-wing-bottom" d="m4.9 21.3 8.7-9.3 1.5 1.5-10.2 7.8Z" />
+                <path class="play-wing play-wing-left" d="M4.9 2.7 15.1 10.5 13.6 12 4.9 2.7Z" />
+              </svg>
+              <span class="store-copy">
+                <span class="store-label">Download on</span>
+                <strong class="store-name">Google Play</strong>
+              </span>
+            </a>
+            <a class="store-badge" href={appStoreLink} target="_blank" rel="noopener noreferrer" aria-label="Download on App Store">
+              <svg class="store-icon store-icon-apple" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M16.2 2.4c.1 1.1-.3 2.1-1 2.9-.7.8-1.7 1.3-2.7 1.2-.1-1.1.3-2.1 1-2.8.7-.8 1.8-1.3 2.7-1.3Z" />
+                <path d="M20 17.1c-.4 1-1 1.9-1.7 2.8-.9 1.2-1.8 2.3-3.2 2.3-.7 0-1.2-.2-1.8-.5-.6-.2-1.2-.5-2-.5s-1.5.3-2.1.5c-.6.2-1.1.5-1.8.5-1.3.1-2.3-1.2-3.2-2.4-1.8-2.6-3.2-7.3-1.3-10.5.9-1.6 2.6-2.6 4.4-2.7.7 0 1.4.3 2 .5.5.2 1 .4 1.5.4.4 0 .9-.2 1.5-.4.8-.3 1.6-.6 2.5-.5.7 0 2.7.3 4 2.1-.1.1-2.4 1.4-2.4 4.1 0 3.2 2.8 4.2 3.6 4.3Z" />
+              </svg>
+              <span class="store-copy">
+                <span class="store-label">Download on</span>
+                <strong class="store-name">App Store</strong>
+              </span>
+            </a>
+            <Button href="/apps" variant="secondary" size="lg" class="explore-apps-cta">
+              Explore all apps
             </Button>
           </div>
         </div>
-        
+
+        <div
+          class="flagship-scene reveal-scale"
+          data-testid="flagship-frendlyst-scene"
+          data-carousel-apps={JSON.stringify(carouselApps)}
+          aria-label="NekoCode app preview carousel"
+        >
+          <div class="flagship-orbit flagship-orbit-one"></div>
+          <div class="flagship-orbit flagship-orbit-two"></div>
+
+          <div class="phone-frame" aria-hidden="true">
+            <div class="phone-speaker"></div>
+            <div class="phone-screen">
+              <div class="phone-status">
+                <span data-carousel-title>{initialCarouselApp.title}</span>
+                <strong data-carousel-status>{initialCarouselApp.statusUpper}</strong>
+              </div>
+
+              <div class="profile-card">
+                <img
+                  src={initialCarouselApp.logo}
+                  alt=""
+                  data-carousel-logo
+                  width="64"
+                  height="64"
+                  loading="eager"
+                  fetchpriority="high"
+                  decoding="async"
+                />
+                <div>
+                  <span data-carousel-profile-label>{initialCarouselApp.profileLabel}</span>
+                  <strong data-carousel-profile-headline>{initialCarouselApp.profileHeadline}</strong>
+                </div>
+              </div>
+
+              <div class="market-card">
+                <span data-carousel-market-label>{initialCarouselApp.marketLabel}</span>
+                <strong data-carousel-market-text>{initialCarouselApp.marketText}</strong>
+              </div>
+
+              <div class="phone-feature-grid">
+                {initialCarouselApp.features.map((feature) => (
+                  <span data-carousel-feature>{feature}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div class="flagship-copy">
+            <img
+              src={initialCarouselApp.logo}
+              alt=""
+              data-carousel-card-logo
+              width="58"
+              height="58"
+              loading="eager"
+              fetchpriority="high"
+              decoding="async"
+            />
+            <div>
+              <span data-carousel-card-label>{initialCarouselApp.status} app</span>
+              <strong data-carousel-card-title>{initialCarouselApp.title}</strong>
+              <p data-carousel-card-tagline>{initialCarouselApp.tagline}</p>
+            </div>
+          </div>
+
+          <div class="app-showcase" data-testid="hero-app-shelf" aria-label="NekoCode app lineup">
+            {carouselApps.map((app, index: number) => {
+              return (
+                <button
+                  type="button"
+                  class:list={['showcase-card', { active: index === 0 }]}
+                  data-carousel-index={index}
+                  aria-pressed={index === 0 ? 'true' : 'false'}
+                >
+                  <img
+                    src={app.logo}
+                    alt=""
+                    width="40"
+                    height="40"
+                    loading={index < 2 ? 'eager' : 'lazy'}
+                    fetchpriority={index === 0 ? 'high' : 'auto'}
+                    decoding="async"
+                  />
+                  <span>{app.title}</span>
+                  <strong>{app.status}</strong>
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
       </div>
     </Container>
   </Section>
   
-  <!-- Featured Work Bento Grid -->
-  <Section class="featured-section">
+  <!-- App Lineup -->
+  <Section class="lineup-section">
     <Container>
       <div class="section-header reveal">
-        <h2 class="text-title-1">APPS & CONCEPTS</h2>
-        <Button href="/work" variant="ghost">View All →</Button>
+        <div>
+          <h2 class="text-title-1">Live and upcoming apps</h2>
+          <p class="section-kicker">A focused lineup across social discovery, learning, health tracking, and playful daily routines.</p>
+        </div>
+        <Button href="/apps" variant="ghost">See all apps</Button>
       </div>
       
-      <BentoGrid columns={3} gap="md">
-        {recentProjects.map((project, index) => (
-          <ProjectCard
-            slug={project.slug}
-            title={project.data.title}
-            subtitle={project.data.subtitle}
-            tagline={project.data.tagline}
-            coverImage={project.data.media.coverImage}
-            type={project.data.type}
-            platforms={project.data.platforms}
-            tech={project.data.tech}
-            status={project.data.status}
-            featured={index === 0}
-            priority={index < 3 ? 'high' : 'auto'}
-            class={`reveal stagger-${index + 1}`}
-          />
-        ))}
-      </BentoGrid>
-    </Container>
-  </Section>
-  
-  <!-- Capabilities Strip -->
-  <Section class="capabilities-section">
-    <Container>
-      <div class="capabilities-grid">
-        {capabilities.map((cap, index) => (
-          <div class={`capability-item reveal stagger-${index + 1}`}>
-            <span class="capability-icon">{cap.icon}</span>
-            <span class="capability-label">{cap.label}</span>
-          </div>
-        ))}
-      </div>
-    </Container>
-  </Section>
-  
-  <!-- Now Building Module -->
-  <Section class="now-section">
-    <Container size="narrow">
-      <div class="now-card glass reveal-scale">
-        <div class="now-header">
-          <div class="now-status">
-            <Tag variant="accent">Live</Tag>
-          </div>
-          <div class="now-icon">
-             <img src={`${base}assets/projects/flipfocus/icon.png`} alt="FlipFocus" width="80" height="80" class="app-icon" />
-          </div>
-        </div>
-        
-        <h3 class="text-title-2">FlipFocus</h3>
-        <p class="now-mono">FLASHCARD_SYSTEM // FSRS-5</p>
-        <p class="now-description">
-          Smart flashcards with spaced repetition, gamification, and OCR scanning.
-        </p>
-        
-        <div class="now-actions">
-            <Button href="/apps/flipfocus" variant="accent" size="sm">
-              View Website
-            </Button>
-        </div>
+      <div class="lineup-grid">
+        {appLineup.map((project: Project, index: number) => {
+          const href = `${base}apps/${project.slug}`;
+          const coverSource = resolveAsset(project.data.media.coverImage);
+          const logoSource = resolveAsset(project.data.media.logo ?? project.data.media.coverImage);
+
+          return (
+            <a class:list={['lineup-card', `reveal stagger-${index + 1}`]} href={href}>
+              <div class="lineup-media">
+                <img
+                  src={coverSource}
+                  alt={`${project.data.title} app preview`}
+                  loading={index < 2 ? 'eager' : 'lazy'}
+                  fetchpriority={index === 0 ? 'high' : 'auto'}
+                  decoding="async"
+                />
+              </div>
+              <div class="lineup-content">
+                <div class="lineup-title-row">
+                  <img
+                    src={logoSource}
+                    alt=""
+                    width="42"
+                    height="42"
+                    loading={index < 2 ? 'eager' : 'lazy'}
+                    fetchpriority={index === 0 ? 'high' : 'auto'}
+                    decoding="async"
+                  />
+                  <div>
+                    <h3>{project.data.title}</h3>
+                    <p>{project.data.category ?? project.data.subtitle ?? 'NekoCode app'}</p>
+                  </div>
+                  <span>{statusLabels[project.data.status]}</span>
+                </div>
+                <p class="lineup-tagline">{project.data.tagline}</p>
+                <div class="lineup-platforms" aria-label={`${project.data.title} platforms`}>
+                  {project.data.platforms.map((platform: Project['data']['platforms'][number]) => (
+                    <span>{platformLabels[platform]}</span>
+                  ))}
+                </div>
+              </div>
+            </a>
+          );
+        })}
       </div>
     </Container>
   </Section>
   
   <!-- Team Spotlight -->
   <Section class="team-section">
-    <Container size="narrow">
-      <TeamSpotlight class="reveal" />
-    </Container>
-  </Section>
-  
-  <!-- CTA Section -->
-  <Section size="lg" class="cta-section">
-    <Container size="narrow">
-      <div class="cta-content glass reveal-scale">
-        <h2 class="text-title-1">Let's build something great</h2>
-        <p class="cta-description">
-          Have a project in mind? I'd love to hear about it.
-        </p>
-        <Button href="/contact" variant="accent" size="lg">
-          Start a Conversation
-        </Button>
-      </div>
-    </Container>
+    <div id="team" data-testid="home-team-section">
+      <Container size="narrow">
+        <TeamSpotlight class="reveal" />
+      </Container>
+    </div>
   </Section>
   
   <Footer slot="footer" />
 </BaseLayout>
 
+<script>
+  type CarouselApp = {
+    title: string;
+    status: string;
+    statusUpper: string;
+    tagline: string;
+    logo: string;
+    profileLabel: string;
+    profileHeadline: string;
+    marketLabel: string;
+    marketText: string;
+    features: string[];
+  };
+
+  const carouselScenes = document.querySelectorAll<HTMLElement>('[data-carousel-apps]');
+
+  carouselScenes.forEach((scene) => {
+    const apps = JSON.parse(scene.getAttribute('data-carousel-apps') || '[]') as CarouselApp[];
+    const buttons = Array.from(scene.querySelectorAll<HTMLButtonElement>('[data-carousel-index]'));
+    if (!apps.length || !buttons.length) return;
+
+    const title = scene.querySelector('[data-carousel-title]');
+    const status = scene.querySelector('[data-carousel-status]');
+    const logo = scene.querySelector('[data-carousel-logo]');
+    const profileLabel = scene.querySelector('[data-carousel-profile-label]');
+    const profileHeadline = scene.querySelector('[data-carousel-profile-headline]');
+    const marketLabel = scene.querySelector('[data-carousel-market-label]');
+    const marketText = scene.querySelector('[data-carousel-market-text]');
+    const cardLogo = scene.querySelector('[data-carousel-card-logo]');
+    const cardLabel = scene.querySelector('[data-carousel-card-label]');
+    const cardTitle = scene.querySelector('[data-carousel-card-title]');
+    const cardTagline = scene.querySelector('[data-carousel-card-tagline]');
+    const featureNodes = Array.from(scene.querySelectorAll('[data-carousel-feature]'));
+
+    let activeIndex = 0;
+    let timer = 0;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const setText = (element: Element | null, value: string) => {
+      if (element) element.textContent = value || '';
+    };
+
+    const setImage = (element: Element | null, src: string) => {
+      if (element instanceof HTMLImageElement && src) {
+        element.src = src;
+      }
+    };
+
+    const selectApp = (index: number, shouldRestart = true) => {
+      const app = apps[index];
+      if (!app) return;
+
+      activeIndex = index;
+      setText(title, app.title);
+      setText(status, app.statusUpper);
+      setImage(logo, app.logo);
+      setText(profileLabel, app.profileLabel);
+      setText(profileHeadline, app.profileHeadline);
+      setText(marketLabel, app.marketLabel);
+      setText(marketText, app.marketText);
+      setImage(cardLogo, app.logo);
+      setText(cardLabel, `${app.status} app`);
+      setText(cardTitle, app.title);
+      setText(cardTagline, app.tagline);
+
+      featureNodes.forEach((feature, featureIndex) => {
+        feature.textContent = (app.features && app.features[featureIndex]) || '';
+      });
+
+      buttons.forEach((button, buttonIndex) => {
+        const isActive = buttonIndex === index;
+        button.classList.toggle('active', isActive);
+        button.setAttribute('aria-pressed', String(isActive));
+      });
+
+      if (shouldRestart) restartTimer();
+    };
+
+    const stopTimer = () => {
+      if (timer) {
+        window.clearInterval(timer);
+        timer = 0;
+      }
+    };
+
+    const startTimer = () => {
+      if (reduceMotion || timer || apps.length < 2) return;
+      timer = window.setInterval(() => {
+        selectApp((activeIndex + 1) % apps.length, false);
+      }, 5200);
+    };
+
+    const restartTimer = () => {
+      stopTimer();
+      startTimer();
+    };
+
+    buttons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const index = Number(button.getAttribute('data-carousel-index'));
+        selectApp(index);
+      });
+    });
+
+    scene.addEventListener('click', (event) => {
+      const target = event.target instanceof Element ? event.target.closest('[data-carousel-index]') : null;
+      if (!(target instanceof HTMLButtonElement)) return;
+
+      const index = Number(target.getAttribute('data-carousel-index'));
+      selectApp(index);
+    });
+
+    scene.addEventListener('pointerenter', stopTimer);
+    scene.addEventListener('pointerleave', startTimer);
+    scene.addEventListener('focusin', stopTimer);
+    scene.addEventListener('focusout', startTimer);
+
+    selectApp(0, false);
+    startTimer();
+  });
+</script>
+
 <style>
-  /* Hero */
-  .hero {
+  :global(.hero) {
     position: relative;
     overflow: hidden;
   }
-  
-  .hero::before {
+
+  :global(.hero.section-xl) {
+    padding-block: clamp(var(--space-12), 10vw, var(--space-20)) var(--space-12) !important;
+  }
+
+  :global(.hero)::before {
     content: '';
     position: absolute;
-    top: -50%;
-    right: -20%;
-    width: 80%;
-    height: 200%;
-    background: radial-gradient(ellipse, var(--color-glow) 0%, transparent 70%);
+    inset: -14% auto auto 46%;
+    width: 48rem;
+    height: 48rem;
+    background:
+      radial-gradient(circle at 50% 42%, rgba(124, 92, 255, 0.2), transparent 62%),
+      radial-gradient(circle at 72% 56%, rgba(237, 106, 93, 0.14), transparent 56%);
+    filter: blur(8px);
+    opacity: 0.82;
     pointer-events: none;
-    /* Scroll-driven parallax - fades and moves as you scroll */
-    animation: hero-glow-scroll linear;
-    animation-timeline: scroll();
-    animation-range: 0% 60%;
   }
-  
-  @keyframes hero-glow-scroll {
-    from { 
-      opacity: 1; 
-      transform: translateY(0) scale(1);
-    }
-    to { 
-      opacity: 0.2; 
-      transform: translateY(-80px) scale(1.15);
-    }
-  }
-  
+
   .hero-wrapper {
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 0.82fr) minmax(420px, 0.9fr);
     align-items: center;
-    justify-content: space-between;
-    gap: var(--space-8);
+    gap: clamp(var(--space-8), 6vw, var(--space-16));
   }
 
   .hero-content {
     position: relative;
-    max-width: 640px;
-    flex: 1;
+    z-index: 1;
+    max-width: 670px;
   }
-  
 
-  
-
-  
-  .hero h1 {
+  :global(.hero) h1 {
     margin-bottom: var(--space-6);
   }
-  
-  .accent {
-    color: var(--color-text);
-    background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-hover) 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-  
-  [data-theme="dark"] .accent {
-    background: linear-gradient(135deg, var(--color-accent) 0%, #D4C5B0 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-  }
 
-  /* Color specific words in hero text with animated shimmer */
-  /* Line 3: "with craft and" -> craft is 2nd word */
-  :global(.line-3 .word:nth-child(2)),
-  /* Line 4: "care" -> care is 1st word */
-  :global(.line-4 .word:nth-child(1)) {
-    position: relative;
-    display: inline-block;
-    background: linear-gradient(
-      90deg,
-      var(--color-accent) 0%,
-      #f0d9b5 25%,
-      var(--color-accent) 50%,
-      #e8c9a0 75%,
-      var(--color-accent) 100%
-    );
-    background-size: 200% auto;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    /* Override word-reveal animation since shimmer replaces it */
-    opacity: 1;
-    transform: none;
-    animation: shimmer 4s linear infinite;
-  }
-  
-  @keyframes shimmer {
-    from { background-position: 200% center; }
-    to { background-position: 0% center; }
-  }
-  
-  @media (prefers-reduced-motion: reduce) {
-    :global(.line-3 .word:nth-child(2)),
-    :global(.line-4 .word:nth-child(1)) {
-      animation: none;
-      background: var(--color-accent);
-      -webkit-text-fill-color: currentColor;
-    }
-  }
-
-  
   .hero-description {
-    font-size: var(--text-xl);
-    color: var(--color-text-secondary);
-    line-height: var(--leading-relaxed);
+    max-width: 600px;
     margin-bottom: var(--space-8);
-    max-width: 560px;
+    color: var(--color-text-secondary);
+    font-size: clamp(1.05rem, 1.7vw, 1.35rem);
+    line-height: 1.7;
   }
-  
+
   .hero-actions {
+    --store-badge-width: 188px;
+    --store-badge-row-width: calc((var(--store-badge-width) * 2) + var(--space-3));
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-4);
+    gap: var(--space-3);
+    align-items: stretch;
+    max-width: var(--store-badge-row-width);
   }
-  
-  /* Section Header */
+
+  .store-badge {
+    min-height: 58px;
+    width: var(--store-badge-width);
+    display: inline-grid;
+    grid-template-columns: 24px minmax(0, 1fr);
+    align-items: center;
+    gap: 0.72rem;
+    padding: 0.72rem 1.05rem;
+    color: var(--color-text);
+    background: rgba(255, 255, 255, 0.055);
+    border: 1px solid rgba(255, 255, 255, 0.13);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    transition:
+      transform var(--duration-normal) var(--ease-out),
+      border-color var(--duration-normal) var(--ease-out),
+      background var(--duration-normal) var(--ease-out);
+  }
+
+  .store-badge:hover {
+    transform: translateY(-2px);
+    border-color: rgba(245, 230, 211, 0.4);
+    background: rgba(255, 255, 255, 0.078);
+  }
+
+  .store-badge-primary {
+    color: #111111;
+    background: var(--color-accent);
+    border-color: rgba(245, 230, 211, 0.9);
+  }
+
+  .store-badge-primary:hover {
+    background: #fff0d8;
+  }
+
+  .store-icon {
+    width: 24px;
+    height: 24px;
+    flex: 0 0 auto;
+  }
+
+  .store-icon-apple {
+    fill: currentColor;
+  }
+
+  .store-icon-play .play-wing-top {
+    fill: #00a8ff;
+  }
+
+  .store-icon-play .play-wing-right {
+    fill: #ffc400;
+  }
+
+  .store-icon-play .play-wing-bottom {
+    fill: #00d084;
+  }
+
+  .store-icon-play .play-wing-left {
+    fill: #ff4f6d;
+  }
+
+  .store-copy {
+    min-width: 0;
+    display: grid;
+    gap: 0.08rem;
+  }
+
+  .store-label {
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    line-height: 1;
+    text-transform: uppercase;
+    opacity: 0.74;
+  }
+
+  .store-name {
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: 0;
+    white-space: nowrap;
+  }
+
+  .hero-actions :global(.explore-apps-cta) {
+    width: var(--store-badge-row-width);
+    max-width: 100%;
+  }
+
+  .flagship-scene {
+    position: relative;
+    z-index: 1;
+    min-height: 700px;
+    display: grid;
+    grid-template-rows: 1fr auto;
+    align-items: end;
+    justify-items: center;
+    padding: clamp(var(--space-5), 4vw, var(--space-8));
+    background:
+      linear-gradient(145deg, rgba(255, 255, 255, 0.095), rgba(255, 255, 255, 0.026)),
+      rgba(18, 18, 22, 0.78);
+    border: 1px solid rgba(255, 255, 255, 0.11);
+    border-radius: 34px;
+    box-shadow:
+      0 34px 110px rgba(0, 0, 0, 0.42),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+  }
+
+  .flagship-scene::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.72), transparent 78%);
+    pointer-events: none;
+  }
+
+  .flagship-orbit {
+    position: absolute;
+    border: 1px solid rgba(245, 230, 211, 0.11);
+    border-radius: 999px;
+    pointer-events: none;
+  }
+
+  .flagship-orbit-one {
+    width: 32rem;
+    height: 32rem;
+    top: 6%;
+    left: 50%;
+    transform: translateX(-50%) rotate(-12deg);
+  }
+
+  .flagship-orbit-two {
+    width: 22rem;
+    height: 22rem;
+    top: 16%;
+    left: 50%;
+    transform: translateX(-50%) rotate(18deg);
+    border-color: rgba(124, 92, 255, 0.18);
+  }
+
+  .phone-frame {
+    position: relative;
+    z-index: 1;
+    width: min(72vw, 292px);
+    aspect-ratio: 9 / 18.9;
+    display: grid;
+    padding: 0.72rem;
+    background:
+      linear-gradient(160deg, rgba(255, 255, 255, 0.19), rgba(255, 255, 255, 0.025)),
+      #111116;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 38px;
+    box-shadow:
+      0 36px 90px rgba(0, 0, 0, 0.55),
+      0 0 0 9px rgba(255, 255, 255, 0.018);
+  }
+
+  .phone-speaker {
+    position: absolute;
+    top: 1rem;
+    left: 50%;
+    z-index: 2;
+    width: 5.2rem;
+    height: 1.25rem;
+    transform: translateX(-50%);
+    background: #09090b;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 999px;
+  }
+
+  .phone-screen {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding: 3.1rem 1.05rem 1.2rem;
+    background:
+      radial-gradient(circle at 78% 16%, rgba(124, 92, 255, 0.32), transparent 34%),
+      radial-gradient(circle at 22% 0%, rgba(237, 106, 93, 0.22), transparent 33%),
+      linear-gradient(180deg, #181720, #09090d 78%);
+    border-radius: 30px;
+    overflow: hidden;
+  }
+
+  .phone-status {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--color-text);
+    font-size: var(--text-xs);
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .phone-status strong {
+    color: #b9ffcf;
+  }
+
+  .profile-card,
+  .market-card,
+  .phone-feature-grid span {
+    background: rgba(255, 255, 255, 0.075);
+    border: 1px solid rgba(255, 255, 255, 0.105);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+
+  .profile-card {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--space-3);
+    align-items: center;
+    padding: var(--space-3);
+    border-radius: 22px;
+  }
+
+  .profile-card img {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(124, 92, 255, 0.34);
+  }
+
+  .profile-card span,
+  .market-card span {
+    display: block;
+    margin-bottom: var(--space-1);
+    color: var(--color-text-secondary);
+    font-size: var(--text-xs);
+    font-weight: 800;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+  }
+
+  .profile-card strong,
+  .market-card strong {
+    display: block;
+    color: var(--color-text);
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: 800;
+    line-height: 1.1;
+  }
+
+  .market-card {
+    padding: var(--space-4);
+    border-radius: 24px;
+  }
+
+  .market-card strong {
+    font-size: var(--text-xl);
+    line-height: 1.15;
+  }
+
+  .phone-feature-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2);
+  }
+
+  .phone-feature-grid span {
+    min-height: 58px;
+    display: grid;
+    place-items: center;
+    padding: var(--space-2);
+    color: var(--color-text);
+    border-radius: 16px;
+    font-size: var(--text-xs);
+    font-weight: 800;
+    line-height: 1.2;
+    text-align: center;
+  }
+
+  .flagship-copy {
+    position: absolute;
+    right: clamp(var(--space-5), 4vw, var(--space-8));
+    bottom: 7.4rem;
+    z-index: 2;
+    width: min(78vw, 300px);
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--space-3);
+    align-items: center;
+    padding: var(--space-4);
+    background: rgba(12, 12, 15, 0.74);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 22px;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+    backdrop-filter: blur(18px);
+  }
+
+  .flagship-copy img {
+    width: 58px;
+    height: 58px;
+    object-fit: cover;
+    border-radius: 17px;
+  }
+
+  .flagship-copy span {
+    display: block;
+    margin-bottom: 0.2rem;
+    color: var(--color-accent);
+    font-size: var(--text-xs);
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .flagship-copy strong {
+    display: block;
+    color: var(--color-text);
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: 900;
+    line-height: 1;
+  }
+
+  .flagship-copy p {
+    margin: var(--space-1) 0 0;
+    color: var(--color-text-secondary);
+    font-size: var(--text-sm);
+    line-height: 1.45;
+  }
+
+  .app-showcase {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-2);
+    margin-top: var(--space-5);
+  }
+
+  .showcase-card {
+    appearance: none;
+    min-height: 92px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: center;
+    justify-items: center;
+    gap: 0.34rem;
+    padding: var(--space-2);
+    color: var(--color-text);
+    background: rgba(10, 10, 13, 0.68);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 18px;
+    font: inherit;
+    text-decoration: none;
+    text-align: center;
+    backdrop-filter: blur(18px);
+    cursor: pointer;
+    transition:
+      transform var(--duration-normal) var(--ease-out),
+      border-color var(--duration-normal) var(--ease-out),
+      background var(--duration-normal) var(--ease-out);
+  }
+
+  .showcase-card:hover,
+  .showcase-card.active {
+    transform: translateY(-2px);
+    border-color: rgba(245, 230, 211, 0.32);
+  }
+
+  .showcase-card.active {
+    background:
+      linear-gradient(180deg, rgba(245, 230, 211, 0.12), rgba(124, 92, 255, 0.08)),
+      rgba(10, 10, 13, 0.82);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+
+  .showcase-card:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+  }
+
+  .showcase-card img {
+    width: 36px;
+    height: 36px;
+    object-fit: cover;
+    border-radius: 12px;
+  }
+
+  .showcase-card span,
+  .showcase-card strong {
+    min-width: 0;
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+  }
+
+  .showcase-card span {
+    font-family: var(--font-display);
+    font-size: 0.73rem;
+    font-weight: 800;
+    line-height: 1.08;
+  }
+
+  .showcase-card strong {
+    color: var(--color-text-secondary);
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    line-height: 1.05;
+  }
+
   .section-header {
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     justify-content: space-between;
-    gap: var(--space-4);
+    gap: var(--space-5);
     margin-bottom: var(--space-8);
   }
-  
+
   .section-header h2 {
     margin: 0;
   }
-  
-  /* Capabilities */
-  .capabilities-section {
-    border-top: 1px solid var(--color-border);
-    border-bottom: 1px solid var(--color-border);
-  }
-  
-  .capabilities-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: var(--space-6);
-    text-align: center;
-  }
-  
-  .capability-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--space-2);
-  }
-  
-  .capability-icon {
-    font-size: var(--text-3xl);
-  }
-  
-  .capability-label {
-    font-size: var(--text-sm);
-    font-weight: 500;
+
+  .section-kicker {
+    max-width: 620px;
+    margin-top: var(--space-3);
     color: var(--color-text-secondary);
-  }
-  
-  /* Now Building */
-  .now-card {
-    padding: var(--space-6);
-    border-radius: var(--radius-2xl);
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-  }
-  
-  .now-header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--space-4);
-    margin-bottom: var(--space-4);
+    font-size: var(--text-base);
+    line-height: 1.7;
   }
 
-  .now-status {
-    position: absolute;
-    top: var(--space-4);
-    right: var(--space-4);
+  .lineup-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-4);
   }
-  
-  .now-icon {
-    margin-top: var(--space-6);
-  }
-  
-  .app-icon {
-    border-radius: 22%;
-    width: 80px;
-    height: 80px;
-    object-fit: contain;
-    object-position: center;
-  }
-  
-  .now-card h3 {
-    margin-bottom: var(--space-1);
+
+  .lineup-card {
+    display: grid;
+    grid-template-rows: auto 1fr;
     color: var(--color-text);
+    text-decoration: none;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.052), rgba(255, 255, 255, 0.018)),
+      rgba(23, 23, 27, 0.76);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 24px;
+    overflow: hidden;
+    transition:
+      transform var(--duration-normal) var(--ease-out),
+      border-color var(--duration-normal) var(--ease-out);
   }
-  
-  .now-mono {
-    font-size: var(--text-xs);
-    font-family: var(--font-mono);
-    color: var(--color-text-secondary);
-    margin-bottom: var(--space-3);
-    letter-spacing: 0.05em;
+
+  .lineup-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(245, 230, 211, 0.38);
   }
-  
-  .now-description {
-    color: var(--color-text-secondary);
-    line-height: var(--leading-relaxed);
-    margin-bottom: var(--space-6);
-    font-size: var(--text-sm);
+
+  .lineup-media {
+    min-height: 0;
+    aspect-ratio: 2 / 1;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 50% 12%, rgba(245, 230, 211, 0.13), transparent 58%),
+      rgba(255, 255, 255, 0.03);
   }
-  
-  .now-actions {
+
+  .lineup-media img {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+    width: 100%;
+    height: 100%;
+    min-width: 100%;
+    min-height: 100%;
+    max-height: none;
+    max-width: none;
+    object-fit: cover;
+    object-position: center;
+    filter: none;
+  }
+
+  .lineup-content {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding: var(--space-5);
   }
-  
-  /* CTA */
-  .cta-content {
-    text-align: center;
-    padding: var(--space-12);
-    border-radius: var(--radius-2xl);
+
+  .lineup-title-row {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: var(--space-3);
+    align-items: center;
   }
-  
-  .cta-content h2 {
-    margin-bottom: var(--space-4);
+
+  .lineup-title-row img {
+    width: 42px;
+    height: 42px;
+    object-fit: cover;
+    border-radius: 12px;
   }
-  
-  .cta-description {
-    font-size: var(--text-lg);
+
+  .lineup-title-row h3 {
+    margin: 0;
+    color: var(--color-text);
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: 900;
+    line-height: 1.05;
+  }
+
+  .lineup-title-row p {
+    margin: var(--space-1) 0 0;
+    color: var(--color-muted);
+    font-size: var(--text-xs);
+    font-weight: 800;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+  }
+
+  .lineup-title-row > span {
+    padding: var(--space-1) var(--space-2);
+    color: var(--color-accent);
+    background: rgba(245, 230, 211, 0.08);
+    border: 1px solid rgba(245, 230, 211, 0.16);
+    border-radius: var(--radius-full);
+    font-size: var(--text-xs);
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .lineup-tagline {
+    margin: 0;
     color: var(--color-text-secondary);
-    margin-bottom: var(--space-6);
+    font-size: var(--text-sm);
+    line-height: 1.65;
+  }
+
+  .lineup-platforms {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-top: auto;
+  }
+
+  .lineup-platforms span {
+    padding: var(--space-1) var(--space-2);
+    color: var(--color-text-secondary);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-full);
+    font-size: var(--text-xs);
+    font-weight: 800;
+    line-height: 1.3;
+  }
+
+  @media (max-width: 980px) {
+    .hero-wrapper {
+      grid-template-columns: 1fr;
+    }
+
+    .flagship-scene {
+      min-height: 680px;
+    }
+
+    .lineup-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+  }
+
+  @media (max-width: 640px) {
+    :global(.hero.section-xl) {
+      padding-block: var(--space-12) var(--space-8) !important;
+    }
+
+    .hero-wrapper {
+      gap: var(--space-8);
+    }
+
+    :global(.hero) h1 {
+      margin-bottom: var(--space-4);
+    }
+
+    :global(.hero) :global(.text-hero) {
+      font-size: clamp(3rem, 16vw, 4.75rem);
+    }
+
+    .hero-description {
+      margin-bottom: var(--space-6);
+      font-size: var(--text-base);
+    }
+
+    .hero-actions {
+      max-width: 100%;
+      flex-direction: column;
+    }
+
+    .hero-actions :global(.btn),
+    .store-badge {
+      width: 100%;
+    }
+
+    .hero-actions :global(.explore-apps-cta) {
+      width: 100%;
+    }
+
+    .flagship-scene {
+      min-height: 720px;
+      padding: var(--space-4);
+      border-radius: 28px;
+    }
+
+    .phone-frame {
+      width: min(82vw, 286px);
+    }
+
+    .flagship-copy {
+      position: relative;
+      right: auto;
+      bottom: auto;
+      width: 100%;
+      margin-top: var(--space-4);
+    }
+
+    .app-showcase {
+    display: flex;
+    max-width: 100%;
+    gap: var(--space-3);
+    margin-top: var(--space-3);
+    overflow-x: auto;
+      overscroll-behavior-inline: contain;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .showcase-card {
+      flex: 0 0 min(76vw, 260px);
+      scroll-snap-align: start;
+    }
+
+    .section-header {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .section-header :global(.text-title-1) {
+      font-size: clamp(2.25rem, 10vw, var(--text-5xl));
+    }
+
+    .lineup-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .lineup-media {
+      min-height: 0;
+      aspect-ratio: 2 / 1;
+    }
+
+    .lineup-title-row {
+      grid-template-columns: auto minmax(0, 1fr);
+    }
+
+    .lineup-title-row > span {
+      grid-column: 2;
+      width: fit-content;
+    }
   }
 </style>

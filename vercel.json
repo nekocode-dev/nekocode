@@ -1,0 +1,73 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "astro",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "rewrites": [
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "frendlyst.nekocode.dev" }],
+      "destination": "/apps/frendlyst"
+    },
+    {
+      "source": "/privacy",
+      "has": [{ "type": "host", "value": "frendlyst.nekocode.dev" }],
+      "destination": "/apps/frendlyst/privacy"
+    },
+    {
+      "source": "/terms",
+      "has": [{ "type": "host", "value": "frendlyst.nekocode.dev" }],
+      "destination": "/apps/frendlyst/terms"
+    },
+    {
+      "source": "/support",
+      "has": [{ "type": "host", "value": "frendlyst.nekocode.dev" }],
+      "destination": "/apps/frendlyst/support"
+    },
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "beanbop.nekocode.dev" }],
+      "destination": "/apps/beanbop"
+    },
+    {
+      "source": "/privacy",
+      "has": [{ "type": "host", "value": "beanbop.nekocode.dev" }],
+      "destination": "/apps/beanbop/privacy"
+    },
+    {
+      "source": "/terms",
+      "has": [{ "type": "host", "value": "beanbop.nekocode.dev" }],
+      "destination": "/apps/beanbop/terms"
+    },
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "flipfocus.nekocode.dev" }],
+      "destination": "/apps/flipfocus"
+    },
+    {
+      "source": "/pricing",
+      "has": [{ "type": "host", "value": "flipfocus.nekocode.dev" }],
+      "destination": "/apps/flipfocus/pricing"
+    },
+    {
+      "source": "/privacy",
+      "has": [{ "type": "host", "value": "flipfocus.nekocode.dev" }],
+      "destination": "/apps/flipfocus/privacy"
+    },
+    {
+      "source": "/terms",
+      "has": [{ "type": "host", "value": "flipfocus.nekocode.dev" }],
+      "destination": "/apps/flipfocus/terms"
+    },
+    {
+      "source": "/report-bug",
+      "has": [{ "type": "host", "value": "flipfocus.nekocode.dev" }],
+      "destination": "/apps/flipfocus/report-bug"
+    },
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "system-fitness.nekocode.dev" }],
+      "destination": "/apps/system-fitness"
+    }
+  ]
+}

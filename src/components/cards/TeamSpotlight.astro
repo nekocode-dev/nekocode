@@ -1,13 +1,17 @@
 ---
 /**
- * TeamSpotlight - Premium 2026 Team Cards
- * Uses unified TeamCard component for consistency
+ * TeamSpotlight - Character team cards
+ * Uses TeamCard so avatar assets are optimized from src/assets/team.
  */
-import { getCollection } from 'astro:content';
+import { getCollection, type CollectionEntry } from 'astro:content';
 import TeamCard from './TeamCard.astro';
 
-const allTeamMembers = await getCollection('team');
-const teamMembers = allTeamMembers.sort((a, b) => (a.data.order || 99) - (b.data.order || 99));
+type TeamMember = CollectionEntry<'team'>;
+
+const allTeamMembers: TeamMember[] = await getCollection('team');
+const teamMembers = allTeamMembers.sort(
+  (a: TeamMember, b: TeamMember) => (a.data.order || 99) - (b.data.order || 99)
+);
 ---
 
 <section class="team-spotlight">
@@ -18,7 +22,7 @@ const teamMembers = allTeamMembers.sort((a, b) => (a.data.order || 99) - (b.data
   </div>
   
   <div class="team-grid">
-    {teamMembers.map(member => (
+    {teamMembers.map((member: TeamMember) => (
       <TeamCard
         name={member.data.name}
         role={member.data.role}
@@ -44,15 +48,15 @@ const teamMembers = allTeamMembers.sort((a, b) => (a.data.order || 99) - (b.data
   .section-eyebrow {
     display: inline-block;
     padding: var(--space-1) var(--space-4);
-    background: rgba(var(--color-accent-rgb, 193, 154, 107), 0.15);
-    border: 1px solid rgba(var(--color-accent-rgb, 193, 154, 107), 0.3);
+    margin-bottom: var(--space-4);
+    color: var(--color-accent);
+    background: rgba(245, 230, 211, 0.12);
+    border: 1px solid rgba(245, 230, 211, 0.24);
     border-radius: var(--radius-full);
     font-size: var(--text-xs);
-    font-weight: 600;
-    text-transform: uppercase;
+    font-weight: 700;
     letter-spacing: 0.1em;
-    color: var(--color-accent);
-    margin-bottom: var(--space-4);
+    text-transform: uppercase;
   }
   
   .spotlight-header h2 {
@@ -68,19 +72,18 @@ const teamMembers = allTeamMembers.sort((a, b) => (a.data.order || 99) - (b.data
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
     gap: var(--space-8);
+    align-items: start;
   }
   
-  /* Responsive */
   @media (max-width: 480px) {
     .team-grid {
       grid-template-columns: 1fr;
     }
   }
   
-  /* ===== Light Mode Overrides ===== */
   [data-theme="light"] .section-eyebrow {
     background: rgba(139, 90, 43, 0.12);
     border-color: rgba(139, 90, 43, 0.25);
     color: #7a4f2a;
   }
-</style></style>
+</style>

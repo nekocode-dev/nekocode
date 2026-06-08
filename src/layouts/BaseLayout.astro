@@ -8,19 +8,75 @@ interface Props {
   title: string;
   description?: string;
   image?: string;
+  imageAlt?: string;
   type?: 'website' | 'article';
+  noindex?: boolean;
+  mainEntityId?: string;
+  structuredData?: Record<string, unknown> | Record<string, unknown>[];
 }
+
+const siteName = 'NekoCode';
+const siteURL = new URL(Astro.site ?? 'https://nekocode.dev');
+const defaultDescription =
+  "NekoCode designs and builds privacy-first mobile apps, web products, and product systems including FlipFocus, BeanBop, and FrendLyst.";
 
 const {
   title,
-  description = "NekoCode - Case studies first, not a gallery. Award-grade portfolio showcasing apps and projects.",
+  description = defaultDescription,
   image = "/og-image.png",
-  type = "website"
+  imageAlt = "NekoCode mobile app design and development studio",
+  type = "website",
+  noindex = false,
+  mainEntityId,
+  structuredData: extraStructuredData = []
 } = Astro.props;
 
-const canonicalURL = new URL(Astro.url.pathname, Astro.site);
-const socialImageURL = new URL(image, Astro.site);
+const fullTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
+const canonicalURL = new URL(Astro.url.pathname, siteURL);
+const socialImageURL = new URL(image, siteURL);
+const logoURL = new URL('/Nekocode.png', siteURL);
 const base = import.meta.env.BASE_URL;
+
+const layoutStructuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": `${siteURL.href}#organization`,
+    name: siteName,
+    url: siteURL.href,
+    logo: logoURL.href,
+    email: "hello@nekocode.dev",
+    description: defaultDescription
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": `${siteURL.href}#website`,
+    name: siteName,
+    url: siteURL.href,
+    publisher: { "@id": `${siteURL.href}#organization` },
+    description: defaultDescription,
+    inLanguage: "en"
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": type === "article" ? "Article" : "WebPage",
+    "@id": `${canonicalURL.href}#webpage`,
+    name: fullTitle,
+    url: canonicalURL.href,
+    description,
+    image: socialImageURL.href,
+    isPartOf: { "@id": `${siteURL.href}#website` },
+    about: { "@id": `${siteURL.href}#organization` },
+    ...(mainEntityId ? { mainEntity: { "@id": mainEntityId } } : {}),
+    inLanguage: "en"
+  }
+];
+
+const structuredData = [
+  ...layoutStructuredData,
+  ...(Array.isArray(extraStructuredData) ? extraStructuredData : [extraStructuredData])
+];
 ---
 
 <!DOCTYPE html>
@@ -34,8 +90,11 @@ const base = import.meta.env.BASE_URL;
     <link rel="preload" href="/fonts/inter-400.woff2" as="font" type="font/woff2" crossorigin />
     
     <!-- SEO -->
-    <title>{title} | NekoCode</title>
+    <title>{fullTitle}</title>
     <meta name="description" content={description} />
+    <meta name="author" content={siteName} />
+    <meta name="application-name" content={siteName} />
+    <meta name="robots" content={noindex ? "noindex, nofollow" : "index, follow, max-image-preview:large"} />
     <link rel="canonical" href={canonicalURL} />
     
     <!-- Favicons -->
@@ -44,20 +103,24 @@ const base = import.meta.env.BASE_URL;
     
     <!-- Open Graph -->
     <meta property="og:type" content={type} />
+    <meta property="og:locale" content="en_US" />
     <meta property="og:url" content={canonicalURL} />
-    <meta property="og:title" content={title} />
+    <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={socialImageURL} />
+    <meta property="og:image:alt" content={imageAlt} />
     <meta property="og:site_name" content="NekoCode" />
     
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={title} />
+    <meta name="twitter:title" content={fullTitle} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={socialImageURL} />
+    <meta name="twitter:image:alt" content={imageAlt} />
     
     <!-- Theme Color -->
     <meta name="theme-color" content="#0D0D0F" />
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(structuredData)} />
   </head>
   <body class="noise-overlay">
     <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -71,6 +134,28 @@ const base = import.meta.env.BASE_URL;
     
     <slot name="footer" />
     <script src="@/scripts/animations.js"></script>
+    <script is:inline>
+      (() => {
+        const scrollToHashTarget = () => {
+          const id = decodeURIComponent(window.location.hash.slice(1));
+          if (!id) return;
+
+          const target = document.getElementById(id);
+          if (!target) return;
+
+          requestAnimationFrame(() => {
+            target.scrollIntoView({ block: 'start', behavior: 'auto' });
+          });
+          window.setTimeout(() => {
+            target.scrollIntoView({ block: 'start', behavior: 'auto' });
+          }, 120);
+        };
+
+        window.addEventListener('DOMContentLoaded', scrollToHashTarget);
+        window.addEventListener('load', scrollToHashTarget);
+        window.addEventListener('hashchange', scrollToHashTarget);
+      })();
+    </script>
   </body>
 </html>
 
