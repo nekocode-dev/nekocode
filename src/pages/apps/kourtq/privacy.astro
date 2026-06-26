@@ -1,0 +1,268 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import NavBar from '@/components/nav/NavBar.astro';
+import Footer from '@/components/nav/Footer.astro';
+import Container from '@/components/layout/Container.astro';
+import Section from '@/components/layout/Section.astro';
+
+const base = import.meta.env.BASE_URL;
+---
+
+<BaseLayout
+  title="Privacy Policy | KourtQ"
+  description="Privacy Policy for KourtQ pickleball scoring app by NekoCode"
+>
+  <NavBar slot="header" />
+
+  <Section size="lg" class="legal-page">
+    <Container size="narrow">
+      <a href={`${base}apps`} class="back-link">Back to apps</a>
+
+      <div class="legal-header glass-panel">
+        <span class="legal-icon" aria-hidden="true">Privacy</span>
+        <div>
+          <h1 class="text-title-1">Privacy Policy</h1>
+          <p class="legal-subtitle">KourtQ by NekoCode</p>
+        </div>
+        <p class="last-updated">Last Updated: June 26, 2026</p>
+      </div>
+
+      <div class="legal-content glass-panel">
+        <div class="highlight-box primary">
+          <h3>Local-first scorekeeping</h3>
+          <p>
+            KourtQ is built for local pickleball scoring. No account is required, KourtQ does not run a
+            NekoCode cloud sync backend, and match data is designed to stay on the device unless you choose to
+            share or export it.
+          </p>
+        </div>
+
+        <section>
+          <h2>Introduction</h2>
+          <p>
+            This Privacy Policy explains how KourtQ ("we," "our," or "us") handles information when you use
+            the KourtQ iOS app and Apple Watch companion experience.
+          </p>
+        </section>
+
+        <section>
+          <h2>Information KourtQ Processes</h2>
+          <p>KourtQ may process information you enter or generate while scoring, including:</p>
+          <ul>
+            <li>Player names, team assignments, and local player profile details</li>
+            <li>Match setup choices, scoring rules, serve state, rally actions, and game results</li>
+            <li>Local match history, score summaries, and app preferences</li>
+            <li>Apple Watch companion state needed to mirror scoring controls from the paired iPhone</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Where Data Is Stored</h2>
+          <ul>
+            <li>KourtQ stores scoring data locally on your device</li>
+            <li>No NekoCode account is required for the core scoring flow</li>
+            <li>We do not upload your match history, player list, or scoring data to a NekoCode cloud backend</li>
+            <li>The Apple Watch companion uses paired-device communication to show and send scoring state</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Sharing and Third Parties</h2>
+          <p>Data may leave your device only in limited cases:</p>
+          <ul>
+            <li>If you use a device share sheet, export feature, screenshot, or support message</li>
+            <li>If you open external support, website, App Store, or system links</li>
+            <li>If Apple processes diagnostics, crash reports, store analytics, or app distribution data under Apple policies</li>
+          </ul>
+          <p>We do not sell your personal information.</p>
+        </section>
+
+        <section>
+          <h2>Analytics and Advertising</h2>
+          <ul>
+            <li>KourtQ does not include a third-party advertising SDK in the current iOS app</li>
+            <li>KourtQ does not require third-party analytics for the core scoring flow</li>
+            <li>Apple may provide App Store and device diagnostics data according to your device and Apple account settings</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Permissions</h2>
+          <p>
+            KourtQ may use network access for app resources, support links, store services, or platform features.
+            The Apple Watch companion uses Apple system frameworks for paired-device score controls. KourtQ does
+            not require location, camera, microphone, or contacts access for core scorekeeping.
+          </p>
+        </section>
+
+        <section>
+          <h2>Data Retention and Deletion</h2>
+          <ul>
+            <li>Local data stays on your device until you delete it, clear app data, or uninstall KourtQ</li>
+            <li>If you export or share files, you control where those files go and how they are deleted</li>
+            <li>If you contact support, we keep the message only as long as needed to respond and maintain support records</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Children's Privacy</h2>
+          <p>
+            KourtQ is a scorekeeping utility and does not knowingly collect children's personal information through
+            a NekoCode cloud backend. Parents or guardians can remove local app data by clearing app data or
+            uninstalling the app.
+          </p>
+        </section>
+
+        <section>
+          <h2>International Users</h2>
+          <p>
+            Because KourtQ does not operate a user cloud backend for match data, NekoCode does not perform its own
+            cross-border transfers of your match history. Third-party services you choose to use may process data
+            under their own policies.
+          </p>
+        </section>
+
+        <section>
+          <h2>Changes to This Policy</h2>
+          <p>
+            We may update this Privacy Policy when KourtQ, platform requirements, or legal requirements change.
+            Updates will be posted with a new "Last Updated" date.
+          </p>
+        </section>
+
+        <section>
+          <h2>Contact</h2>
+          <ul>
+            <li><strong>Email:</strong> nekocode.dev@gmail.com</li>
+            <li><strong>Website:</strong> <a href={`${base}contact`}>NekoCode Contact</a></li>
+          </ul>
+        </section>
+      </div>
+    </Container>
+  </Section>
+
+  <Footer slot="footer" />
+</BaseLayout>
+
+<style>
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-6);
+    color: var(--color-muted);
+    font-size: var(--text-sm);
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  .back-link:hover {
+    color: var(--color-text);
+  }
+
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-xl);
+  }
+
+  [data-theme="light"] .glass-panel {
+    background: rgba(255, 255, 255, 0.8);
+    border-color: rgba(0, 0, 0, 0.08);
+  }
+
+  .legal-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-6);
+    margin-bottom: var(--space-8);
+  }
+
+  .legal-icon {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.5rem;
+    padding: 0 var(--space-3);
+    border-radius: var(--radius-md);
+    color: var(--color-accent-contrast);
+    background: var(--color-accent);
+    font-size: var(--text-sm);
+    font-weight: 700;
+  }
+
+  .legal-header h1 {
+    margin: 0;
+  }
+
+  .legal-subtitle {
+    color: var(--color-muted);
+    font-size: var(--text-sm);
+    margin: 0;
+  }
+
+  .last-updated {
+    margin-left: auto;
+    font-size: var(--text-xs);
+    color: var(--color-accent);
+    font-family: monospace;
+  }
+
+  .legal-content {
+    line-height: 1.8;
+    padding: var(--space-6);
+  }
+
+  .legal-content section {
+    margin-bottom: var(--space-10);
+  }
+
+  .legal-content h2 {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-accent);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .legal-content h3 {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: var(--space-3);
+  }
+
+  .legal-content p,
+  .legal-content li {
+    color: var(--color-text-secondary);
+  }
+
+  .legal-content ul {
+    margin-left: var(--space-5);
+  }
+
+  .highlight-box {
+    padding: var(--space-5);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-8);
+    border: 1px solid var(--color-border);
+  }
+
+  .highlight-box.primary {
+    background: rgba(var(--color-accent-rgb), 0.08);
+    border-color: rgba(var(--color-accent-rgb), 0.25);
+  }
+
+  @media (max-width: 768px) {
+    .legal-header,
+    .legal-content {
+      padding: var(--space-4);
+    }
+
+    .last-updated {
+      margin-left: 0;
+      width: 100%;
+    }
+  }
+</style>
