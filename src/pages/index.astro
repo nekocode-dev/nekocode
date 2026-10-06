@@ -6,6 +6,7 @@ import StudioIcon from '@/components/ui/StudioIcon.astro';
 import { getCollection, type CollectionEntry } from 'astro:content';
 
 const base = import.meta.env.BASE_URL;
+const assetURL = (path: string) => path.startsWith('/') ? `${base}${path.slice(1)}` : path;
 type Project = CollectionEntry<'projects'>;
 const projects: Project[] = await getCollection('projects');
 const order = ['beanbop', 'flipfocus'];
@@ -63,7 +64,7 @@ const statusLabels: Record<string, string> = { live: 'Live', in_progress: 'In de
       <div class="featured-grid" data-testid="featured-apps">
         {apps.map(project => (
           <a class="featured-card" href={`${base}apps/${project.slug}`} aria-label={`${project.data.title} — ${statusLabels[project.data.status]}. Learn more.`}>
-            <img class="app-icon" src={`${base}assets/studio/${project.slug}.svg`} alt="" width="84" height="84" loading="eager" />
+            <img class="app-icon" src={assetURL(project.data.media.logo ?? project.data.media.coverImage)} alt="" width="84" height="84" loading="eager" />
             <div class="app-copy"><h3>{project.data.title}</h3><p>{cardCopy[project.slug] ?? project.data.tagline}</p></div>
             <ul class="app-platforms" aria-label={`${project.data.title} platforms`}>
               {(['ios', 'android', 'web'] as const).filter(platform => project.data.platforms.includes(platform)).map(platform => (

@@ -20,9 +20,12 @@ test('homepage hero and featured cards navigate to existing pages', async ({ pag
   const cards = page.locator('[data-testid="featured-apps"] a');
   await expect(cards).toHaveCount(2);
   expect(await cards.locator('h3').allTextContents()).toEqual(['BeanBop', 'FlipFocus']);
-  for (const slug of ['beanbop', 'flipfocus']) {
-    await expect(cards.filter({ has: page.locator(`img[src$="/${slug}.svg"]`) })).toHaveAttribute('href', `/apps/${slug}`);
+  const originalIcons = { beanbop: '/assets/projects/beanbop/logo.webp', flipfocus: '/assets/projects/flipfocus/icon.png' };
+  for (const [slug, icon] of Object.entries(originalIcons)) {
+    await expect(cards.filter({ has: page.locator(`img[src="${icon}"]`) })).toHaveAttribute('href', `/apps/${slug}`);
   }
+  await expect(page.locator('.nav-logo img')).toHaveAttribute('src', '/Nekocode.png');
+  await expect(page.locator('.footer-logo img')).toHaveAttribute('src', '/Nekocode.png');
   await page.getByRole('link', { name: 'Explore Our Apps' }).click();
   await expect(page.getByRole('heading', { name: 'NekoCode App Catalog' })).toBeVisible();
 });
