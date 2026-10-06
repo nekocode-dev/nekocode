@@ -33,6 +33,8 @@ test('homepage hero and featured cards navigate to existing pages', async ({ pag
 test('withdrawn apps are absent from site listings and sitemap', async ({ page, request }) => {
   for (const path of ['/', '/apps', '/work', '/team', '/contact']) {
     await page.goto(path);
+    await expect(page.locator('footer')).toContainText('Nine lives of code.');
+    await expect(page.locator('footer visitor-counter')).toHaveCount(1);
     await expect(page.locator('body')).not.toContainText(/FrendLyst|SYSTEM Fitness/i);
     await expect(page.locator('a[href*="/apps/frendlyst"], a[href*="/apps/system-fitness"]')).toHaveCount(0);
   }
@@ -80,4 +82,41 @@ test('responsive homepage remains readable without horizontal overflow', async (
 test('contact form remains available', async ({ page }) => {
   await page.goto('/contact');
   await expect(page.locator('form')).toBeVisible();
+});
+
+test('restored visitor counter displays the service total and does not count returning visitors twice', async ({ page }) => {
+  const actions: string[] = [];
+  await page.route('**/visitor-counter-test*', async route => {
+    actions.push(new URL(route.request().url()).searchParams.get('action') || '');
+    await route.fulfill({ json: { count: 1234 } });
+  });
+  // Exercise the production component without incrementing the real service during tests.
+  await page.route('http://localhost:4321/', async route => {
+    const response = await route.fetch();
+    const body = (await response.text()).replace(/data-script-url(?:="[^"]*")?/g, 'data-script-url="http://localhost:4321/visitor-counter-test"');
+    await route.fulfill({ response, body });
+  });
+  await page.goto('/');
+  await expect(page.locator('visitor-counter .count')).toHaveText('1,234');
+  await expect(page.locator('visitor-counter')).toHaveAttribute('data-state', 'ready');
+  await page.reload();
+  await expect(page.locator('visitor-counter .count')).toHaveText('1,234');
+  expect(actions).toEqual(['increment_visitor', 'get_count']);
+});
+
+test('visitor counter handles a failed service without displaying a fabricated total', async ({ page }) => {
+  let requests = 0;
+  await page.route('**/visitor-counter-test*', route => {
+    requests++;
+    return route.fulfill({ status: 503, body: 'Unavailable' });
+  });
+  await page.route('http://localhost:4321/', async route => {
+    const response = await route.fetch();
+    const body = (await response.text()).replace(/data-script-url(?:="[^"]*")?/g, 'data-script-url="http://localhost:4321/visitor-counter-test"');
+    await route.fulfill({ response, body });
+  });
+  await page.goto('/');
+  await expect(page.locator('visitor-counter .count')).toHaveText('—');
+  await expect(page.locator('visitor-counter')).toHaveAttribute('data-state', 'unavailable');
+  expect(requests).toBe(1);
 });

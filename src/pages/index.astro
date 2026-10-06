@@ -11,8 +11,8 @@ type Project = CollectionEntry<'projects'>;
 const projects: Project[] = await getCollection('projects');
 const order = ['beanbop', 'flipfocus'];
 const cardCopy: Record<string, string> = {
-  beanbop: 'Tiny bean. Big habits.',
-  flipfocus: 'Focus, your way.'
+  beanbop: 'Track your caffeine, build mindful habits, and find your daily balance.',
+  flipfocus: 'Turn notes into flashcards and make learning stick with spaced repetition.'
 };
 const apps = order.flatMap(slug => {
   const project = projects.find(project => project.slug === slug);
@@ -64,13 +64,18 @@ const statusLabels: Record<string, string> = { live: 'Live', in_progress: 'In de
       <div class="featured-grid" data-testid="featured-apps">
         {apps.map(project => (
           <a class="featured-card" href={`${base}apps/${project.slug}`} aria-label={`${project.data.title} — ${statusLabels[project.data.status]}. Learn more.`}>
-            <img class="app-icon" src={assetURL(project.data.media.logo ?? project.data.media.coverImage)} alt="" width="84" height="84" loading="eager" />
-            <div class="app-copy"><h3>{project.data.title}</h3><p>{cardCopy[project.slug] ?? project.data.tagline}</p></div>
-            <ul class="app-platforms" aria-label={`${project.data.title} platforms`}>
-              {(['ios', 'android', 'web'] as const).filter(platform => project.data.platforms.includes(platform)).map(platform => (
-                <li title={`${platformLabels[platform]}${project.data.status === 'coming_soon' ? ' — coming soon' : ''}`}><StudioIcon name={platform} size={23} /><span class="sr-only">{platformLabels[platform]}</span></li>
-              ))}
-            </ul>
+            <div class="app-body">
+              <img class="app-icon" src={assetURL(project.data.media.logo ?? project.data.media.coverImage)} alt="" width="80" height="80" loading="eager" />
+              <div class="app-copy"><h3>{project.data.title}</h3><p>{cardCopy[project.slug] ?? project.data.tagline}</p></div>
+            </div>
+            <div class="app-footer">
+              <ul class="app-platforms" aria-label={`${project.data.title} platforms`}>
+                {(['ios', 'android', 'web'] as const).filter(platform => project.data.platforms.includes(platform)).map(platform => (
+                  <li><StudioIcon name={platform} size={18} /><span>{platformLabels[platform]}{project.slug === 'flipfocus' && platform === 'ios' ? ' soon' : ''}</span></li>
+                ))}
+              </ul>
+              <span class="app-action">Explore app <StudioIcon name="arrow" size={20} /></span>
+            </div>
           </a>
         ))}
       </div>
@@ -82,12 +87,12 @@ const statusLabels: Record<string, string> = { live: 'Live', in_progress: 'In de
 
 <style>
   .studio-container { width: min(100% - 8.8vw, 1536px); margin-inline: auto; }
-  .studio-hero { position: relative; isolation: isolate; min-height: clamp(520px, 36.3vw, 650px); overflow: hidden; background: #fff; }
+  .studio-hero { position: relative; isolation: isolate; min-height: clamp(500px, 34.9vw, 600px); overflow: hidden; background: #fff; }
   .hero-art { position: absolute; inset: 0; z-index: -2; }
   .hero-art img { width: 100%; height: 100%; object-fit: cover; object-position: right center; }
   .studio-hero::before { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, #fff 29%, rgba(255,255,255,.85) 35%, rgba(255,255,255,.1) 45%, transparent 50%); pointer-events: none; }
   .hero-inner { min-height: inherit; display: flex; align-items: center; }
-  .hero-copy { padding-block: 50px; width: 570px; max-width: 45%; }
+  .hero-copy { padding-block: 48px; width: 590px; max-width: 46%; }
   h1 { font-family: var(--font-display); font-size: clamp(76px, 6.8vw, 114px); font-weight: 800; line-height: 1.03; letter-spacing: -.045em; }
   .hero-tagline { margin-top: 6px; font-family: var(--font-display); font-size: clamp(26px, 2.4vw, 39px); font-weight: 500; line-height: 1.2; letter-spacing: -.01em; }
   .hero-description { margin-top: 15px; color: #343b50; font-size: clamp(18px, 1.42vw, 23px); line-height: 1.5; }
@@ -98,23 +103,29 @@ const statusLabels: Record<string, string> = { live: 'Live', in_progress: 'In de
   .studio-button:hover { transform: translateY(-2px); box-shadow: 0 7px 18px #10131b15; }
   .primary:hover { background: #303644; }
   .secondary:hover { background: #f5f5f7; }
-  .studio-values { display: flex; align-items: center; flex-wrap: wrap; gap: 28px; margin-top: 43px; }
+  .studio-values { display: flex; align-items: center; flex-wrap: wrap; gap: 28px; margin-top: 38px; }
   .studio-values li { display: flex; align-items: center; gap: 11px; font-size: 14px; white-space: nowrap; }
-  .featured-section { padding-block: 22px 58px; background: #faf8f6; }
-  .featured-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 17px; }
+  .featured-section { padding-block: 30px 38px; background: #faf8f6; border-top: 1px solid #f1eeeb; }
+  .featured-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 22px; }
   .eyebrow { font-size: 13px; letter-spacing: .17em; color: #343b50; }
   h2 { font-family: var(--font-display); font-size: 34px; font-weight: 700; line-height: 1.2; letter-spacing: -.02em; margin-top: 3px; }
   .view-apps { display: inline-flex; align-items: center; gap: 4px; font-size: 16px; min-height: 44px; margin-top: 20px; }
   .view-apps:hover { text-decoration: underline; text-underline-offset: 5px; }
   .featured-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
-  .featured-card { min-height: 168px; display: grid; grid-template-columns: 84px minmax(0,1fr); grid-template-rows: 1fr auto; gap: 16px 20px; padding: 22px 26px; border: 1px solid #e7e7ec; border-radius: 18px; background: #ffffffb8; transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease; }
-  .featured-card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px #21242e0a; border-color: #c8cbd4; }
-  .app-icon { width: 84px; height: 84px; border-radius: 22px; grid-row: 1 / 3; }
-  .app-copy { padding-top: 2px; }
-  h3 { font-family: var(--font-display); font-size: 19px; font-weight: 700; line-height: 1.2; letter-spacing: -.01em; }
-  .app-copy p { margin-top: 8px; color: #343b50; font-size: 13px; line-height: 1.45; }
-  .app-platforms { display: flex; align-items: center; gap: 17px; grid-column: 2; }
-  .app-platforms li { display: flex; align-items: center; }
+  .featured-card { display: flex; flex-direction: column; gap: 22px; padding: 24px 26px 20px; border: 1px solid #e4e3e6; border-radius: 18px; background: #fff; box-shadow: 0 2px 4px #25232b02; transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease; }
+  .featured-card:hover { transform: translateY(-3px); box-shadow: 0 12px 28px #21242e0b; border-color: #c8cbd4; }
+  .app-body { display: flex; align-items: center; gap: 20px; }
+  .app-icon { width: 80px; height: 80px; flex: 0 0 auto; border-radius: 20px; object-fit: contain; }
+  .app-copy { min-width: 0; }
+  h3 { font-family: var(--font-display); font-size: 23px; font-weight: 700; line-height: 1.2; letter-spacing: -.02em; }
+  .app-copy p { margin-top: 7px; color: #535767; font-size: 15px; line-height: 1.55; max-width: 400px; text-wrap: pretty; }
+  .app-footer { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: auto; padding-top: 16px; border-top: 1px solid #efedf0; }
+  .app-platforms { display: flex; align-items: center; gap: 16px; }
+  .app-platforms li { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #535767; white-space: nowrap; }
+  .app-platforms :global(svg) { color: #171a23; }
+  .app-action { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; white-space: nowrap; }
+  .app-action :global(svg) { transition: transform 180ms ease; }
+  .featured-card:hover .app-action :global(svg) { transform: translateX(3px); }
   @media (min-width: 1800px) { .hero-copy { max-width: 42%; } }
   @media (max-width: 1250px) {
     .hero-copy { max-width: 48%; }
@@ -122,9 +133,9 @@ const statusLabels: Record<string, string> = { live: 'Live', in_progress: 'In de
     .studio-values { gap: 18px; }
     .studio-values li { gap: 8px; font-size: 12px; }
     .studio-button { padding-inline: 22px; font-size: 16px; }
-    .featured-card { padding: 20px; grid-template-columns: 68px minmax(0,1fr); column-gap: 15px; }
-    .app-icon { width: 68px; height: 68px; border-radius: 18px; }
-    h3 { font-size: 17px; }
+    .featured-card { padding: 22px; }
+    .app-body { gap: 16px; }
+    .app-icon { width: 72px; height: 72px; border-radius: 18px; }
   }
   @media (max-width: 1000px) {
     .studio-container { width: calc(100% - 48px); }
@@ -134,15 +145,15 @@ const statusLabels: Record<string, string> = { live: 'Live', in_progress: 'In de
     h1 { font-size: 76px; }
     .hero-tagline { font-size: 27px; }
     .studio-values { gap: 16px; }
-    .featured-card { min-height: 155px; grid-template-columns: 80px minmax(0,1fr); }
-    .app-icon { width: 80px; height: 80px; }
-    h3 { font-size: 19px; }
+    .app-copy p { font-size: 14px; }
+    .app-platforms { gap: 12px; }
+    .app-action { font-size: 12px; gap: 4px; }
   }
   @media (max-width: 760px) {
     .studio-container { width: calc(100% - 40px); }
     .studio-hero { display: flex; flex-direction: column; min-height: 0; }
     .hero-inner { order: -1; min-height: 0; }
-    .hero-copy { max-width: 100%; width: 100%; padding-block: 40px 25px; }
+    .hero-copy { max-width: 100%; width: 100%; padding-block: 36px 28px; }
     h1 { font-size: clamp(56px, 12vw, 82px); }
     .hero-tagline { font-size: clamp(23px, 4.9vw, 30px); }
     .hero-description { font-size: 17px; max-width: 400px; }
@@ -150,26 +161,35 @@ const statusLabels: Record<string, string> = { live: 'Live', in_progress: 'In de
     .hero-actions { gap: 12px; margin-top: 22px; }
     .studio-button { min-height: 52px; font-size: 15px; padding-inline: 20px; }
     .secondary { min-width: 0; }
-    .studio-values { gap: 22px; margin-top: 28px; }
+    .studio-values { gap: 14px 22px; margin-top: 28px; }
     .studio-values li { font-size: 12px; gap: 7px; }
     .studio-values :global(svg) { width: 22px; height: 22px; }
-    .hero-art { position: relative; height: auto; aspect-ratio: 1.6; width: 100%; z-index: 0; }
+    .hero-art { position: relative; height: auto; aspect-ratio: 1.55; width: 100%; z-index: 0; }
     .hero-art img { object-fit: cover; object-position: right; }
     .studio-hero::before { display: none; }
     .featured-section { padding-block: 26px 36px; }
     h2 { font-size: 29px; }
     .view-apps { font-size: 13px; }
-    .featured-grid { gap: 14px; }
-    .featured-card { gap: 14px; padding: 19px; min-height: 146px; }
+    .featured-grid { grid-template-columns: 1fr; gap: 14px; }
+    .featured-card { gap: 20px; padding: 22px; }
   }
   @media (max-width: 560px) {
     .hero-actions { gap: 10px; }
     .studio-button { padding-inline: 18px; font-size: 14px; gap: 10px; }
     .featured-grid { grid-template-columns: 1fr; }
-    .featured-card { min-height: 134px; grid-template-columns: 76px minmax(0,1fr); gap: 8px 20px; }
-    .app-icon { width: 76px; height: 76px; }
+    .featured-card { padding: 20px; }
+    .app-body { align-items: flex-start; gap: 15px; }
+    .app-icon { width: 64px; height: 64px; border-radius: 16px; }
+    h3 { font-size: 21px; }
     .app-copy p { font-size: 14px; }
-    .studio-values { justify-content: space-between; gap: 8px; }
+    .studio-values { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; padding-block: 17px; border-block: 1px solid #efedf0; }
+    .studio-values li { flex-direction: column; align-items: center; gap: 8px; font-size: 12px; white-space: normal; text-align: center; }
+    .app-footer { gap: 12px; }
+  }
+  @media (max-width: 360px) {
+    .studio-button { width: 100%; }
+    .app-footer { align-items: flex-start; flex-direction: column; gap: 14px; }
+    .view-apps { font-size: 12px; }
     .studio-values li { font-size: 11px; }
   }
   @media (prefers-reduced-motion: reduce) { .studio-button, .featured-card { transition: none; } .studio-button:hover, .featured-card:hover { transform: none; } }

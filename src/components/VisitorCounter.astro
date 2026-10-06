@@ -6,11 +6,11 @@ const { class: className } = Astro.props;
 const scriptUrl = import.meta.env.PUBLIC_GOOGLE_SCRIPT_URL || '';
 ---
 
-<visitor-counter class={className} data-script-url={scriptUrl}>
+<visitor-counter class={className} data-script-url={scriptUrl} data-state="loading">
   <div class="counter-container" title="Unique Visitors">
-    <span class="status-dot"></span>
-    <span class="label">UNIQUE VISITORS:</span>
-    <span class="count">...</span>
+    <span class="status-dot" aria-hidden="true"></span>
+    <span class="label">Unique visitors</span>
+    <span class="count" aria-live="polite">…</span>
   </div>
 </visitor-counter>
 
@@ -18,50 +18,39 @@ const scriptUrl = import.meta.env.PUBLIC_GOOGLE_SCRIPT_URL || '';
   .counter-container {
     display: inline-flex;
     align-items: center;
-    gap: 0.6rem;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.65rem;
-    color: var(--color-muted);
-    opacity: 0.6;
-    padding: 0.2rem 0;
-    transition: all 0.3s ease;
-    cursor: help;
-  }
-
-  .counter-container:hover {
-    opacity: 1;
+    gap: 8px;
+    font-family: var(--font-text);
+    font-size: 12px;
     color: var(--color-text-secondary);
+    padding-block: 2px;
   }
 
   .status-dot {
     width: 6px;
     height: 6px;
-    background-color: var(--color-accent);
+    flex: 0 0 auto;
+    background-color: var(--color-muted);
     border-radius: 50%;
-    animation: pulse 2s infinite;
   }
 
-  .label {
-    letter-spacing: 0.05em;
-    font-weight: 500;
-  }
+  visitor-counter[data-state="ready"] .status-dot { background-color: #328256; }
+  .label { font-weight: 500; }
 
   .count {
     font-weight: 600;
     min-width: 2ch;
-  }
-
-  @keyframes pulse {
-    0% { opacity: 0.4; }
-    50% { opacity: 1; }
-    100% { opacity: 0.4; }
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text);
   }
 </style>
 
 <script>
   class VisitorCounter extends HTMLElement {
-    constructor() {
-      super();
+    initialized = false;
+
+    connectedCallback() {
+      if (this.initialized) return;
+      this.initialized = true;
       this.init();
     }
 
@@ -94,38 +83,29 @@ const scriptUrl = import.meta.env.PUBLIC_GOOGLE_SCRIPT_URL || '';
     async init() {
       const scriptUrl = this.dataset.scriptUrl;
       const countElement = this.querySelector('.count');
-      if (!scriptUrl || !countElement) return;
-
-      // Generate or retrieve fingerprint
-      const fingerprintKey = 'neko_visitor_fp';
-      const recordedKey = 'neko_visitor_recorded';
-      const sessionKey = 'neko_session_counted';
-      
-      let fingerprint = localStorage.getItem(fingerprintKey);
-      if (!fingerprint) {
-        fingerprint = this.generateFingerprint();
-        localStorage.setItem(fingerprintKey, fingerprint);
-      }
-      
-      // Check if this session has already been counted (prevents multiple counts on SPA navigation)
-      const sessionCounted = sessionStorage.getItem(sessionKey);
-      const hasVisited = localStorage.getItem(recordedKey);
-      
-      // Determine action: only increment if never visited OR new session with different fingerprint
-      let action = 'get_count';
-      let shouldIncrement = false;
-      
-      if (!hasVisited) {
-        // First time visitor - increment
-        action = 'increment_visitor';
-        shouldIncrement = true;
-      } else if (!sessionCounted) {
-        // Returning visitor, new session - just get count (don't increment)
-        // This prevents over-counting when localStorage is cleared but fingerprint changes
-        action = 'get_count';
+      if (!countElement) return;
+      if (!scriptUrl) {
+        countElement.textContent = '—';
+        this.dataset.state = 'unavailable';
+        return;
       }
 
       try {
+
+        const fingerprintKey = 'neko_visitor_fp';
+        const recordedKey = 'neko_visitor_recorded';
+        const sessionKey = 'neko_session_counted';
+
+        let fingerprint = localStorage.getItem(fingerprintKey);
+        if (!fingerprint) {
+          fingerprint = this.generateFingerprint();
+          localStorage.setItem(fingerprintKey, fingerprint);
+        }
+
+        // Preserve the existing service contract: only count a visitor once.
+        const shouldIncrement = !localStorage.getItem(recordedKey);
+        const action = shouldIncrement ? 'increment_visitor' : 'get_count';
+
         const url = new URL(scriptUrl);
         url.searchParams.set('action', action);
         if (shouldIncrement) {
@@ -138,22 +118,26 @@ const scriptUrl = import.meta.env.PUBLIC_GOOGLE_SCRIPT_URL || '';
         
         const data = await response.json();
         
-        if (data.count !== undefined) {
+        if (typeof data.count === 'number' && Number.isFinite(data.count) && data.count >= 0) {
           // Format number with locale (e.g., 1,024)
           countElement.textContent = new Intl.NumberFormat('en-US').format(data.count);
+          this.dataset.state = 'ready';
           
           if (shouldIncrement) {
             localStorage.setItem(recordedKey, fingerprint);
           }
           // Mark this session as counted to prevent re-counting on SPA navigation
           sessionStorage.setItem(sessionKey, 'true');
+        } else {
+          throw new Error('Invalid visitor count');
         }
       } catch (err) {
         console.error('Visitor counter error:', err);
-        countElement.textContent = '---';
+        countElement.textContent = '—';
+        this.dataset.state = 'unavailable';
       }
     }
   }
 
-  customElements.define('visitor-counter', VisitorCounter);
+  if (!customElements.get('visitor-counter')) customElements.define('visitor-counter', VisitorCounter);
 </script>

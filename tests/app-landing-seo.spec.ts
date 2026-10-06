@@ -142,6 +142,6 @@ test('apps catalog reads like a product catalog rather than a portfolio gallery'
 
   await expect(page).toHaveTitle(/NekoCode App Catalog/i);
   await expect(page.getByRole('heading', { name: 'NekoCode App Catalog' })).toBeVisible();
-  await expect(page.getByText(/Compare the live and upcoming NekoCode apps/i)).toBeVisible();
+  await expect(page.getByText(/Thoughtful tools for your everyday life/i)).toBeVisible();
   await expect(page.getByText(/story of problem-solving and craft/i)).toHaveCount(0);
 });
