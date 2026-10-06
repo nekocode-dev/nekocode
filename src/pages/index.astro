@@ -2,1177 +2,174 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import NavBar from '@/components/nav/NavBar.astro';
 import Footer from '@/components/nav/Footer.astro';
-import Container from '@/components/layout/Container.astro';
-import Section from '@/components/layout/Section.astro';
-import TeamSpotlight from '@/components/cards/TeamSpotlight.astro';
-import Button from '@/components/ui/Button.astro';
-import { appLandingPages } from '@/data/appLanding';
-
+import StudioIcon from '@/components/ui/StudioIcon.astro';
 import { getCollection, type CollectionEntry } from 'astro:content';
 
-type Project = CollectionEntry<'projects'>;
-
-// Get app products for the homepage showcase.
-const appProjects: Project[] = (await getCollection('projects'))
-  .filter((project: Project) => project.data.type === 'app');
-// Sort: FrendLyst first, then featured, then others.
-appProjects.sort((a: Project, b: Project) => {
-  if (a.slug === 'frendlyst') return -1;
-  if (b.slug === 'frendlyst') return 1;
-  if (a.data.featured && !b.data.featured) return -1;
-  if (!a.data.featured && b.data.featured) return 1;
-  return 0;
-});
-const appLineup = appProjects.slice(0, 4);
-const frendLystProject = appProjects.find((project: Project) => project.slug === 'frendlyst') ?? appProjects[0];
-const frendLystLanding = appLandingPages.frendlyst;
-const googlePlayLink = frendLystLanding.storeLinks.find((link) => link.label === 'Google Play')?.href ?? '/apps/frendlyst';
-const appStoreLink = frendLystLanding.storeLinks.find((link) => link.label === 'App Store')?.href ?? '/apps/frendlyst';
-
 const base = import.meta.env.BASE_URL;
-const pageDescription =
-  "Explore NekoCode apps including FrendLyst, FlipFocus, BeanBop, and SYSTEM Fitness: privacy-first social, learning, wellness, and gamified mobile products.";
-
-const statusLabels: Record<Project['data']['status'], string> = {
-  live: 'Live',
-  in_progress: 'In development',
-  archived: 'Archived',
-  coming_soon: 'Coming soon'
+type Project = CollectionEntry<'projects'>;
+const projects: Project[] = await getCollection('projects');
+const order = ['beanbop', 'flipfocus'];
+const cardCopy: Record<string, string> = {
+  beanbop: 'Tiny bean. Big habits.',
+  flipfocus: 'Focus, your way.'
 };
-
-const platformLabels: Record<Project['data']['platforms'][number], string> = {
-  ios: 'iOS',
-  android: 'Android',
-  web: 'Web'
-};
-
-const resolveAsset = (path?: string) => {
-  if (!path) return '';
-  return path.startsWith('/') ? `${base}${path.slice(1)}` : path;
-};
-
-type AppLandingSlug = keyof typeof appLandingPages;
-
-const isAppLandingSlug = (slug: string): slug is AppLandingSlug => slug in appLandingPages;
-
-const heroFeatureOverrides: Record<string, string[]> = {
-  frendlyst: ['Profile Worth', 'Friend Market', 'Clubs', 'Gifts']
-};
-
-const heroCopyOverrides: Record<string, Partial<{
-  profileLabel: string;
-  profileHeadline: string;
-  marketLabel: string;
-  marketText: string;
-}>> = {
-  frendlyst: {
-    profileLabel: 'Profile Worth',
-    profileHeadline: 'Social discovery',
-    marketLabel: 'Friend Market',
-    marketText: 'Find people through rankings, gifts, and clubs.'
-  }
-};
-
-const carouselApps = appLineup.map((project: Project) => {
-  const landing = isAppLandingSlug(project.slug) ? appLandingPages[project.slug] : undefined;
-  const copyOverride = heroCopyOverrides[project.slug] ?? {};
-  const features = heroFeatureOverrides[project.slug] ?? landing?.features.slice(0, 4).map((feature) => feature.title) ?? [
-    project.data.category ?? project.data.title,
-    statusLabels[project.data.status],
-    ...project.data.platforms.map((platform) => platformLabels[platform])
-  ];
-  const workflow = landing?.workflow ?? [];
-
-  return {
-    slug: project.slug,
-    title: project.data.title,
-    status: statusLabels[project.data.status],
-    statusUpper: statusLabels[project.data.status].toUpperCase(),
-    tagline: project.data.tagline,
-    logo: resolveAsset(project.data.media.logo ?? project.data.media.coverImage),
-    profileLabel: copyOverride.profileLabel ?? landing?.features[0]?.title ?? project.data.category ?? project.data.title,
-    profileHeadline: copyOverride.profileHeadline ?? landing?.category ?? project.data.category ?? project.data.title,
-    marketLabel: copyOverride.marketLabel ?? workflow[1]?.title ?? landing?.workflow[0]?.title ?? project.data.subtitle ?? project.data.title,
-    marketText: copyOverride.marketText ?? workflow[1]?.description ?? landing?.heroDescription ?? project.data.tagline,
-    features: features.slice(0, 4)
-  };
+const apps = order.flatMap(slug => {
+  const project = projects.find(project => project.slug === slug);
+  return project ? [project] : [];
 });
-
-const initialCarouselApp = carouselApps[0];
-
+const platformLabels = { ios: 'iOS', android: 'Android', web: 'Web' };
+const statusLabels: Record<string, string> = { live: 'Live', in_progress: 'In development', coming_soon: 'Coming soon', archived: 'Archived' };
 ---
 
 <BaseLayout
   title="NekoCode Apps | Privacy-First Mobile App Showcase"
-  description={pageDescription}
-  image="/og-image.png"
+  description="Explore BeanBop and FlipFocus by NekoCode. Simple, useful, and playful apps for a kinder tomorrow, with privacy in mind."
+  appearance="studio"
 >
   <NavBar slot="header" />
-  
-  <!-- Hero Section -->
-  <Section size="xl" class="hero">
-    <Container>
-      <div class="hero-wrapper" data-testid="app-showcase-hero">
-        <div class="hero-content">
-          <h1 class="text-hero">
-            <div class="line-1" data-split-text>NekoCode Apps</div>
-          </h1>
-          
-          <p class="hero-description reveal stagger-2">
-            Privacy-first mobile apps, playful systems, and product experiments led by FrendLyst, a live social discovery game for Android and iOS.
-          </p>
-          
-          <div class="hero-actions reveal stagger-3" data-testid="hero-actions">
-            <a class="store-badge store-badge-primary" href={googlePlayLink} target="_blank" rel="noopener noreferrer" aria-label="Download on Google Play">
-              <svg class="store-icon store-icon-play" viewBox="0 0 24 24" aria-hidden="true">
-                <path class="play-wing play-wing-top" d="M4.9 2.7c-.5.3-.8.9-.8 1.6v15.4c0 .7.3 1.3.8 1.6l8.7-9.3L4.9 2.7Z" />
-                <path class="play-wing play-wing-right" d="m15.1 10.4 2.9 1.7c.8.5.8 1.5 0 2l-2.9 1.7-2.9-2.8 2.9-2.6Z" />
-                <path class="play-wing play-wing-bottom" d="m4.9 21.3 8.7-9.3 1.5 1.5-10.2 7.8Z" />
-                <path class="play-wing play-wing-left" d="M4.9 2.7 15.1 10.5 13.6 12 4.9 2.7Z" />
-              </svg>
-              <span class="store-copy">
-                <span class="store-label">Download on</span>
-                <strong class="store-name">Google Play</strong>
-              </span>
-            </a>
-            <a class="store-badge" href={appStoreLink} target="_blank" rel="noopener noreferrer" aria-label="Download on App Store">
-              <svg class="store-icon store-icon-apple" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M16.2 2.4c.1 1.1-.3 2.1-1 2.9-.7.8-1.7 1.3-2.7 1.2-.1-1.1.3-2.1 1-2.8.7-.8 1.8-1.3 2.7-1.3Z" />
-                <path d="M20 17.1c-.4 1-1 1.9-1.7 2.8-.9 1.2-1.8 2.3-3.2 2.3-.7 0-1.2-.2-1.8-.5-.6-.2-1.2-.5-2-.5s-1.5.3-2.1.5c-.6.2-1.1.5-1.8.5-1.3.1-2.3-1.2-3.2-2.4-1.8-2.6-3.2-7.3-1.3-10.5.9-1.6 2.6-2.6 4.4-2.7.7 0 1.4.3 2 .5.5.2 1 .4 1.5.4.4 0 .9-.2 1.5-.4.8-.3 1.6-.6 2.5-.5.7 0 2.7.3 4 2.1-.1.1-2.4 1.4-2.4 4.1 0 3.2 2.8 4.2 3.6 4.3Z" />
-              </svg>
-              <span class="store-copy">
-                <span class="store-label">Download on</span>
-                <strong class="store-name">App Store</strong>
-              </span>
-            </a>
-            <Button href="/apps" variant="secondary" size="lg" class="explore-apps-cta">
-              Explore all apps
-            </Button>
-          </div>
+
+  <section class="studio-hero" aria-labelledby="hero-title" data-testid="studio-hero">
+    <picture class="hero-art">
+      <img
+        src={`${base}assets/studio/nekocode-hero.webp`}
+        alt="Two cat characters creating apps together in a bright NekoCode studio."
+        width="2055" height="765" loading="eager" fetchpriority="high" decoding="async"
+      />
+    </picture>
+    <div class="studio-container hero-inner">
+      <div class="hero-copy">
+        <h1 id="hero-title">NekoCode</h1>
+        <p class="hero-tagline">Apps for a kinder tomorrow.</p>
+        <p class="hero-description">We build simple, useful, and playful apps<br class="desktop-break" /> with privacy in mind.</p>
+        <div class="hero-actions" data-testid="hero-actions">
+          <a class="studio-button primary" href={`${base}apps`}>Explore Our Apps <StudioIcon name="arrow" /></a>
+          <a class="studio-button secondary" href={`${base}contact`}>Get in Touch</a>
         </div>
-
-        <div
-          class="flagship-scene reveal-scale"
-          data-testid="flagship-frendlyst-scene"
-          data-carousel-apps={JSON.stringify(carouselApps)}
-          aria-label="NekoCode app preview carousel"
-        >
-          <div class="flagship-orbit flagship-orbit-one"></div>
-          <div class="flagship-orbit flagship-orbit-two"></div>
-
-          <div class="phone-frame" aria-hidden="true">
-            <div class="phone-speaker"></div>
-            <div class="phone-screen">
-              <div class="phone-status">
-                <span data-carousel-title>{initialCarouselApp.title}</span>
-                <strong data-carousel-status>{initialCarouselApp.statusUpper}</strong>
-              </div>
-
-              <div class="profile-card">
-                <img
-                  src={initialCarouselApp.logo}
-                  alt=""
-                  data-carousel-logo
-                  width="64"
-                  height="64"
-                  loading="eager"
-                  fetchpriority="high"
-                  decoding="async"
-                />
-                <div>
-                  <span data-carousel-profile-label>{initialCarouselApp.profileLabel}</span>
-                  <strong data-carousel-profile-headline>{initialCarouselApp.profileHeadline}</strong>
-                </div>
-              </div>
-
-              <div class="market-card">
-                <span data-carousel-market-label>{initialCarouselApp.marketLabel}</span>
-                <strong data-carousel-market-text>{initialCarouselApp.marketText}</strong>
-              </div>
-
-              <div class="phone-feature-grid">
-                {initialCarouselApp.features.map((feature) => (
-                  <span data-carousel-feature>{feature}</span>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div class="flagship-copy">
-            <img
-              src={initialCarouselApp.logo}
-              alt=""
-              data-carousel-card-logo
-              width="58"
-              height="58"
-              loading="eager"
-              fetchpriority="high"
-              decoding="async"
-            />
-            <div>
-              <span data-carousel-card-label>{initialCarouselApp.status} app</span>
-              <strong data-carousel-card-title>{initialCarouselApp.title}</strong>
-              <p data-carousel-card-tagline>{initialCarouselApp.tagline}</p>
-            </div>
-          </div>
-
-          <div class="app-showcase" data-testid="hero-app-shelf" aria-label="NekoCode app lineup">
-            {carouselApps.map((app, index: number) => {
-              return (
-                <button
-                  type="button"
-                  class:list={['showcase-card', { active: index === 0 }]}
-                  data-carousel-index={index}
-                  aria-pressed={index === 0 ? 'true' : 'false'}
-                >
-                  <img
-                    src={app.logo}
-                    alt=""
-                    width="40"
-                    height="40"
-                    loading={index < 2 ? 'eager' : 'lazy'}
-                    fetchpriority={index === 0 ? 'high' : 'auto'}
-                    decoding="async"
-                  />
-                  <span>{app.title}</span>
-                  <strong>{app.status}</strong>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
+        <ul class="studio-values" aria-label="Our values">
+          <li><StudioIcon name="lock" size={29} /><span>Privacy-first</span></li>
+          <li><StudioIcon name="people" size={32} /><span>People-focused</span></li>
+          <li><StudioIcon name="heart" size={30} /><span>Built with care</span></li>
+        </ul>
       </div>
-    </Container>
-  </Section>
-  
-  <!-- App Lineup -->
-  <Section class="lineup-section">
-    <Container>
-      <div class="section-header reveal">
-        <div>
-          <h2 class="text-title-1">Live and upcoming apps</h2>
-          <p class="section-kicker">A focused lineup across social discovery, learning, health tracking, and playful daily routines.</p>
-        </div>
-        <Button href="/apps" variant="ghost">See all apps</Button>
-      </div>
-      
-      <div class="lineup-grid">
-        {appLineup.map((project: Project, index: number) => {
-          const href = `${base}apps/${project.slug}`;
-          const coverSource = resolveAsset(project.data.media.coverImage);
-          const logoSource = resolveAsset(project.data.media.logo ?? project.data.media.coverImage);
-
-          return (
-            <a class:list={['lineup-card', `reveal stagger-${index + 1}`]} href={href}>
-              <div class="lineup-media">
-                <img
-                  src={coverSource}
-                  alt={`${project.data.title} app preview`}
-                  loading={index < 2 ? 'eager' : 'lazy'}
-                  fetchpriority={index === 0 ? 'high' : 'auto'}
-                  decoding="async"
-                />
-              </div>
-              <div class="lineup-content">
-                <div class="lineup-title-row">
-                  <img
-                    src={logoSource}
-                    alt=""
-                    width="42"
-                    height="42"
-                    loading={index < 2 ? 'eager' : 'lazy'}
-                    fetchpriority={index === 0 ? 'high' : 'auto'}
-                    decoding="async"
-                  />
-                  <div>
-                    <h3>{project.data.title}</h3>
-                    <p>{project.data.category ?? project.data.subtitle ?? 'NekoCode app'}</p>
-                  </div>
-                  <span>{statusLabels[project.data.status]}</span>
-                </div>
-                <p class="lineup-tagline">{project.data.tagline}</p>
-                <div class="lineup-platforms" aria-label={`${project.data.title} platforms`}>
-                  {project.data.platforms.map((platform: Project['data']['platforms'][number]) => (
-                    <span>{platformLabels[platform]}</span>
-                  ))}
-                </div>
-              </div>
-            </a>
-          );
-        })}
-      </div>
-    </Container>
-  </Section>
-  
-  <!-- Team Spotlight -->
-  <Section class="team-section">
-    <div id="team" data-testid="home-team-section">
-      <Container size="narrow">
-        <TeamSpotlight class="reveal" />
-      </Container>
     </div>
-  </Section>
-  
+  </section>
+
+  <section class="featured-section" aria-labelledby="featured-title">
+    <div class="studio-container">
+      <div class="featured-heading">
+        <div><p class="eyebrow">/ APPS</p><h2 id="featured-title">Featured Apps</h2></div>
+        <a class="view-apps" href={`${base}apps`}>View all apps <StudioIcon name="arrow" size={20} /></a>
+      </div>
+      <div class="featured-grid" data-testid="featured-apps">
+        {apps.map(project => (
+          <a class="featured-card" href={`${base}apps/${project.slug}`} aria-label={`${project.data.title} — ${statusLabels[project.data.status]}. Learn more.`}>
+            <img class="app-icon" src={`${base}assets/studio/${project.slug}.svg`} alt="" width="84" height="84" loading="eager" />
+            <div class="app-copy"><h3>{project.data.title}</h3><p>{cardCopy[project.slug] ?? project.data.tagline}</p></div>
+            <ul class="app-platforms" aria-label={`${project.data.title} platforms`}>
+              {(['ios', 'android', 'web'] as const).filter(platform => project.data.platforms.includes(platform)).map(platform => (
+                <li title={`${platformLabels[platform]}${project.data.status === 'coming_soon' ? ' — coming soon' : ''}`}><StudioIcon name={platform} size={23} /><span class="sr-only">{platformLabels[platform]}</span></li>
+              ))}
+            </ul>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
   <Footer slot="footer" />
 </BaseLayout>
 
-<script>
-  type CarouselApp = {
-    title: string;
-    status: string;
-    statusUpper: string;
-    tagline: string;
-    logo: string;
-    profileLabel: string;
-    profileHeadline: string;
-    marketLabel: string;
-    marketText: string;
-    features: string[];
-  };
-
-  const carouselScenes = document.querySelectorAll<HTMLElement>('[data-carousel-apps]');
-
-  carouselScenes.forEach((scene) => {
-    const apps = JSON.parse(scene.getAttribute('data-carousel-apps') || '[]') as CarouselApp[];
-    const buttons = Array.from(scene.querySelectorAll<HTMLButtonElement>('[data-carousel-index]'));
-    if (!apps.length || !buttons.length) return;
-
-    const title = scene.querySelector('[data-carousel-title]');
-    const status = scene.querySelector('[data-carousel-status]');
-    const logo = scene.querySelector('[data-carousel-logo]');
-    const profileLabel = scene.querySelector('[data-carousel-profile-label]');
-    const profileHeadline = scene.querySelector('[data-carousel-profile-headline]');
-    const marketLabel = scene.querySelector('[data-carousel-market-label]');
-    const marketText = scene.querySelector('[data-carousel-market-text]');
-    const cardLogo = scene.querySelector('[data-carousel-card-logo]');
-    const cardLabel = scene.querySelector('[data-carousel-card-label]');
-    const cardTitle = scene.querySelector('[data-carousel-card-title]');
-    const cardTagline = scene.querySelector('[data-carousel-card-tagline]');
-    const featureNodes = Array.from(scene.querySelectorAll('[data-carousel-feature]'));
-
-    let activeIndex = 0;
-    let timer = 0;
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    const setText = (element: Element | null, value: string) => {
-      if (element) element.textContent = value || '';
-    };
-
-    const setImage = (element: Element | null, src: string) => {
-      if (element instanceof HTMLImageElement && src) {
-        element.src = src;
-      }
-    };
-
-    const selectApp = (index: number, shouldRestart = true) => {
-      const app = apps[index];
-      if (!app) return;
-
-      activeIndex = index;
-      setText(title, app.title);
-      setText(status, app.statusUpper);
-      setImage(logo, app.logo);
-      setText(profileLabel, app.profileLabel);
-      setText(profileHeadline, app.profileHeadline);
-      setText(marketLabel, app.marketLabel);
-      setText(marketText, app.marketText);
-      setImage(cardLogo, app.logo);
-      setText(cardLabel, `${app.status} app`);
-      setText(cardTitle, app.title);
-      setText(cardTagline, app.tagline);
-
-      featureNodes.forEach((feature, featureIndex) => {
-        feature.textContent = (app.features && app.features[featureIndex]) || '';
-      });
-
-      buttons.forEach((button, buttonIndex) => {
-        const isActive = buttonIndex === index;
-        button.classList.toggle('active', isActive);
-        button.setAttribute('aria-pressed', String(isActive));
-      });
-
-      if (shouldRestart) restartTimer();
-    };
-
-    const stopTimer = () => {
-      if (timer) {
-        window.clearInterval(timer);
-        timer = 0;
-      }
-    };
-
-    const startTimer = () => {
-      if (reduceMotion || timer || apps.length < 2) return;
-      timer = window.setInterval(() => {
-        selectApp((activeIndex + 1) % apps.length, false);
-      }, 5200);
-    };
-
-    const restartTimer = () => {
-      stopTimer();
-      startTimer();
-    };
-
-    buttons.forEach((button) => {
-      button.addEventListener('click', () => {
-        const index = Number(button.getAttribute('data-carousel-index'));
-        selectApp(index);
-      });
-    });
-
-    scene.addEventListener('click', (event) => {
-      const target = event.target instanceof Element ? event.target.closest('[data-carousel-index]') : null;
-      if (!(target instanceof HTMLButtonElement)) return;
-
-      const index = Number(target.getAttribute('data-carousel-index'));
-      selectApp(index);
-    });
-
-    scene.addEventListener('pointerenter', stopTimer);
-    scene.addEventListener('pointerleave', startTimer);
-    scene.addEventListener('focusin', stopTimer);
-    scene.addEventListener('focusout', startTimer);
-
-    selectApp(0, false);
-    startTimer();
-  });
-</script>
-
 <style>
-  :global(.hero) {
-    position: relative;
-    overflow: hidden;
-  }
-
-  :global(.hero.section-xl) {
-    padding-block: clamp(var(--space-12), 10vw, var(--space-20)) var(--space-12) !important;
-  }
-
-  :global(.hero)::before {
-    content: '';
-    position: absolute;
-    inset: -14% auto auto 46%;
-    width: 48rem;
-    height: 48rem;
-    background:
-      radial-gradient(circle at 50% 42%, rgba(124, 92, 255, 0.2), transparent 62%),
-      radial-gradient(circle at 72% 56%, rgba(237, 106, 93, 0.14), transparent 56%);
-    filter: blur(8px);
-    opacity: 0.82;
-    pointer-events: none;
-  }
-
-  .hero-wrapper {
-    display: grid;
-    grid-template-columns: minmax(0, 0.82fr) minmax(420px, 0.9fr);
-    align-items: center;
-    gap: clamp(var(--space-8), 6vw, var(--space-16));
-  }
-
-  .hero-content {
-    position: relative;
-    z-index: 1;
-    max-width: 670px;
-  }
-
-  :global(.hero) h1 {
-    margin-bottom: var(--space-6);
-  }
-
-  .hero-description {
-    max-width: 600px;
-    margin-bottom: var(--space-8);
-    color: var(--color-text-secondary);
-    font-size: clamp(1.05rem, 1.7vw, 1.35rem);
-    line-height: 1.7;
-  }
-
-  .hero-actions {
-    --store-badge-width: 188px;
-    --store-badge-row-width: calc((var(--store-badge-width) * 2) + var(--space-3));
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-3);
-    align-items: stretch;
-    max-width: var(--store-badge-row-width);
-  }
-
-  .store-badge {
-    min-height: 58px;
-    width: var(--store-badge-width);
-    display: inline-grid;
-    grid-template-columns: 24px minmax(0, 1fr);
-    align-items: center;
-    gap: 0.72rem;
-    padding: 0.72rem 1.05rem;
-    color: var(--color-text);
-    background: rgba(255, 255, 255, 0.055);
-    border: 1px solid rgba(255, 255, 255, 0.13);
-    border-radius: var(--radius-md);
-    text-decoration: none;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
-    transition:
-      transform var(--duration-normal) var(--ease-out),
-      border-color var(--duration-normal) var(--ease-out),
-      background var(--duration-normal) var(--ease-out);
-  }
-
-  .store-badge:hover {
-    transform: translateY(-2px);
-    border-color: rgba(245, 230, 211, 0.4);
-    background: rgba(255, 255, 255, 0.078);
-  }
-
-  .store-badge-primary {
-    color: #111111;
-    background: var(--color-accent);
-    border-color: rgba(245, 230, 211, 0.9);
-  }
-
-  .store-badge-primary:hover {
-    background: #fff0d8;
-  }
-
-  .store-icon {
-    width: 24px;
-    height: 24px;
-    flex: 0 0 auto;
-  }
-
-  .store-icon-apple {
-    fill: currentColor;
-  }
-
-  .store-icon-play .play-wing-top {
-    fill: #00a8ff;
-  }
-
-  .store-icon-play .play-wing-right {
-    fill: #ffc400;
-  }
-
-  .store-icon-play .play-wing-bottom {
-    fill: #00d084;
-  }
-
-  .store-icon-play .play-wing-left {
-    fill: #ff4f6d;
-  }
-
-  .store-copy {
-    min-width: 0;
-    display: grid;
-    gap: 0.08rem;
-  }
-
-  .store-label {
-    font-size: 0.68rem;
-    font-weight: 800;
-    letter-spacing: 0.06em;
-    line-height: 1;
-    text-transform: uppercase;
-    opacity: 0.74;
-  }
-
-  .store-name {
-    font-family: var(--font-display);
-    font-size: var(--text-lg);
-    font-weight: 800;
-    line-height: 1.05;
-    letter-spacing: 0;
-    white-space: nowrap;
-  }
-
-  .hero-actions :global(.explore-apps-cta) {
-    width: var(--store-badge-row-width);
-    max-width: 100%;
-  }
-
-  .flagship-scene {
-    position: relative;
-    z-index: 1;
-    min-height: 700px;
-    display: grid;
-    grid-template-rows: 1fr auto;
-    align-items: end;
-    justify-items: center;
-    padding: clamp(var(--space-5), 4vw, var(--space-8));
-    background:
-      linear-gradient(145deg, rgba(255, 255, 255, 0.095), rgba(255, 255, 255, 0.026)),
-      rgba(18, 18, 22, 0.78);
-    border: 1px solid rgba(255, 255, 255, 0.11);
-    border-radius: 34px;
-    box-shadow:
-      0 34px 110px rgba(0, 0, 0, 0.42),
-      inset 0 1px 0 rgba(255, 255, 255, 0.08);
-    overflow: hidden;
-  }
-
-  .flagship-scene::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background:
-      linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
-    background-size: 48px 48px;
-    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.72), transparent 78%);
-    pointer-events: none;
-  }
-
-  .flagship-orbit {
-    position: absolute;
-    border: 1px solid rgba(245, 230, 211, 0.11);
-    border-radius: 999px;
-    pointer-events: none;
-  }
-
-  .flagship-orbit-one {
-    width: 32rem;
-    height: 32rem;
-    top: 6%;
-    left: 50%;
-    transform: translateX(-50%) rotate(-12deg);
-  }
-
-  .flagship-orbit-two {
-    width: 22rem;
-    height: 22rem;
-    top: 16%;
-    left: 50%;
-    transform: translateX(-50%) rotate(18deg);
-    border-color: rgba(124, 92, 255, 0.18);
-  }
-
-  .phone-frame {
-    position: relative;
-    z-index: 1;
-    width: min(72vw, 292px);
-    aspect-ratio: 9 / 18.9;
-    display: grid;
-    padding: 0.72rem;
-    background:
-      linear-gradient(160deg, rgba(255, 255, 255, 0.19), rgba(255, 255, 255, 0.025)),
-      #111116;
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    border-radius: 38px;
-    box-shadow:
-      0 36px 90px rgba(0, 0, 0, 0.55),
-      0 0 0 9px rgba(255, 255, 255, 0.018);
-  }
-
-  .phone-speaker {
-    position: absolute;
-    top: 1rem;
-    left: 50%;
-    z-index: 2;
-    width: 5.2rem;
-    height: 1.25rem;
-    transform: translateX(-50%);
-    background: #09090b;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 999px;
-  }
-
-  .phone-screen {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-4);
-    padding: 3.1rem 1.05rem 1.2rem;
-    background:
-      radial-gradient(circle at 78% 16%, rgba(124, 92, 255, 0.32), transparent 34%),
-      radial-gradient(circle at 22% 0%, rgba(237, 106, 93, 0.22), transparent 33%),
-      linear-gradient(180deg, #181720, #09090d 78%);
-    border-radius: 30px;
-    overflow: hidden;
-  }
-
-  .phone-status {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: var(--color-text);
-    font-size: var(--text-xs);
-    font-weight: 800;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-
-  .phone-status strong {
-    color: #b9ffcf;
-  }
-
-  .profile-card,
-  .market-card,
-  .phone-feature-grid span {
-    background: rgba(255, 255, 255, 0.075);
-    border: 1px solid rgba(255, 255, 255, 0.105);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  }
-
-  .profile-card {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    gap: var(--space-3);
-    align-items: center;
-    padding: var(--space-3);
-    border-radius: 22px;
-  }
-
-  .profile-card img {
-    width: 64px;
-    height: 64px;
-    object-fit: cover;
-    border-radius: 18px;
-    box-shadow: 0 10px 30px rgba(124, 92, 255, 0.34);
-  }
-
-  .profile-card span,
-  .market-card span {
-    display: block;
-    margin-bottom: var(--space-1);
-    color: var(--color-text-secondary);
-    font-size: var(--text-xs);
-    font-weight: 800;
-    letter-spacing: 0.07em;
-    text-transform: uppercase;
-  }
-
-  .profile-card strong,
-  .market-card strong {
-    display: block;
-    color: var(--color-text);
-    font-family: var(--font-display);
-    font-size: var(--text-lg);
-    font-weight: 800;
-    line-height: 1.1;
-  }
-
-  .market-card {
-    padding: var(--space-4);
-    border-radius: 24px;
-  }
-
-  .market-card strong {
-    font-size: var(--text-xl);
-    line-height: 1.15;
-  }
-
-  .phone-feature-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-2);
-  }
-
-  .phone-feature-grid span {
-    min-height: 58px;
-    display: grid;
-    place-items: center;
-    padding: var(--space-2);
-    color: var(--color-text);
-    border-radius: 16px;
-    font-size: var(--text-xs);
-    font-weight: 800;
-    line-height: 1.2;
-    text-align: center;
-  }
-
-  .flagship-copy {
-    position: absolute;
-    right: clamp(var(--space-5), 4vw, var(--space-8));
-    bottom: 7.4rem;
-    z-index: 2;
-    width: min(78vw, 300px);
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    gap: var(--space-3);
-    align-items: center;
-    padding: var(--space-4);
-    background: rgba(12, 12, 15, 0.74);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 22px;
-    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
-    backdrop-filter: blur(18px);
-  }
-
-  .flagship-copy img {
-    width: 58px;
-    height: 58px;
-    object-fit: cover;
-    border-radius: 17px;
-  }
-
-  .flagship-copy span {
-    display: block;
-    margin-bottom: 0.2rem;
-    color: var(--color-accent);
-    font-size: var(--text-xs);
-    font-weight: 900;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-
-  .flagship-copy strong {
-    display: block;
-    color: var(--color-text);
-    font-family: var(--font-display);
-    font-size: var(--text-2xl);
-    font-weight: 900;
-    line-height: 1;
-  }
-
-  .flagship-copy p {
-    margin: var(--space-1) 0 0;
-    color: var(--color-text-secondary);
-    font-size: var(--text-sm);
-    line-height: 1.45;
-  }
-
-  .app-showcase {
-    position: relative;
-    z-index: 2;
-    width: 100%;
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: var(--space-2);
-    margin-top: var(--space-5);
-  }
-
-  .showcase-card {
-    appearance: none;
-    min-height: 92px;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    align-items: center;
-    justify-items: center;
-    gap: 0.34rem;
-    padding: var(--space-2);
-    color: var(--color-text);
-    background: rgba(10, 10, 13, 0.68);
-    border: 1px solid rgba(255, 255, 255, 0.09);
-    border-radius: 18px;
-    font: inherit;
-    text-decoration: none;
-    text-align: center;
-    backdrop-filter: blur(18px);
-    cursor: pointer;
-    transition:
-      transform var(--duration-normal) var(--ease-out),
-      border-color var(--duration-normal) var(--ease-out),
-      background var(--duration-normal) var(--ease-out);
-  }
-
-  .showcase-card:hover,
-  .showcase-card.active {
-    transform: translateY(-2px);
-    border-color: rgba(245, 230, 211, 0.32);
-  }
-
-  .showcase-card.active {
-    background:
-      linear-gradient(180deg, rgba(245, 230, 211, 0.12), rgba(124, 92, 255, 0.08)),
-      rgba(10, 10, 13, 0.82);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  }
-
-  .showcase-card:focus-visible {
-    outline: 2px solid var(--color-accent);
-    outline-offset: 3px;
-  }
-
-  .showcase-card img {
-    width: 36px;
-    height: 36px;
-    object-fit: cover;
-    border-radius: 12px;
-  }
-
-  .showcase-card span,
-  .showcase-card strong {
-    min-width: 0;
-    overflow: visible;
-    text-overflow: clip;
-    white-space: normal;
-  }
-
-  .showcase-card span {
-    font-family: var(--font-display);
-    font-size: 0.73rem;
-    font-weight: 800;
-    line-height: 1.08;
-  }
-
-  .showcase-card strong {
-    color: var(--color-text-secondary);
-    font-size: 0.62rem;
-    font-weight: 800;
-    letter-spacing: 0.07em;
-    text-transform: uppercase;
-    line-height: 1.05;
-  }
-
-  .section-header {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: var(--space-5);
-    margin-bottom: var(--space-8);
-  }
-
-  .section-header h2 {
-    margin: 0;
-  }
-
-  .section-kicker {
-    max-width: 620px;
-    margin-top: var(--space-3);
-    color: var(--color-text-secondary);
-    font-size: var(--text-base);
-    line-height: 1.7;
-  }
-
-  .lineup-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-4);
-  }
-
-  .lineup-card {
-    display: grid;
-    grid-template-rows: auto 1fr;
-    color: var(--color-text);
-    text-decoration: none;
-    background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.052), rgba(255, 255, 255, 0.018)),
-      rgba(23, 23, 27, 0.76);
-    border: 1px solid rgba(255, 255, 255, 0.09);
-    border-radius: 24px;
-    overflow: hidden;
-    transition:
-      transform var(--duration-normal) var(--ease-out),
-      border-color var(--duration-normal) var(--ease-out);
-  }
-
-  .lineup-card:hover {
-    transform: translateY(-3px);
-    border-color: rgba(245, 230, 211, 0.38);
-  }
-
-  .lineup-media {
-    min-height: 0;
-    aspect-ratio: 2 / 1;
-    display: grid;
-    place-items: center;
-    padding: 0;
-    overflow: hidden;
-    background:
-      radial-gradient(circle at 50% 12%, rgba(245, 230, 211, 0.13), transparent 58%),
-      rgba(255, 255, 255, 0.03);
-  }
-
-  .lineup-media img {
-    display: block;
-    inline-size: 100%;
-    block-size: 100%;
-    width: 100%;
-    height: 100%;
-    min-width: 100%;
-    min-height: 100%;
-    max-height: none;
-    max-width: none;
-    object-fit: cover;
-    object-position: center;
-    filter: none;
-  }
-
-  .lineup-content {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-4);
-    padding: var(--space-5);
-  }
-
-  .lineup-title-row {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    gap: var(--space-3);
-    align-items: center;
-  }
-
-  .lineup-title-row img {
-    width: 42px;
-    height: 42px;
-    object-fit: cover;
-    border-radius: 12px;
-  }
-
-  .lineup-title-row h3 {
-    margin: 0;
-    color: var(--color-text);
-    font-family: var(--font-display);
-    font-size: var(--text-xl);
-    font-weight: 900;
-    line-height: 1.05;
-  }
-
-  .lineup-title-row p {
-    margin: var(--space-1) 0 0;
-    color: var(--color-muted);
-    font-size: var(--text-xs);
-    font-weight: 800;
-    letter-spacing: 0.07em;
-    text-transform: uppercase;
-  }
-
-  .lineup-title-row > span {
-    padding: var(--space-1) var(--space-2);
-    color: var(--color-accent);
-    background: rgba(245, 230, 211, 0.08);
-    border: 1px solid rgba(245, 230, 211, 0.16);
-    border-radius: var(--radius-full);
-    font-size: var(--text-xs);
-    font-weight: 900;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    white-space: nowrap;
-  }
-
-  .lineup-tagline {
-    margin: 0;
-    color: var(--color-text-secondary);
-    font-size: var(--text-sm);
-    line-height: 1.65;
-  }
-
-  .lineup-platforms {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-2);
-    margin-top: auto;
-  }
-
-  .lineup-platforms span {
-    padding: var(--space-1) var(--space-2);
-    color: var(--color-text-secondary);
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: var(--radius-full);
-    font-size: var(--text-xs);
-    font-weight: 800;
-    line-height: 1.3;
-  }
-
-  @media (max-width: 980px) {
-    .hero-wrapper {
-      grid-template-columns: 1fr;
-    }
-
-    .flagship-scene {
-      min-height: 680px;
-    }
-
-    .lineup-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-  }
-
-  @media (max-width: 640px) {
-    :global(.hero.section-xl) {
-      padding-block: var(--space-12) var(--space-8) !important;
-    }
-
-    .hero-wrapper {
-      gap: var(--space-8);
-    }
-
-    :global(.hero) h1 {
-      margin-bottom: var(--space-4);
-    }
-
-    :global(.hero) :global(.text-hero) {
-      font-size: clamp(3rem, 16vw, 4.75rem);
-    }
-
-    .hero-description {
-      margin-bottom: var(--space-6);
-      font-size: var(--text-base);
-    }
-
-    .hero-actions {
-      max-width: 100%;
-      flex-direction: column;
-    }
-
-    .hero-actions :global(.btn),
-    .store-badge {
-      width: 100%;
-    }
-
-    .hero-actions :global(.explore-apps-cta) {
-      width: 100%;
-    }
-
-    .flagship-scene {
-      min-height: 720px;
-      padding: var(--space-4);
-      border-radius: 28px;
-    }
-
-    .phone-frame {
-      width: min(82vw, 286px);
-    }
-
-    .flagship-copy {
-      position: relative;
-      right: auto;
-      bottom: auto;
-      width: 100%;
-      margin-top: var(--space-4);
-    }
-
-    .app-showcase {
-    display: flex;
-    max-width: 100%;
-    gap: var(--space-3);
-    margin-top: var(--space-3);
-    overflow-x: auto;
-      overscroll-behavior-inline: contain;
-      scroll-snap-type: x mandatory;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    .showcase-card {
-      flex: 0 0 min(76vw, 260px);
-      scroll-snap-align: start;
-    }
-
-    .section-header {
-      align-items: flex-start;
-      flex-direction: column;
-    }
-
-    .section-header :global(.text-title-1) {
-      font-size: clamp(2.25rem, 10vw, var(--text-5xl));
-    }
-
-    .lineup-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .lineup-media {
-      min-height: 0;
-      aspect-ratio: 2 / 1;
-    }
-
-    .lineup-title-row {
-      grid-template-columns: auto minmax(0, 1fr);
-    }
-
-    .lineup-title-row > span {
-      grid-column: 2;
-      width: fit-content;
-    }
-  }
+  .studio-container { width: min(100% - 8.8vw, 1536px); margin-inline: auto; }
+  .studio-hero { position: relative; isolation: isolate; min-height: clamp(520px, 36.3vw, 650px); overflow: hidden; background: #fff; }
+  .hero-art { position: absolute; inset: 0; z-index: -2; }
+  .hero-art img { width: 100%; height: 100%; object-fit: cover; object-position: right center; }
+  .studio-hero::before { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, #fff 29%, rgba(255,255,255,.85) 35%, rgba(255,255,255,.1) 45%, transparent 50%); pointer-events: none; }
+  .hero-inner { min-height: inherit; display: flex; align-items: center; }
+  .hero-copy { padding-block: 50px; width: 570px; max-width: 45%; }
+  h1 { font-family: var(--font-display); font-size: clamp(76px, 6.8vw, 114px); font-weight: 800; line-height: 1.03; letter-spacing: -.045em; }
+  .hero-tagline { margin-top: 6px; font-family: var(--font-display); font-size: clamp(26px, 2.4vw, 39px); font-weight: 500; line-height: 1.2; letter-spacing: -.01em; }
+  .hero-description { margin-top: 15px; color: #343b50; font-size: clamp(18px, 1.42vw, 23px); line-height: 1.5; }
+  .hero-actions { display: flex; flex-wrap: wrap; gap: 19px; margin-top: 24px; }
+  .studio-button { min-height: 56px; display: inline-flex; align-items: center; justify-content: center; gap: 15px; padding: 13px 30px; border: 1px solid #171a23; border-radius: 12px; font-size: 18px; font-weight: 500; transition: background 180ms ease, transform 180ms ease, box-shadow 180ms ease; }
+  .primary { color: #fff; background: linear-gradient(135deg, #191d27, #10131b); box-shadow: 0 4px 12px #10131b0a; }
+  .secondary { min-width: 180px; background: #ffffffc9; }
+  .studio-button:hover { transform: translateY(-2px); box-shadow: 0 7px 18px #10131b15; }
+  .primary:hover { background: #303644; }
+  .secondary:hover { background: #f5f5f7; }
+  .studio-values { display: flex; align-items: center; flex-wrap: wrap; gap: 28px; margin-top: 43px; }
+  .studio-values li { display: flex; align-items: center; gap: 11px; font-size: 14px; white-space: nowrap; }
+  .featured-section { padding-block: 22px 58px; background: #faf8f6; }
+  .featured-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 17px; }
+  .eyebrow { font-size: 13px; letter-spacing: .17em; color: #343b50; }
+  h2 { font-family: var(--font-display); font-size: 34px; font-weight: 700; line-height: 1.2; letter-spacing: -.02em; margin-top: 3px; }
+  .view-apps { display: inline-flex; align-items: center; gap: 4px; font-size: 16px; min-height: 44px; margin-top: 20px; }
+  .view-apps:hover { text-decoration: underline; text-underline-offset: 5px; }
+  .featured-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+  .featured-card { min-height: 168px; display: grid; grid-template-columns: 84px minmax(0,1fr); grid-template-rows: 1fr auto; gap: 16px 20px; padding: 22px 26px; border: 1px solid #e7e7ec; border-radius: 18px; background: #ffffffb8; transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease; }
+  .featured-card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px #21242e0a; border-color: #c8cbd4; }
+  .app-icon { width: 84px; height: 84px; border-radius: 22px; grid-row: 1 / 3; }
+  .app-copy { padding-top: 2px; }
+  h3 { font-family: var(--font-display); font-size: 19px; font-weight: 700; line-height: 1.2; letter-spacing: -.01em; }
+  .app-copy p { margin-top: 8px; color: #343b50; font-size: 13px; line-height: 1.45; }
+  .app-platforms { display: flex; align-items: center; gap: 17px; grid-column: 2; }
+  .app-platforms li { display: flex; align-items: center; }
+  @media (min-width: 1800px) { .hero-copy { max-width: 42%; } }
+  @media (max-width: 1250px) {
+    .hero-copy { max-width: 48%; }
+    .hero-tagline { font-size: 28px; }
+    .studio-values { gap: 18px; }
+    .studio-values li { gap: 8px; font-size: 12px; }
+    .studio-button { padding-inline: 22px; font-size: 16px; }
+    .featured-card { padding: 20px; grid-template-columns: 68px minmax(0,1fr); column-gap: 15px; }
+    .app-icon { width: 68px; height: 68px; border-radius: 18px; }
+    h3 { font-size: 17px; }
+  }
+  @media (max-width: 1000px) {
+    .studio-container { width: calc(100% - 48px); }
+    .featured-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .hero-copy { max-width: 56%; }
+    .studio-hero::before { background: linear-gradient(90deg,#fff 25%,#ffffffed 42%,#ffffff70 54%,transparent 68%); }
+    h1 { font-size: 76px; }
+    .hero-tagline { font-size: 27px; }
+    .studio-values { gap: 16px; }
+    .featured-card { min-height: 155px; grid-template-columns: 80px minmax(0,1fr); }
+    .app-icon { width: 80px; height: 80px; }
+    h3 { font-size: 19px; }
+  }
+  @media (max-width: 760px) {
+    .studio-container { width: calc(100% - 40px); }
+    .studio-hero { display: flex; flex-direction: column; min-height: 0; }
+    .hero-inner { order: -1; min-height: 0; }
+    .hero-copy { max-width: 100%; width: 100%; padding-block: 40px 25px; }
+    h1 { font-size: clamp(56px, 12vw, 82px); }
+    .hero-tagline { font-size: clamp(23px, 4.9vw, 30px); }
+    .hero-description { font-size: 17px; max-width: 400px; }
+    .desktop-break { display: none; }
+    .hero-actions { gap: 12px; margin-top: 22px; }
+    .studio-button { min-height: 52px; font-size: 15px; padding-inline: 20px; }
+    .secondary { min-width: 0; }
+    .studio-values { gap: 22px; margin-top: 28px; }
+    .studio-values li { font-size: 12px; gap: 7px; }
+    .studio-values :global(svg) { width: 22px; height: 22px; }
+    .hero-art { position: relative; height: auto; aspect-ratio: 1.6; width: 100%; z-index: 0; }
+    .hero-art img { object-fit: cover; object-position: right; }
+    .studio-hero::before { display: none; }
+    .featured-section { padding-block: 26px 36px; }
+    h2 { font-size: 29px; }
+    .view-apps { font-size: 13px; }
+    .featured-grid { gap: 14px; }
+    .featured-card { gap: 14px; padding: 19px; min-height: 146px; }
+  }
+  @media (max-width: 560px) {
+    .hero-actions { gap: 10px; }
+    .studio-button { padding-inline: 18px; font-size: 14px; gap: 10px; }
+    .featured-grid { grid-template-columns: 1fr; }
+    .featured-card { min-height: 134px; grid-template-columns: 76px minmax(0,1fr); gap: 8px 20px; }
+    .app-icon { width: 76px; height: 76px; }
+    .app-copy p { font-size: 14px; }
+    .studio-values { justify-content: space-between; gap: 8px; }
+    .studio-values li { font-size: 11px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .studio-button, .featured-card { transition: none; } .studio-button:hover, .featured-card:hover { transform: none; } }
 </style>

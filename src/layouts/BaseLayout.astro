@@ -13,12 +13,13 @@ interface Props {
   noindex?: boolean;
   mainEntityId?: string;
   structuredData?: Record<string, unknown> | Record<string, unknown>[];
+  appearance?: 'default' | 'studio';
 }
 
 const siteName = 'NekoCode';
 const siteURL = new URL(Astro.site ?? 'https://nekocode.dev');
 const defaultDescription =
-  "NekoCode designs and builds privacy-first mobile apps, web products, and product systems including FlipFocus, BeanBop, and FrendLyst.";
+  "NekoCode designs and builds privacy-first mobile apps, web products, and product systems including FlipFocus and BeanBop.";
 
 const {
   title,
@@ -28,7 +29,8 @@ const {
   type = "website",
   noindex = false,
   mainEntityId,
-  structuredData: extraStructuredData = []
+  structuredData: extraStructuredData = [],
+  appearance = 'default'
 } = Astro.props;
 
 const fullTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
@@ -80,7 +82,7 @@ const structuredData = [
 ---
 
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme={appearance === 'studio' ? 'light' : 'dark'}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -119,12 +121,12 @@ const structuredData = [
     <meta name="twitter:image:alt" content={imageAlt} />
     
     <!-- Theme Color -->
-    <meta name="theme-color" content="#0D0D0F" />
+    <meta name="theme-color" content={appearance === 'studio' ? '#ffffff' : '#0D0D0F'} />
     <script type="application/ld+json" is:inline set:html={JSON.stringify(structuredData)} />
   </head>
-  <body class="noise-overlay">
+  <body class:list={[{ 'noise-overlay': appearance === 'default', 'studio-page': appearance === 'studio' }]}>
     <a href="#main-content" class="skip-link">Skip to main content</a>
-    <FluidBackground />
+    {appearance === 'default' && <FluidBackground />}
     
     <slot name="header" />
     
@@ -169,6 +171,18 @@ const structuredData = [
   main {
     flex: 1;
   }
+
+  :global(.studio-page) {
+    --color-bg: #ffffff;
+    --color-text: #090b12;
+    --color-text-secondary: #343b50;
+    --color-accent: #171a23;
+    --color-accent-hover: #303644;
+    --color-accent-contrast: #ffffff;
+    --color-border: #e7e7ec;
+  }
+
+  :global(.studio-page .custom-cursor) { display: none; }
   
   /* ========================================
      Enhanced View Transitions - Cinematic Feel

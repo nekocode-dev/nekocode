@@ -14,8 +14,6 @@ type Project = CollectionEntry<'projects'>;
 const allProjects: Project[] = await getCollection('projects');
 const apps: Project[] = allProjects.filter((project: Project) => project.data.type === 'app');
 apps.sort((a: Project, b: Project) => {
-  if (a.slug === 'frendlyst') return -1;
-  if (b.slug === 'frendlyst') return 1;
   if (a.data.featured && !b.data.featured) return -1;
   if (!a.data.featured && b.data.featured) return 1;
   return a.data.title.localeCompare(b.data.title);
@@ -26,8 +24,9 @@ const categories = [...new Set(apps.map((project: Project) => project.data.categ
 ---
 
 <BaseLayout
+  appearance="studio"
   title="NekoCode App Catalog"
-  description="Compare the live and upcoming NekoCode apps across social discovery, learning, wellness, caffeine tracking, and gamified fitness."
+  description="Explore BeanBop for caffeine tracking and FlipFocus for flashcards and study games. Privacy-first apps from NekoCode."
 >
   <NavBar slot="header" />
   
@@ -53,7 +52,7 @@ const categories = [...new Set(apps.map((project: Project) => project.data.categ
           <span>Products listed</span>
         </div>
         <div>
-          <strong>4</strong>
+          <strong>{categories.length}</strong>
           <span>App categories</span>
         </div>
       </div>

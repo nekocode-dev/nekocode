@@ -15,7 +15,7 @@ type Platform = Project['data']['platforms'][number];
 
 export async function getStaticPaths() {
   const projects: Project[] = await getCollection('projects');
-  const dedicatedRoutes = new Set(['flipfocus', 'beanbop', 'frendlyst', 'system-fitness', 'nekocode-site']);
+  const dedicatedRoutes = new Set(['flipfocus', 'beanbop', 'nekocode-site']);
 
   return projects
     .filter((project: Project) => !dedicatedRoutes.has(project.slug))

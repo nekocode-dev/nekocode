@@ -7,11 +7,12 @@ import Section from '@/components/layout/Section.astro';
 import BentoGrid from '@/components/layout/BentoGrid.astro';
 import ProjectCard from '@/components/cards/ProjectCard.astro';
 import Tag from '@/components/ui/Tag.astro';
-import { getCollection } from 'astro:content';
+import { getCollection, type CollectionEntry } from 'astro:content';
 
 // Get all projects
-const allProjects = (await getCollection('projects'))
-  .filter((project) => project.slug !== 'nekocode-site' && project.id !== 'nekocode-site');
+type Project = CollectionEntry<'projects'>;
+const allProjects: Project[] = (await getCollection('projects'))
+  .filter((project: Project) => project.slug !== 'nekocode-site' && project.id !== 'nekocode-site');
 
 // Extract unique values for filters
 const allTypes = [...new Set(allProjects.map(p => p.data.type))];
@@ -19,7 +20,7 @@ const allPlatforms = [...new Set(allProjects.flatMap(p => p.data.platforms))];
 const allTech = [...new Set(allProjects.flatMap(p => p.data.tech))];
 ---
 
-<BaseLayout title="Work" description="Explore my products and concepts">
+<BaseLayout title="Work" description="Explore my products and concepts" appearance="studio">
   <NavBar slot="header" />
   
   <Section size="lg">
@@ -183,8 +184,8 @@ const allTech = [...new Set(allProjects.flatMap(p => p.data.tech))];
 
 <script>
   // Simple client-side filtering
-  const filterChips = document.querySelectorAll('.filter-chip');
-  const projectCards = document.querySelectorAll('.project-card');
+  const filterChips = document.querySelectorAll<HTMLButtonElement>('.filter-chip');
+  const projectCards = document.querySelectorAll<HTMLElement>('.project-card');
   
   let activeFilters = {
     type: 'all',
@@ -195,6 +196,7 @@ const allTech = [...new Set(allProjects.flatMap(p => p.data.tech))];
     chip.addEventListener('click', () => {
       const filterType = chip.dataset.filter;
       const value = chip.dataset.value;
+      if ((filterType !== 'type' && filterType !== 'platform') || !value) return;
       
       // Update active state
       document.querySelectorAll(`[data-filter="${filterType}"]`).forEach(c => {

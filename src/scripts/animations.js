@@ -211,6 +211,7 @@ function initCardTilt() {
  * Optimized: Uses translate3d for hardware acceleration and avoids layout thrashing
  */
 function initCustomCursor() {
+    if (document.body.classList.contains('studio-page')) return;
     // Check for reduced motion preference
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 

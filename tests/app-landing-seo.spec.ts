@@ -2,19 +2,6 @@ import { test, expect, type Page } from '@playwright/test';
 
 const appRoutes = [
   {
-    path: '/apps/frendlyst',
-    name: 'FrendLyst',
-    titlePattern: /FrendLyst Social Discovery Game App/i,
-    descriptionPattern: /profile worth.*clubs.*gifts/i,
-    category: 'SocialNetworkingApplication',
-    operatingSystem: 'Android, iOS',
-    featureList: ['Profile worth', 'Friend market', 'Gifts and wallet', 'Trust controls'],
-    storeLinks: [
-      'https://play.google.com/store/apps/details?id=com.nekocode.frendlyst',
-      'https://apps.apple.com/us/app/frendlyst-social-game/id6763485928'
-    ]
-  },
-  {
     path: '/apps/beanbop',
     name: 'BeanBop',
     titlePattern: /BeanBop Smart Caffeine Tracker App/i,
@@ -36,16 +23,6 @@ const appRoutes = [
     operatingSystem: 'Android',
     featureList: ['FSRS-5 scheduling', 'Offline-first library', 'OCR scanning', 'WiFi Direct sharing'],
     storeLinks: ['https://play.google.com/store/apps/details?id=com.nekocode.flipfocus']
-  },
-  {
-    path: '/apps/system-fitness',
-    name: 'SYSTEM Fitness',
-    titlePattern: /SYSTEM Fitness Quest Workout Tracker App/i,
-    descriptionPattern: /daily quests.*pose verification.*progression/i,
-    category: 'HealthApplication',
-    operatingSystem: 'Android, iOS',
-    featureList: ['Daily contracts', 'Pose verification', 'Class paths', 'Challenge loop'],
-    storeLinks: []
   }
 ];
 
@@ -167,37 +144,4 @@ test('apps catalog reads like a product catalog rather than a portfolio gallery'
   await expect(page.getByRole('heading', { name: 'NekoCode App Catalog' })).toBeVisible();
   await expect(page.getByText(/Compare the live and upcoming NekoCode apps/i)).toBeVisible();
   await expect(page.getByText(/story of problem-solving and craft/i)).toHaveCount(0);
-});
-
-test('FrendLyst phone mockup keeps the app logo centered instead of cropping square art', async ({ page }) => {
-  await page.goto('/apps/frendlyst');
-
-  const mockupIcon = page.locator('[data-testid="phone-mockup-icon"]');
-  const phoneScreen = page.locator('[data-testid="phone-mockup-screen"]');
-
-  await expect(phoneScreen).toBeVisible();
-  await expect(mockupIcon).toBeVisible();
-  await expect(mockupIcon).toHaveAttribute('src', /\/assets\/projects\/frendlyst\/icon\.png$/);
-  await expect(mockupIcon).toHaveCSS('object-fit', 'cover');
-
-  const geometry = await mockupIcon.evaluate((icon) => {
-    const iconRect = icon.getBoundingClientRect();
-    const screenRect = icon.closest('[data-testid="phone-mockup-screen"]')?.getBoundingClientRect();
-
-    return {
-      iconWidth: iconRect.width,
-      iconHeight: iconRect.height,
-      screenWidth: screenRect?.width ?? 0,
-      screenHeight: screenRect?.height ?? 0,
-      centerOffsetX: Math.abs((iconRect.left + iconRect.width / 2) - ((screenRect?.left ?? 0) + (screenRect?.width ?? 0) / 2)),
-      centerOffsetY: Math.abs((iconRect.top + iconRect.height / 2) - ((screenRect?.top ?? 0) + (screenRect?.height ?? 0) / 2))
-    };
-  });
-
-  expect(geometry.iconWidth).toBeGreaterThan(92);
-  expect(geometry.iconWidth).toBeLessThan(180);
-  expect(geometry.iconHeight).toBeCloseTo(geometry.iconWidth, 1);
-  expect(geometry.iconHeight).toBeLessThan(geometry.screenHeight * 0.34);
-  expect(geometry.centerOffsetX).toBeLessThan(8);
-  expect(geometry.centerOffsetY).toBeLessThan(70);
 });
