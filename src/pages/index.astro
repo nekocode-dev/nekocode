@@ -149,7 +149,7 @@ const statusLabels: Record<string, string> = { live: 'Live', in_progress: 'In de
     .app-platforms { gap: 12px; }
     .app-action { font-size: 12px; gap: 4px; }
   }
-  @media (max-width: 760px) {
+  @media (max-width: 860px) {
     .studio-container { width: calc(100% - 40px); }
     .studio-hero { display: flex; flex-direction: column; min-height: 0; }
     .hero-inner { order: -1; min-height: 0; }
@@ -164,16 +164,17 @@ const statusLabels: Record<string, string> = { live: 'Live', in_progress: 'In de
     .studio-values { gap: 14px 22px; margin-top: 28px; }
     .studio-values li { font-size: 12px; gap: 7px; }
     .studio-values :global(svg) { width: 22px; height: 22px; }
-    .hero-art { position: relative; height: auto; aspect-ratio: 1.55; width: 100%; z-index: 0; }
+    .hero-art { position: relative; height: auto; aspect-ratio: 1.9; width: 100%; z-index: 0; }
     .hero-art img { object-fit: cover; object-position: right; }
     .studio-hero::before { display: none; }
     .featured-section { padding-block: 26px 36px; }
     h2 { font-size: 29px; }
     .view-apps { font-size: 13px; }
-    .featured-grid { grid-template-columns: 1fr; gap: 14px; }
+    .featured-grid { gap: 14px; }
     .featured-card { gap: 20px; padding: 22px; }
   }
   @media (max-width: 560px) {
+    .hero-art { aspect-ratio: 1.55; }
     .hero-actions { gap: 10px; }
     .studio-button { padding-inline: 18px; font-size: 14px; gap: 10px; }
     .featured-grid { grid-template-columns: 1fr; }
@@ -186,6 +187,7 @@ const statusLabels: Record<string, string> = { live: 'Live', in_progress: 'In de
     .studio-values li { flex-direction: column; align-items: center; gap: 8px; font-size: 12px; white-space: normal; text-align: center; }
     .app-footer { gap: 12px; }
   }
+  @media (max-width: 760px) { .featured-grid { grid-template-columns: 1fr; } }
   @media (max-width: 360px) {
     .studio-button { width: 100%; }
     .app-footer { align-items: flex-start; flex-direction: column; gap: 14px; }
