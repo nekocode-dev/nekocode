@@ -21,7 +21,7 @@ const base = import.meta.env.BASE_URL;
           <h1 class="text-title-1">{title}</h1>
           <p class="info-subtitle">Chickubo: Cozy Chicken Farm by NekoCode</p>
         </div>
-        {updated && <p class="last-updated">Last updated: <time datetime="2026-10-08">October 8, 2026</time></p>}
+        {updated && <p class="last-updated">Last updated: <time datetime="2026-10-09">October 9, 2026</time></p>}
       </div>
       <div class="info-content glass-panel"><slot /></div>
       <nav class="page-links" aria-label="Chickubo help and policies">
@@ -31,7 +31,7 @@ const base = import.meta.env.BASE_URL;
       </nav>
     </Container>
   </Section>
-  <Footer slot="footer" />
+  <Footer slot="footer" showVisitorCounter={false} />
 </BaseLayout>
 
 <style>

@@ -2,45 +2,51 @@
 import ChickuboInfoLayout from '@/layouts/ChickuboInfoLayout.astro';
 ---
 
-<ChickuboInfoLayout title="Privacy Policy" description="How Chickubo handles local farm saves, settings, support messages, and optional purchase services." icon="🔒" updated>
+<ChickuboInfoLayout title="Privacy Policy" description="How Chickubo handles local farm saves, support messages, store services, and visits to these help pages." icon="🔒" updated>
   <div class="highlight-box">
-    <p>Chickubo's core farm progress and preferences are saved on your device. iCloud Save is not connected. Account sign-in, paid checkout, and RevenueCat are not enabled in the current build described by this policy.</p>
+    <p>Chickubo saves your farm and preferences on your device. The current version has no online account, iCloud synchronization, advertising SDK, or analytics SDK. Paid checkout and RevenueCat are not enabled.</p>
   </div>
   <section>
-    <h2>Who we are and what this policy covers</h2>
-    <p>NekoCode develops Chickubo: Cozy Chicken Farm. This policy explains the information handled by the game, optional purchase services when available, and messages you choose to send to support. Contact us at <a href="mailto:support@nekocode.dev?subject=Chickubo%20Privacy">support@nekocode.dev</a> about privacy.</p>
+    <h2>Who we are</h2>
+    <p>NekoCode develops Chickubo: Cozy Chicken Farm. This policy covers the game, information you send to Chickubo support, and the Chickubo help and policy pages on nekocode.dev. For privacy questions or requests, contact <a href="mailto:nekocode.dev@gmail.com?subject=Chickubo%20Privacy">nekocode.dev@gmail.com</a>.</p>
   </section>
   <section>
-    <h2>Farm data stored on your device</h2>
-    <p>The local save stores chickens and owned breeds, eggs, coins and gems, inventory, housing and upgrades, crop and workshop progress, feed and water supplies, production timers, and timestamps used to calculate offline progress. It also stores tutorial progress, pending game rewards, and preferences such as music and effects volume, Gentle Motion, and in-game notices.</p>
-    <p>The game uses this information to load your farm, continue production, remember settings, and prevent duplicate reward delivery. The current build does not upload your farm save to a NekoCode cloud service or synchronize it through iCloud.</p>
+    <h2>Information kept on your device</h2>
+    <p>Your local save contains your chickens, breeds, eggs, coins and gems, inventory, housing, upgrades, crops, workshop progress, feed and water, production timers, and offline-progress timestamps. It also contains tutorial progress, pending rewards, preferences, and purchase-delivery records where applicable.</p>
+    <p>Chickubo uses this information to load your farm, calculate production, remember settings, and prevent duplicate rewards. The game keeps local backup and recovery copies to protect saves. It does not upload your farm to a NekoCode server or synchronize it through iCloud.</p>
   </section>
   <section>
-    <h2>Optional accounts and purchases</h2>
-    <p>The current build does not enable account sign-in or paid checkout. If a later version makes these features available, purchases will be processed by the platform store. NekoCode does not receive your payment card number.</p>
-    <p>Purchase verification requires an account or customer identifier, product identifier, store transaction identifier, receipt or purchase token, purchase state, and reward or delivery records. These records are used to confirm payment, associate a purchase with the correct player, prevent duplicate or fraudulent claims, deliver virtual items, and reconcile refunds or unfinished purchases. The game also keeps local purchase and delivery records when purchases are enabled.</p>
-    <p>RevenueCat is planned for optional purchase management and is not active in the current build. When enabled, RevenueCat may process the account or app-user identifier, store receipts and transaction history, purchase and entitlement status, and technical information such as app and operating-system versions and network information. The exact active services and data disclosures will be updated here and in the store listing before those features are enabled.</p>
-    <p>Apple and RevenueCat process information under their own policies: <a href="https://www.apple.com/legal/privacy/" target="_blank" rel="noopener noreferrer">Apple Privacy Policy</a> and <a href="https://www.revenuecat.com/privacy/" target="_blank" rel="noopener noreferrer">RevenueCat Privacy Policy</a>. A purchase account does not itself provide cloud synchronization or recovery of your farm save.</p>
+    <h2>Store services and purchases</h2>
+    <p>Paid checkout and online account sign-in are not available in the current version. A platform store component, if installed, may contact Apple to retrieve product information. Apple handles its own store and account information under the <a href="https://www.apple.com/legal/privacy/" target="_blank" rel="noopener noreferrer">Apple Privacy Policy</a>. NekoCode does not receive your payment card number.</p>
+    <p>RevenueCat is not integrated in this version. Before enabling an online account, purchase verification, or RevenueCat, we will update this policy and the App Store privacy disclosures to describe the actual information collected, purposes, providers, retention, and deletion controls. Any RevenueCat processing of player purchase data would be on NekoCode's behalf, rather than an independent use of that data.</p>
+    <p>An online purchase service does not by itself provide cloud backup or synchronization of your farm.</p>
   </section>
   <section>
     <h2>Support messages</h2>
-    <p>If you contact us, your email address, message, and any screenshots, device information, or purchase references you choose to include are handled through our email service so we can investigate and reply. Do not send passwords, sign-in tokens, or payment card details. Support messages are separate from the local farm save.</p>
+    <p>If you email support, we receive your email address, message, and any device information, screenshots, or purchase references you choose to send. We use them to respond, investigate the issue, and handle related follow-up. Our email provider also processes the message to deliver and store correspondence. Do not send passwords, sign-in tokens, or payment card details.</p>
+    <p>Support correspondence is kept for as long as needed to handle the request, investigate recurring issues, and meet applicable obligations. You can request access, correction, or deletion at <a href="mailto:nekocode.dev@gmail.com?subject=Chickubo%20Privacy%20Request">nekocode.dev@gmail.com</a>. We may need information to verify the request and may retain information where required by law.</p>
   </section>
   <section>
-    <h2>Ads, analytics, and permissions</h2>
-    <p>The current game build does not include advertising or third-party analytics services. Core gameplay does not need your location, contacts, camera, or microphone. Opening a support or policy link uses your browser; the destination receives ordinary web-request information under its own policies. Any optional store, account, or verification service needs a network connection when enabled.</p>
+    <h2>These website pages</h2>
+    <p>Visiting the Chickubo help or policy pages sends ordinary web-request information, such as your IP address and browser information, to the website's hosting and delivery providers. The site is published through GitHub Pages; see <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener noreferrer">GitHub's Privacy Statement</a> for its processing and retention practices.</p>
+    <p>Earlier versions of these pages included a visitor counter that used browser storage and sent a hash derived from browser and device attributes to a Google Apps Script service. That counter has been removed from Chickubo pages. Previously stored browser keys may remain until you clear this site's browser storage; clearing website storage does not erase a farm saved in the game. Contact us about access or deletion of previously submitted visitor-counter information. Other NekoCode pages and external sites may have their own data practices.</p>
   </section>
   <section>
-    <h2>Keeping and deleting information</h2>
-    <p>Local save data remains within the game's device storage. Removing the app or clearing its data may remove the farm; any device or operating-system backups are controlled by your platform settings. NekoCode cannot remotely erase a local save or promise recovery after it is lost.</p>
-    <p>Contact <a href="mailto:support@nekocode.dev?subject=Chickubo%20Privacy%20Request">support@nekocode.dev</a> with a request about support information you have sent us. We may need information to identify your request. If online accounts or purchase services are enabled later, we will explain their retention and account-deletion controls before they are available. Store transaction records may need to be retained for purchase integrity or legal obligations; removing a local save does not delete records held by Apple or another service.</p>
+    <h2>Sharing, security, and permissions</h2>
+    <p>We do not sell your personal information or use the current game for advertising tracking. Information you send to support is handled by providers needed to deliver that service, or disclosed when required by law. Providers acting on our behalf must protect the information consistently with this policy. We use reasonable safeguards, but no storage or transmission method is guaranteed completely secure.</p>
+    <p>Core gameplay does not need access to your location, contacts, camera, or microphone. The Notifications preference controls in-game notices. Opening an external link uses your browser or another app, and the destination's privacy practices apply.</p>
+  </section>
+  <section>
+    <h2>Your choices and local deletion</h2>
+    <p>You control the game data on your device. Removing the app or clearing its app data may remove the save and local recovery copies. Device or operating-system backups are controlled by your platform settings. A gameplay reset is not a full deletion: purchase-delivery records, purchase-account binding, and once-only offer state may be retained to prevent duplicate rewards.</p>
+    <p>NekoCode cannot remotely erase or recover your local farm. Removing local data does not delete support messages or records held by Apple, your email provider, or website hosts. Contact us separately about information we hold. Depending on your location, you may also have rights to restrict or object to processing, obtain a copy of your information, or complain to a data-protection authority.</p>
   </section>
   <section>
     <h2>Children and family devices</h2>
-    <p>The current game has no online chat or public player profiles. Parents or guardians should supervise optional purchases and any information sent to support. If you believe a child has sent personal information to us that should be removed, contact support with enough detail for us to locate it.</p>
+    <p>The game has no online chat or public player profiles. Parents or guardians should supervise any information a child sends to support and any purchases if they become available. If you believe a child has sent personal information that should be removed, email us with enough detail to locate it.</p>
   </section>
   <section>
     <h2>Changes and contact</h2>
-    <p>We will update this notice when the game's data practices change and revise the date above. For questions or privacy requests, email <a href="mailto:support@nekocode.dev?subject=Chickubo%20Privacy">support@nekocode.dev</a>.</p>
+    <p>We will revise this policy and its date when the game's data practices change. Privacy questions and requests can be sent to <a href="mailto:nekocode.dev@gmail.com?subject=Chickubo%20Privacy">nekocode.dev@gmail.com</a>.</p>
   </section>
 </ChickuboInfoLayout>

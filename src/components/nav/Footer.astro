@@ -2,8 +2,8 @@
 import StudioIcon from '@/components/ui/StudioIcon.astro';
 import VisitorCounter from '@/components/VisitorCounter.astro';
 interface SocialLink { label: string; href: string; icon: 'github' | 'linkedin' | 'twitter' | 'email'; }
-interface Props { socials?: SocialLink[]; }
-const { socials = [
+interface Props { socials?: SocialLink[]; showVisitorCounter?: boolean; }
+const { showVisitorCounter = true, socials = [
   { label: 'GitHub', href: 'https://github.com/nekocode-dev', icon: 'github' },
   { label: 'Email', href: 'mailto:hello@nekocode.dev', icon: 'email' }
 ] } = Astro.props;
@@ -26,7 +26,7 @@ const links = [{ label: 'Home', href: '' }, { label: 'Apps', href: 'apps' }, { l
   </div>
   <div class="footer-bottom">
     <p>&copy; {currentYear} NekoCode. Built with craft and care.</p>
-    <VisitorCounter />
+    {showVisitorCounter && <VisitorCounter />}
   </div>
 </footer>
 <style>
