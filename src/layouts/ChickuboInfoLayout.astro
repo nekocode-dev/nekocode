@@ -10,7 +10,7 @@ const { title, description, icon = '🐔', updated = false } = Astro.props;
 const base = import.meta.env.BASE_URL;
 ---
 
-<BaseLayout title={`${title} | Chickubo`} description={description} image="/assets/projects/chickubo/icon.webp" imageAlt="Chickubo white hen on a cozy farm">
+<BaseLayout title={title === 'Chickubo' ? 'Chickubo: Cozy Chicken Farm' : `${title} | Chickubo`} description={description} image="/assets/projects/chickubo/icon.webp" imageAlt="Chickubo white hen on a cozy farm">
   <ChickuboNav slot="header" />
   <Section size="lg" class="chickubo-page">
     <Container size="narrow">
