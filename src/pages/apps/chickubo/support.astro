@@ -1,0 +1,51 @@
+---
+import ChickuboInfoLayout from '@/layouts/ChickuboInfoLayout.astro';
+---
+
+<ChickuboInfoLayout title="Support" description="Chickubo support for local saves, offline progress, chickens, crops, egg storage, and optional purchases." icon="💬">
+  <div class="highlight-box">
+    <p>Need help on the farm? Start with the answers below or email <a href="mailto:support@nekocode.dev?subject=Chickubo%20Support">support@nekocode.dev</a>.</p>
+  </div>
+  <section>
+    <h2>My chickens are not laying</h2>
+    <p>Check the feed and water in the hen's house. Each laying cycle uses supplies, and a full conveyor can stop new eggs from arriving. Collect waiting eggs, make room in egg storage, and refill the house. Different houses keep their own supplies.</p>
+  </section>
+  <section>
+    <h2>Where do collected eggs go?</h2>
+    <p>Collected eggs go into storage baskets for their egg type. Check storage capacity if you cannot collect more. Sell stored eggs when you need coins or room for the next batch.</p>
+  </section>
+  <section>
+    <h2>How do crops and feed work?</h2>
+    <p>Open Crop Farm, plant an available seed, and check the growth timer. Harvest a ready crop to add feed to your feed store, then use that feed for your hens. Make room in the feed store if harvesting is blocked. Each crop farm keeps its own planted crops and progress; offline time grows crops to readiness but does not harvest or replant them for you.</p>
+  </section>
+  <section>
+    <h2>What happens while I am away?</h2>
+    <p>Chickubo calculates up to eight hours of offline progress when you return. Hens still need feed, water, and room for eggs; crops and workshop water also follow their production limits. Time away does not supply an empty house or remove a full-storage limit. The welcome-back report shows the progress earned.</p>
+  </section>
+  <section>
+    <h2>Where is my farm saved?</h2>
+    <p>Your farm saves on this device. Settings shows the current save status. iCloud Save is not connected in this build, and the farm does not automatically transfer to another device. Uninstalling the game or clearing its app data may remove local progress.</p>
+    <p>If Settings reports a save problem, keep the game and its app data installed and contact support before resetting or reinstalling. We cannot promise recovery of a missing local save.</p>
+  </section>
+  <section>
+    <h2>Purchases and Restore</h2>
+    <p>Paid checkout is not enabled in the current build. Where optional purchases become available, the platform store handles payment and the game delivers rewards only after the purchase is verified and saved.</p>
+    <p>Use Restore in Settings when the platform store is available to check unfinished purchases. Coins, gems, and other consumable rewards that have already been delivered and used are not restored as a new purchase. If a reward is missing, keep your store receipt and email support with the product name, purchase date, and transaction or order reference. Never send payment card details or passwords.</p>
+    <p>For an Apple refund request, use <a href="https://reportaproblem.apple.com/" target="_blank" rel="noopener noreferrer">Apple's Report a Problem service</a>. Apple determines eligibility under its policies and applicable law.</p>
+  </section>
+  <section>
+    <h2>Sound, motion, and tutorials</h2>
+    <p>Settings lets you change Music and Sound FX separately and enable Gentle Motion. The Notifications setting controls in-game notices. Use Settings → Replay Tutorial to revisit care, storage, hatching, crops, Hydro, upgrades, Gacha, and other farm lessons.</p>
+  </section>
+  <section>
+    <h2>Report a problem</h2>
+    <p>Email <a href="mailto:support@nekocode.dev?subject=Chickubo%20Support">support@nekocode.dev</a> and include:</p>
+    <ul>
+      <li>Your device model, operating system version, and Chickubo version.</li>
+      <li>What happened, what you expected, and the steps that caused it.</li>
+      <li>The save status shown in Settings, if the issue involves progress.</li>
+      <li>A screenshot if it helps explain the issue, with personal information hidden.</li>
+    </ul>
+    <p>Send only what is needed to explain the problem. Do not include passwords, sign-in tokens, or payment card details.</p>
+  </section>
+</ChickuboInfoLayout>

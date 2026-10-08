@@ -56,6 +56,12 @@ const categories = [...new Set(apps.map((project: Project) => project.data.categ
           <span>App categories</span>
         </div>
       </div>
+      <aside class="app-support" aria-label="Chickubo support">
+        <p><strong>Chickubo: Cozy Chicken Farm</strong> — find game help and information about your local farm data.</p>
+        <a href="/apps/chickubo/support/">Support</a>
+        <a href="/apps/chickubo/privacy/">Privacy Policy</a>
+        <a href="/apps/chickubo/terms/">Terms</a>
+      </aside>
       
       <!-- Category Chips -->
       {categories.length > 0 && (
@@ -173,6 +179,10 @@ const categories = [...new Set(apps.map((project: Project) => project.data.categ
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--space-4);
   }
+
+  .app-support { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-5); margin-bottom: var(--space-8); padding: var(--space-5); border: 1px solid var(--color-border); border-radius: var(--radius-lg); }
+  .app-support p { flex: 1 1 100%; color: var(--color-text-secondary); }
+  .app-support a { display: inline-flex; align-items: center; min-height: 44px; font-size: var(--text-sm); text-decoration: underline; text-underline-offset: 4px; }
   
   .category-bar {
     display: flex;

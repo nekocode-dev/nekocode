@@ -1,0 +1,24 @@
+---
+import ChickuboInfoLayout from '@/layouts/ChickuboInfoLayout.astro';
+const base = import.meta.env.BASE_URL;
+---
+
+<ChickuboInfoLayout title="Chickubo" description="Official support, privacy information, and terms for Chickubo: Cozy Chicken Farm by NekoCode.">
+  <div class="highlight-box">
+    <p>Welcome to your cozy chicken farm. Care for hens, collect eggs, grow crops, and build your farm at your own pace.</p>
+  </div>
+  <section>
+    <h2>Help for your farm</h2>
+    <p>Find help with feed and water, egg storage, crops, offline progress, local saves, and purchases.</p>
+    <p><a href={`${base}apps/chickubo/support/`}>Visit Chickubo Support →</a></p>
+  </section>
+  <section>
+    <h2>Your game and your data</h2>
+    <p>Farm progress is saved on your device. iCloud Save is not connected in the current build.</p>
+    <p><a href={`${base}apps/chickubo/privacy/`}>Read the Privacy Policy</a> · <a href={`${base}apps/chickubo/terms/`}>Read the Terms of Service</a></p>
+  </section>
+  <section>
+    <h2>Contact NekoCode</h2>
+    <p>Email <a href="mailto:support@nekocode.dev?subject=Chickubo%20Support">support@nekocode.dev</a> for Chickubo help.</p>
+  </section>
+</ChickuboInfoLayout>
