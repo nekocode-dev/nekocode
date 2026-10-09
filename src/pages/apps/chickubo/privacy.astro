@@ -2,9 +2,9 @@
 import ChickuboInfoLayout from '@/layouts/ChickuboInfoLayout.astro';
 ---
 
-<ChickuboInfoLayout title="Privacy Policy" description="How Chickubo handles local farm saves, support messages, store services, and visits to these help pages." icon="🔒" updated>
+<ChickuboInfoLayout title="Privacy Policy" description="How Chickubo handles local farm saves, optional purchase accounts, verified purchases, deletion requests, and support." icon="🔒" updated>
   <div class="highlight-box">
-    <p>Chickubo saves your farm and preferences on your device. The current version has no online account, iCloud synchronization, advertising SDK, or analytics SDK. Paid checkout and RevenueCat are not enabled.</p>
+    <p>Chickubo saves your farm and preferences on your device. Optional purchase accounts and paid checkout are disabled in the current build. The sections below explain their data handling if they become available. A purchase account does not back up or synchronize your farm.</p>
   </div>
   <section>
     <h2>Who we are</h2>
@@ -14,12 +14,26 @@ import ChickuboInfoLayout from '@/layouts/ChickuboInfoLayout.astro';
     <h2>Information kept on your device</h2>
     <p>Your local save contains your chickens, breeds, eggs, coins and gems, inventory, housing, upgrades, crops, workshop progress, feed and water, production timers, and offline-progress timestamps. It also contains tutorial progress, pending rewards, preferences, and purchase-delivery records where applicable.</p>
     <p>Chickubo uses this information to load your farm, calculate production, remember settings, and prevent duplicate rewards. The game keeps local backup and recovery copies to protect saves. It does not upload your farm to a NekoCode server or synchronize it through iCloud.</p>
+    <p>If account services become available and you sign in, the app keeps sign-in credentials in its private device storage so you can stay signed in. Local purchase records may include your account identifier and whether a purchase was made in store testing or the live store. A hashed record of a deletion request can also remain on your device to keep purchases disabled if the request's confirmation is lost. Keep your device secure and never send sign-in codes or credentials to support.</p>
   </section>
   <section>
-    <h2>Store services and purchases</h2>
-    <p>Paid checkout and online account sign-in are not available in the current version. A platform store component, if installed, may contact Apple to retrieve product information. Apple handles its own store and account information under the <a href="https://www.apple.com/legal/privacy/" target="_blank" rel="noopener noreferrer">Apple Privacy Policy</a>. NekoCode does not receive your payment card number.</p>
-    <p>RevenueCat is not integrated in this version. Before enabling an online account, purchase verification, or RevenueCat, we will update this policy and the App Store privacy disclosures to describe the actual information collected, purposes, providers, retention, and deletion controls. Any RevenueCat processing of player purchase data would be on NekoCode's behalf, rather than an independent use of that data.</p>
-    <p>An online purchase service does not by itself provide cloud backup or synchronization of your farm.</p>
+    <h2>Optional verified-email purchase account</h2>
+    <p>You can play the core farm game without signing in. If account services are enabled, Settings → Purchases &amp; Account lets you choose to enter an email address and request a sign-in code. Supabase and the configured email-delivery provider process that address and code to create or authenticate your account. Supabase keeps an account identifier, email-verification information, and session records. We use your verified account identifier to connect purchases to their owner. The sign-in email is not used to subscribe you to marketing.</p>
+    <p>When the purchase service is available, signing in is required for paid purchases. It does not upload chickens, crops, farm progress, or spendable balances. Signing into the same account on another device does not restore or synchronize your local farm.</p>
+  </section>
+  <section>
+    <h2>Native store purchases and verification</h2>
+    <p>A native store component, if installed, may contact Apple for product information. Apple handles payment and its own store account information under the <a href="https://www.apple.com/legal/privacy/" target="_blank" rel="noopener noreferrer">Apple Privacy Policy</a>. NekoCode does not receive your payment card number.</p>
+    <p>When the purchase service is enabled and you make or recover a purchase, the app sends your account identifier, the purchased item and quantity, transaction reference, reward-delivery details, and Apple app receipt to NekoCode's verification service hosted on Supabase. An app receipt can contain purchase history beyond the single item being checked. The service sends the receipt and account identifier to RevenueCat to check that the purchase belongs to this app and account, and check refunds or revoked purchases. Your account identifier, rather than your email address, identifies you to RevenueCat.</p>
+    <p>We use this information to verify and administer purchases, keep delivery records, prevent duplicate or unauthorized rewards, and investigate purchase issues. RevenueCat also provides purchase reporting. Our purchase records include account and transaction identifiers, the item, whether it was bought in testing or the live store, purchase or refund status, delivered rewards, and relevant dates. Limited offers may also have eligibility and reservation records. We send the Apple receipt to RevenueCat for processing but do not keep a copy in our purchase database.</p>
+    <p>Supabase provides authentication, hosting, and database services; RevenueCat provides purchase verification and administration on NekoCode's behalf. Providers may also process technical request information needed to operate and secure their services. These services do not provide a cloud farm backup, recovery of spent currency, or a synchronized wallet. Account sign-in and paid checkout remain disabled in the current build.</p>
+  </section>
+  <section>
+    <h2>Account retention and deletion</h2>
+    <p>When accounts are available, we keep account and purchase records as needed to provide authentication, verify purchases and their delivery, prevent misuse, address disputes, and meet applicable obligations. In Settings → Purchases &amp; Account, a signed-in player can confirm and select Delete account. This is separate from signing out, resetting a farm, or uninstalling the app.</p>
+    <p>Once the service accepts a deletion request, it blocks purchases for that account and the app clears the saved sign-in credential. We remove direct account and transaction identifiers and delivery details from our purchase records, request removal of Supabase authentication and RevenueCat customer data, and retry if a provider has not completed removal. We temporarily keep the account identifier needed to finish those requests while provider removal is pending. A message saying deletion was requested does not mean all provider copies have already been erased.</p>
+    <p>Minimal security records may remain after account deletion for as long as needed to prevent the same purchase being redeemed again and to prevent misuse. These include hashed account and transaction identifiers, the purchased item, whether it was bought in testing or the live store, and refund or revocation status. These records are pseudonymized, rather than anonymous, and are used for purchase protection.</p>
+    <p>Account deletion does not erase the local farm or local records linking purchases to their original account, cancel an Apple transaction, or automatically request a refund. It disables purchase access and may prevent an unfinished purchase from being delivered; keep your store receipt and use <a href="https://reportaproblem.apple.com/" target="_blank" rel="noopener noreferrer">Apple's Report a Problem service</a> for an Apple refund request. Apple and other providers may retain information under their own legal obligations and backup practices. If you need help with a deletion request or information we hold, email <a href="mailto:nekocode.dev@gmail.com?subject=Chickubo%20Privacy%20Request">nekocode.dev@gmail.com</a>.</p>
   </section>
   <section>
     <h2>Support messages</h2>
@@ -33,17 +47,18 @@ import ChickuboInfoLayout from '@/layouts/ChickuboInfoLayout.astro';
   </section>
   <section>
     <h2>Sharing, security, and permissions</h2>
-    <p>We do not sell your personal information or use the current game for advertising tracking. Information you send to support is handled by providers needed to deliver that service, or disclosed when required by law. Providers acting on our behalf must protect the information consistently with this policy. We use reasonable safeguards, but no storage or transmission method is guaranteed completely secure.</p>
+    <p>We do not sell your personal information or use it for advertising tracking. The current game has no advertising SDK or gameplay-analytics SDK. Information is shared with providers needed for the optional account, purchase, support, and hosting services described here, or when required by law. Providers acting on our behalf must provide protection consistent with this policy and applicable requirements. Provider information is available in the <a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer">Supabase Privacy Policy</a> and <a href="https://www.revenuecat.com/privacy/" target="_blank" rel="noopener noreferrer">RevenueCat Privacy Policy</a>; those notices do not replace NekoCode's responsibility for information processed on our behalf.</p>
+    <p>Service providers may process information in countries other than yours. We use reasonable safeguards, but no storage or transmission method is guaranteed completely secure.</p>
     <p>Core gameplay does not need access to your location, contacts, camera, or microphone. The Notifications preference controls in-game notices. Opening an external link uses your browser or another app, and the destination's privacy practices apply.</p>
   </section>
   <section>
     <h2>Your choices and local deletion</h2>
-    <p>You control the game data on your device. Removing the app or clearing its app data may remove the save and local recovery copies. Device or operating-system backups are controlled by your platform settings. A gameplay reset is not a full deletion: purchase-delivery records, purchase-account binding, and once-only offer state may be retained to prevent duplicate rewards.</p>
-    <p>NekoCode cannot remotely erase or recover your local farm. Removing local data does not delete support messages or records held by Apple, your email provider, or website hosts. Contact us separately about information we hold. Depending on your location, you may also have rights to restrict or object to processing, obtain a copy of your information, or complain to a data-protection authority.</p>
+    <p>You control the game data on your device. Removing the app or clearing its app data may remove the save and local recovery copies. Device or operating-system backups are controlled by your platform settings. A gameplay reset is not a full deletion: delivery records, the original account used for purchases, and whether a one-time offer was claimed may be retained to prevent duplicate rewards.</p>
+    <p>NekoCode cannot remotely erase or recover your local farm. Removing local data does not delete an online purchase account, support messages, or records held by Apple, your email provider, or website hosts. Use the account-deletion control for an online purchase account when available, and contact us separately about other information we hold. Depending on your location, you may also have rights to restrict or object to processing, obtain a copy of your information, or complain to a data-protection authority.</p>
   </section>
   <section>
     <h2>Children and family devices</h2>
-    <p>The game has no online chat or public player profiles. Parents or guardians should supervise any information a child sends to support and any purchases if they become available. If you believe a child has sent personal information that should be removed, email us with enough detail to locate it.</p>
+    <p>The game has no online chat or public player profiles. Parents or guardians should supervise any optional account sign-in, information a child sends to support, and purchases if they become available. If you believe a child has sent personal information that should be removed, email us with enough detail to locate it.</p>
   </section>
   <section>
     <h2>Changes and contact</h2>

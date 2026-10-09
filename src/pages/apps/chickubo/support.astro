@@ -1,5 +1,6 @@
 ---
 import ChickuboInfoLayout from '@/layouts/ChickuboInfoLayout.astro';
+const base = import.meta.env.BASE_URL;
 ---
 
 <ChickuboInfoLayout title="Support" description="Chickubo support for local saves, offline progress, chickens, crops, egg storage, and optional purchases." icon="💬">
@@ -28,9 +29,20 @@ import ChickuboInfoLayout from '@/layouts/ChickuboInfoLayout.astro';
     <p>If Settings reports a save problem, keep the game and its app data installed and contact support before resetting or reinstalling. We cannot promise recovery of a missing local save.</p>
   </section>
   <section>
+    <h2>Purchase account and email codes</h2>
+    <p>Optional purchase accounts and paid checkout are disabled in the current build. When available, Settings → Purchases &amp; Account lets you enter an email address, select Send sign-in code, and enter the code from your email to sign in. The account controls only appear when account services are available. You can play your farm without an account.</p>
+    <p>Use the original purchase email for a farm that already has purchase records. An account verifies purchase ownership; it does not back up or synchronize chickens, crops, progress, or spendable currency. Signing in on a different device does not restore a farm. If a code expires or does not arrive, check your inbox and spam folder and request a new code. Never send the code or session credentials to support.</p>
+  </section>
+  <section>
+    <h2>Delete a purchase account</h2>
+    <p>When account services are available, sign in and open Settings → Purchases &amp; Account. Read and select the confirmation checkbox, then select Delete account. Signing out alone does not delete an account.</p>
+    <p>When the service accepts the request, purchases are disabled for the account and the saved sign-in credential is removed from this device. Supabase and RevenueCat data removal can remain pending while the service retries provider requests. The requested message is not a confirmation that every provider copy has already been erased. Request deletion directly in the app. Email support if the request fails or you need its status.</p>
+    <p>Your local farm, delivery history, and records linking purchases to their original account may remain on the device. Deletion does not automatically refund or cancel an Apple transaction and may prevent unfinished purchases from being delivered. Limited security records may also be retained to prevent duplicate redemption; see the <a href={`${base}apps/chickubo/privacy/`}>Privacy Policy</a> for more about retained records and your choices. Before removing local app data, consider any unfinished purchases and keep the store receipt.</p>
+  </section>
+  <section>
     <h2>Purchases and Restore</h2>
     <p>Paid checkout is not enabled in the current build. Where optional purchases become available, the platform store handles payment and the game delivers rewards only after the purchase is verified and saved.</p>
-    <p>Use Restore in Settings when the platform store is available to check unfinished purchases. Coins, gems, and other consumable rewards that have already been delivered and used are not restored as a new purchase. If a reward is missing, keep your store receipt and email support with the product name, purchase date, and transaction or order reference. Never send payment card details or passwords.</p>
+    <p>Use Restore in Settings when the platform store and purchase-account services are available to check unfinished purchases. Use the original verified purchase account. Coins, gems, and other consumable rewards that have already been delivered and used are not restored as a new purchase or as a cloud wallet balance. If a reward is missing, keep your store receipt and email support with the product name, purchase date, and transaction or order reference. Never send payment card details, passwords, sign-in codes, or session credentials.</p>
     <p>For an Apple refund request, use <a href="https://reportaproblem.apple.com/" target="_blank" rel="noopener noreferrer">Apple's Report a Problem service</a>. Apple determines eligibility under its policies and applicable law.</p>
   </section>
   <section>
