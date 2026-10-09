@@ -1,63 +1,16 @@
 ---
 import ChickuboInfoLayout from '@/layouts/ChickuboInfoLayout.astro';
-const base = import.meta.env.BASE_URL;
 ---
 
-<ChickuboInfoLayout title="Support" description="Chickubo support for local saves, offline progress, chickens, crops, egg storage, and optional purchases." icon="💬">
-  <div class="highlight-box">
-    <p>Need help on the farm? Start with the answers below or email <a href="mailto:nekocode.dev@gmail.com?subject=Chickubo%20Support">nekocode.dev@gmail.com</a>.</p>
-  </div>
-  <section>
-    <h2>My chickens are not laying</h2>
-    <p>Check the feed and water in the hen's house. Each laying cycle uses supplies, and a full conveyor can stop new eggs from arriving. Collect waiting eggs, make room in egg storage, and refill the house. Different houses keep their own supplies.</p>
-  </section>
-  <section>
-    <h2>Where do collected eggs go?</h2>
-    <p>Collected eggs go into storage baskets for their egg type. Check storage capacity if you cannot collect more. Sell stored eggs when you need coins or room for the next batch.</p>
-  </section>
-  <section>
-    <h2>How do crops and feed work?</h2>
-    <p>Open Crop Farm, plant an available seed, and check the growth timer. Harvest a ready crop to add feed to your feed store, then use that feed for your hens. Make room in the feed store if harvesting is blocked. Each crop farm keeps its own planted crops and progress; offline time grows crops to readiness but does not harvest or replant them for you.</p>
-  </section>
-  <section>
-    <h2>What happens while I am away?</h2>
-    <p>Chickubo calculates up to eight hours of offline progress when you return. Hens still need feed, water, and room for eggs; crops and workshop water also follow their production limits. Time away does not supply an empty house or remove a full-storage limit. The welcome-back report shows the progress earned.</p>
-  </section>
-  <section>
-    <h2>Where is my farm saved?</h2>
-    <p>Your farm saves on this device, with local backup and recovery copies. Settings shows the current save status. Supported, configured iOS builds can sync through your current Apple/iCloud account. Native integration is undergoing validation; Settings → iCloud Save shows whether it is available and provides sync, pause, conflict, and deletion controls. Check the sync status before switching devices, use the same iCloud account, and keep internet access and iCloud storage available. A purchase account does not control this save ownership. Uninstalling the game or clearing its app data may remove local progress. A gameplay reset may keep purchase-delivery records and one-time offer state; it is not a full data-deletion control.</p>
-    <p>If Settings reports a save problem, keep the game and its app data installed and contact support before resetting or reinstalling. We cannot promise recovery of a missing local save.</p>
-  </section>
-  <section>
-    <h2>Purchase account and email codes</h2>
-    <p>Optional purchase accounts and paid checkout are disabled in the current build. When available, Settings → Purchases &amp; Account lets you enter an email address, select Send sign-in code, and enter the code from your email to sign in. The account controls only appear when account services are available. You can play your farm without an account.</p>
-    <p>Use the original purchase email for a farm that already has purchase records. An account verifies purchase ownership; it does not back up or synchronize chickens, crops, progress, or spendable currency. Signing in on a different device does not restore a farm. If a code expires or does not arrive, check your inbox and spam folder and request a new code. Never send the code or session credentials to support.</p>
-  </section>
-  <section>
-    <h2>Delete a purchase account</h2>
-    <p>When account services are available, sign in and open Settings → Purchases &amp; Account. Read and select the confirmation checkbox, then select Delete account. Signing out alone does not delete an account.</p>
-    <p>When the service accepts the request, purchases are disabled for the account and the saved sign-in credential is removed from this device. Supabase and RevenueCat data removal can remain pending while the service retries provider requests. The requested message is not a confirmation that every provider copy has already been erased. Request deletion directly in the app. Email support if the request fails or you need its status.</p>
-    <p>Your local farm, delivery history, and records linking purchases to their original account may remain on the device. Deletion does not automatically refund or cancel an Apple transaction and may prevent unfinished purchases from being delivered. Limited security records may also be retained to prevent duplicate redemption; see the <a href={`${base}apps/chickubo/privacy/`}>Privacy Policy</a> for more about retained records and your choices. Before removing local app data, consider any unfinished purchases and keep the store receipt.</p>
-  </section>
-  <section>
-    <h2>Purchases and Restore</h2>
-    <p>Paid checkout is not enabled in the current build. Where optional purchases become available, the platform store handles payment and the game delivers rewards only after the purchase is verified and saved.</p>
-    <p>Use Restore in Settings when the platform store and purchase-account services are available to check unfinished purchases. Use the original verified purchase account. Coins, gems, and other consumable rewards that have already been delivered and used are not restored as a new purchase or as a cloud wallet balance. If a reward is missing, keep your store receipt and email support with the product name, purchase date, and transaction or order reference. Never send payment card details, passwords, sign-in codes, or session credentials.</p>
-    <p>For an Apple refund request, use <a href="https://reportaproblem.apple.com/" target="_blank" rel="noopener noreferrer">Apple's Report a Problem service</a>. Apple determines eligibility under its policies and applicable law.</p>
-  </section>
-  <section>
-    <h2>Sound, motion, and tutorials</h2>
-    <p>Settings lets you change Music and Sound FX separately and enable Gentle Motion. The Notifications setting controls in-game notices. Use Settings → Replay Tutorial to revisit care, storage, hatching, crops, Hydro, upgrades, Gacha, and other farm lessons.</p>
-  </section>
-  <section>
-    <h2>Report a problem</h2>
-    <p>Email <a href="mailto:nekocode.dev@gmail.com?subject=Chickubo%20Support">nekocode.dev@gmail.com</a> and include:</p>
-    <ul>
-      <li>Your device model, operating system version, and Chickubo version.</li>
-      <li>What happened, what you expected, and the steps that caused it.</li>
-      <li>The save status shown in Settings, if the issue involves progress.</li>
-      <li>A screenshot if it helps explain the issue, with personal information hidden.</li>
-    </ul>
-    <p>Send only what is needed to explain the problem. Do not include passwords, sign-in tokens, or payment card details.</p>
-  </section>
+<ChickuboInfoLayout title="Support" description="Chickubo support: offline gameplay, Apple/iCloud saves, purchases, and support without email signup." icon="🐔" updated>
+  <div class="highlight-box"><p>Need a little help on the farm? Chickubo works offline without email signup. Find answers below or contact nekocode.dev@gmail.com.</p></div>
+  <section><h2>Chickens Are Not Laying</h2><p>Check that the chicken house has feed and water, and that there is room on its conveyor. Collect waiting eggs and refill supplies to keep your hens laying.</p></section>
+  <section><h2>Save and Progress</h2><p>Your farm saves on this device. On supported iOS builds, Settings → iCloud Save manages automatic sync with your current Apple/iCloud account, pause, conflict choices, and cloud deletion. Check its status before changing devices. Sync needs internet and available iCloud storage. Keep the game installed and contact support before resetting or reinstalling if you have a save problem.</p></section>
+  <section><h2>No Email Account Needed</h2><p>Use the Apple/iCloud account already on your device for supported cloud saves. App Store payments use the account selected for Media &amp; Purchases, which can differ from your iCloud account. Chickubo does not ask for your Apple password or require an email code.</p></section>
+  <section><h2>Purchases and Restore</h2><p>Paid checkout remains disabled while native integration is being validated. When available, Restore checks unfinished purchases in the App Store. Already delivered or spent consumables are not granted again. Their remaining balances and delivery records are part of your saved farm. If a payment belongs to a different farm, load that farm through iCloud or contact support with a redacted receipt.</p></section>
+  <section><h2>Limited Offer</h2><p>The Farm Starter offer gives a guaranteed Rare Barred Rock chicken, 10,000 coins, and 20 feed. It appears after 25 eggs are laid and you complete a sale and feeding. It lasts 24 hours and can be claimed once per saved farm. An approved payment can finish delivery after the countdown expires.</p></section>
+  <section><h2>Privacy and Refunds</h2><p>Delete iCloud save in the save screen affects the synced snapshot and pauses this device; local files and store records are separate. Pause other devices first. For NekoCode-held purchase-reporting or support records, email nekocode.dev@gmail.com. Apple refund requests use reportaproblem.apple.com.</p></section>
+  <section><h2>Sound and Gentle Motion</h2><p>Open Settings to adjust Music and Sound FX separately, mute effects, or turn on Gentle Motion. Notifications controls in-game notices.</p></section>
+  <section><h2>Report a Problem</h2><p>Email nekocode.dev@gmail.com with your device model, operating-system and game versions, what happened, and the steps that caused it. A redacted screenshot or receipt reference can help. Never include passwords or payment card details.</p></section>
+  <section><h2>Contact NekoCode</h2><p><a href="mailto:nekocode.dev@gmail.com?subject=Chickubo">nekocode.dev@gmail.com</a></p></section>
 </ChickuboInfoLayout>
